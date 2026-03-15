@@ -50,3 +50,5 @@ next-env.d.ts
 
 # drizzle
 drizzle/meta/_journal.json
+
+.open-next

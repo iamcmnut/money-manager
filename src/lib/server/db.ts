@@ -1,3 +1,4 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { drizzle } from 'drizzle-orm/d1';
 import * as schema from '../db/schema';
 
@@ -16,13 +17,9 @@ export function createDatabase(d1: D1Database): Database {
  */
 export async function getDatabase(): Promise<Database | null> {
   try {
-    const { getRequestContext } = await import('@cloudflare/next-on-pages');
-    const ctx = getRequestContext();
-    console.log('[DB] Request context:', !!ctx);
-    console.log('[DB] Env:', !!ctx?.env);
-    console.log('[DB] DB binding:', !!ctx?.env?.DB);
-    if (ctx?.env?.DB) {
-      return createDatabase(ctx.env.DB);
+    const { env } = await getCloudflareContext();
+    if (env?.DB) {
+      return createDatabase(env.DB as unknown as D1Database);
     }
   } catch (error) {
     console.log('[DB] Error getting context:', error);

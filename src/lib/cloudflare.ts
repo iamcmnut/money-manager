@@ -1,3 +1,4 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { drizzle } from 'drizzle-orm/d1';
 import * as schema from './db/schema';
 
@@ -7,34 +8,15 @@ export interface CloudflareEnv {
   FEATURE_FLAGS: KVNamespace;
 }
 
-// Global cache for bindings (used in edge runtime)
-let cachedEnv: CloudflareEnv | null = null;
-
 /**
  * Get Cloudflare environment bindings
  * Works in both Cloudflare Workers/Pages and local development
  */
 export async function getCloudflareEnv(): Promise<CloudflareEnv | null> {
-  if (cachedEnv) {
-    return cachedEnv;
-  }
-
-  // Try to get from global context (Cloudflare Pages)
-  if (typeof process !== 'undefined' && process.env) {
-    const env = (process as unknown as { env: CloudflareEnv }).env;
-    if (env?.DB && env?.FEATURE_FLAGS) {
-      cachedEnv = env;
-      return cachedEnv;
-    }
-  }
-
-  // Try getRequestContext from @cloudflare/next-on-pages
   try {
-    const cfModule = await import('@cloudflare/next-on-pages');
-    const ctx = cfModule.getRequestContext();
-    if (ctx?.env) {
-      cachedEnv = ctx.env as CloudflareEnv;
-      return cachedEnv;
+    const { env } = await getCloudflareContext();
+    if (env?.DB) {
+      return env as unknown as CloudflareEnv;
     }
   } catch {
     // Not running in Cloudflare environment
