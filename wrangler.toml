@@ -1,0 +1,18 @@
+name = "manager-money"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "manager-money-db"
+database_id = "local-dev-id" # Replace with actual ID for production
+migrations_dir = "drizzle"
+
+# KV Namespace for Feature Flags
+[[kv_namespaces]]
+binding = "FEATURE_FLAGS"
+id = "local-kv-id" # Replace with actual ID for production
+
+[vars]
+ENVIRONMENT = "development"

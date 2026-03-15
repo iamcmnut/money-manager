@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /boss-office/
+Disallow: /api/
+
+Sitemap: https://manager.money/sitemap.xml

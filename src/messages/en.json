@@ -1,0 +1,133 @@
+{
+  "metadata": {
+    "title": "Manager.money - Personal Finance",
+    "description": "A modular personal finance web application for managing EV costs, living expenses, and savings."
+  },
+  "nav": {
+    "home": "Home",
+    "ev": "EV",
+    "livingCost": "Living Cost",
+    "savings": "Savings"
+  },
+  "home": {
+    "title": "Manage Your Money",
+    "subtitle": "A modular personal finance application to help you make better financial decisions.",
+    "getStarted": "Get started"
+  },
+  "modules": {
+    "ev": {
+      "title": "EV Calculator",
+      "description": "Calculate and compare electric vehicle charging costs",
+      "pageDescription": "Calculate and compare electric vehicle charging costs. Plan your EV expenses efficiently.",
+      "comingSoon": "Coming Soon",
+      "comingSoonDescription": "This module is under development. Check back soon for EV cost calculations.",
+      "featuresPlanned": "Features planned:",
+      "features": {
+        "homeCharging": "Home charging cost calculator",
+        "publicCharging": "Public charging comparison",
+        "monthlyExpense": "Monthly expense tracking",
+        "costPerKm": "Cost per kilometer analysis"
+      }
+    },
+    "livingCost": {
+      "title": "Living Cost",
+      "description": "Track and manage your monthly living expenses",
+      "pageDescription": "Track and manage your monthly living expenses. Get insights into your spending habits.",
+      "comingSoon": "Coming Soon",
+      "comingSoonDescription": "This module is under development. Check back soon for expense tracking features.",
+      "featuresPlanned": "Features planned:",
+      "features": {
+        "categorization": "Monthly expense categorization",
+        "budgetPlanning": "Budget planning tools",
+        "spendingTrends": "Spending trend analysis",
+        "billReminders": "Bill reminders"
+      }
+    },
+    "savings": {
+      "title": "Savings",
+      "description": "Plan and track your savings goals",
+      "pageDescription": "Plan and track your savings goals. Build your financial future with smart saving strategies.",
+      "comingSoon": "Coming Soon",
+      "comingSoonDescription": "This module is under development. Check back soon for savings tracking features.",
+      "featuresPlanned": "Features planned:",
+      "features": {
+        "goalSetting": "Savings goal setting",
+        "progressTracking": "Progress tracking",
+        "interestCalculations": "Interest calculations",
+        "milestones": "Milestone celebrations"
+      }
+    }
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signInTitle": "Sign In",
+    "signInDescription": "Sign in to access your account",
+    "signInDisabled": "Sign-in is currently disabled. Please contact an administrator.",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "createAccount": "Create Account",
+    "pleaseWait": "Please wait...",
+    "noAccount": "Don't have an account? Register",
+    "hasAccount": "Already have an account? Sign in",
+    "continueWithGoogle": "Continue with Google",
+    "or": "Or",
+    "invalidCredentials": "Invalid email or password",
+    "registrationFailed": "Registration failed",
+    "accountCreated": "Account created. Please sign in.",
+    "errorOccurred": "An error occurred. Please try again.",
+    "error": {
+      "title": "Authentication Error",
+      "description": "Unable to sign in at this time",
+      "message": "Sign-in is currently disabled or an error occurred. Please try again later or contact support if the problem persists.",
+      "returnHome": "Return Home"
+    }
+  },
+  "user": {
+    "adminPanel": "Admin Panel"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "description": "Manage users and application settings",
+    "users": "Users",
+    "usersDescription": "View and manage registered users",
+    "featureFlags": "Feature Flags",
+    "featureFlagsDescription": "Enable or disable application modules",
+    "sessionInfo": "Session Info",
+    "sessionInfoDescription": "Your current session details",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "na": "N/A",
+    "loadingUsers": "Loading users...",
+    "loadingFlags": "Loading flags...",
+    "failedToLoadUsers": "Failed to fetch users",
+    "failedToLoadFlags": "Failed to load flags",
+    "noUsers": "No users found",
+    "unknown": "Unknown",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "flagsSavedKV": "Flags saved to KV storage",
+    "flagsUpdatedLocal": "Flags updated (local only)",
+    "failedToSave": "Failed to save",
+    "failedToSaveFlags": "Failed to save flags",
+    "flags": {
+      "module_ev": "EV Calculator Module",
+      "module_living_cost": "Living Cost Module",
+      "module_savings": "Savings Module",
+      "auth_google": "Google Sign-in",
+      "auth_credentials": "Email/Password Sign-in"
+    }
+  },
+  "footer": {
+    "builtWith": "Built with Next.js. Deployed on Cloudflare."
+  },
+  "language": {
+    "en": "English",
+    "th": "ภาษาไทย",
+    "switchLanguage": "Switch language"
+  }
+}
