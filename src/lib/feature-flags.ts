@@ -29,9 +29,31 @@ function parseEnvBoolean(value: string | undefined, defaultValue: boolean): bool
   return value.toLowerCase() === 'true' || value === '1';
 }
 
+function getCloudflareEnvFromGlobal(): Record<string, unknown> | undefined {
+  const ctx = (globalThis as Record<symbol, unknown>)[Symbol.for('__cloudflare-context__')] as
+    | { env?: Record<string, unknown> }
+    | undefined;
+  return ctx?.env;
+}
+
+function getEnvValue(envVar: string): string | undefined {
+  // Try Cloudflare context first (works in Workers runtime)
+  try {
+    const cfEnv = getCloudflareEnvFromGlobal();
+    if (cfEnv?.[envVar] !== undefined) {
+      return String(cfEnv[envVar]);
+    }
+  } catch {
+    // Not in Cloudflare environment
+  }
+
+  // Fallback to process.env (works in Node.js / local dev)
+  return process.env[envVar];
+}
+
 export function getFeatureFlag(flag: FeatureFlag): boolean {
   const envVar = FLAG_ENV_MAP[flag];
-  const envValue = process.env[envVar];
+  const envValue = getEnvValue(envVar);
   return parseEnvBoolean(envValue, DEFAULT_FLAGS[flag]);
 }
 

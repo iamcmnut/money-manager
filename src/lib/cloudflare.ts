@@ -1,4 +1,3 @@
-import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { drizzle } from 'drizzle-orm/d1';
 import * as schema from './db/schema';
 
@@ -8,15 +7,21 @@ export interface CloudflareEnv {
   FEATURE_FLAGS: KVNamespace;
 }
 
+function getCloudflareContextFromGlobal(): { env?: Record<string, unknown> } | undefined {
+  return (globalThis as Record<symbol, unknown>)[Symbol.for('__cloudflare-context__')] as
+    | { env?: Record<string, unknown> }
+    | undefined;
+}
+
 /**
  * Get Cloudflare environment bindings
  * Works in both Cloudflare Workers/Pages and local development
  */
-export async function getCloudflareEnv(): Promise<CloudflareEnv | null> {
+export function getCloudflareEnv(): CloudflareEnv | null {
   try {
-    const { env } = await getCloudflareContext();
-    if (env?.DB) {
-      return env as unknown as CloudflareEnv;
+    const ctx = getCloudflareContextFromGlobal();
+    if (ctx?.env?.DB) {
+      return ctx.env as unknown as CloudflareEnv;
     }
   } catch {
     // Not running in Cloudflare environment
@@ -28,8 +33,8 @@ export async function getCloudflareEnv(): Promise<CloudflareEnv | null> {
 /**
  * Get D1 database instance
  */
-export async function getDb() {
-  const env = await getCloudflareEnv();
+export function getDb() {
+  const env = getCloudflareEnv();
   if (!env?.DB) {
     return null;
   }
@@ -39,14 +44,14 @@ export async function getDb() {
 /**
  * Get KV namespace for feature flags
  */
-export async function getKV(): Promise<KVNamespace | null> {
-  const env = await getCloudflareEnv();
+export function getKV(): KVNamespace | null {
+  const env = getCloudflareEnv();
   return env?.FEATURE_FLAGS ?? null;
 }
 
 /**
  * Check if running in Cloudflare environment
  */
-export async function isCloudflareEnv(): Promise<boolean> {
-  return (await getCloudflareEnv()) !== null;
+export function isCloudflareEnv(): boolean {
+  return getCloudflareEnv() !== null;
 }

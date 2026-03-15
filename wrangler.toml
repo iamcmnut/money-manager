@@ -21,3 +21,22 @@ id = "ad6ecec556d74f7484a94f188bf4a8eb"
 
 [vars]
 ENVIRONMENT = "production"
+FEATURE_AUTH_CREDENTIALS = "true"
+FEATURE_MODULE_EV = "true"
+FEATURE_MODULE_LIVING_COST = "true"
+FEATURE_MODULE_SAVINGS = "true"
+
+[observability]
+enabled = false
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = true
+persist = true
+head_sampling_rate = 1

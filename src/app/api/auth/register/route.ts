@@ -14,7 +14,7 @@ interface RegisterBody {
 }
 
 export async function POST(request: Request) {
-  const credentialsEnabled = getFeatureFlag('auth_credentials');
+  const credentialsEnabled = await getFeatureFlag('auth_credentials');
 
   if (!credentialsEnabled) {
     return NextResponse.json(

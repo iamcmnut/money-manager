@@ -11,7 +11,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const flags = getAllFeatureFlags();
+  const flags = await getAllFeatureFlags();
 
   return NextResponse.json(flags);
 }

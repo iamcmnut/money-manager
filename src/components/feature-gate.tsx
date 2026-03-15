@@ -7,8 +7,8 @@ interface FeatureGateProps {
   fallback?: React.ReactNode;
 }
 
-export function FeatureGate({ flag, children, fallback = null }: FeatureGateProps) {
-  const isEnabled = getFeatureFlag(flag);
+export async function FeatureGate({ flag, children, fallback = null }: FeatureGateProps) {
+  const isEnabled = await getFeatureFlag(flag);
 
   if (!isEnabled) {
     return <>{fallback}</>;
