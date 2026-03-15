@@ -7,6 +7,7 @@ import { ThemeToggle } from './theme-toggle';
 import { MobileNav } from './mobile-nav';
 import { LanguageSwitcher } from './language-switcher';
 import { AuthButtons } from '@/components/auth/auth-buttons';
+import { Wallet } from 'lucide-react';
 
 type NavLink = {
   href: '/' | '/ev' | '/living-cost' | '/savings';
@@ -25,20 +26,27 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold">Manager.money</span>
+          <Link href="/" className="mr-8 flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80">
+              <Wallet className="h-4 w-4 text-primary-foreground" />
+            </div>
+            <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-lg font-bold text-transparent">
+              Manager.money
+            </span>
           </Link>
-          <nav className="flex items-center gap-4 text-sm lg:gap-6">
+          <nav className="flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'transition-colors hover:text-foreground/80',
-                  pathname === link.href ? 'text-foreground' : 'text-foreground/60'
+                  'rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
+                  pathname === link.href
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground'
                 )}
               >
                 {t(link.labelKey)}
@@ -48,8 +56,13 @@ export function Header() {
         </div>
         <MobileNav />
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none" />
-          <nav className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 md:hidden">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80">
+              <Wallet className="h-4 w-4 text-primary-foreground" />
+            </div>
+            <span className="font-bold">Manager.money</span>
+          </Link>
+          <nav className="flex items-center gap-1">
             <LanguageSwitcher />
             <ThemeToggle />
             <AuthButtons />

@@ -10,44 +10,33 @@ const DEFAULT_FLAGS: Record<FeatureFlag, boolean> = {
   module_living_cost: true,
   module_savings: true,
   auth_google: false,
-  auth_credentials: false, // Email/password auth disabled by default
+  auth_credentials: false,
 };
 
-export async function getFeatureFlag(
-  kv: KVNamespace | undefined,
-  flag: FeatureFlag
-): Promise<boolean> {
-  if (!kv) {
-    return DEFAULT_FLAGS[flag] ?? false;
-  }
+// Map feature flags to environment variable names
+const FLAG_ENV_MAP: Record<FeatureFlag, string> = {
+  module_ev: 'FEATURE_MODULE_EV',
+  module_living_cost: 'FEATURE_MODULE_LIVING_COST',
+  module_savings: 'FEATURE_MODULE_SAVINGS',
+  auth_google: 'FEATURE_AUTH_GOOGLE',
+  auth_credentials: 'FEATURE_AUTH_CREDENTIALS',
+};
 
-  try {
-    const value = await kv.get(flag);
-    if (value === null) {
-      return DEFAULT_FLAGS[flag] ?? false;
-    }
-    return value === 'true';
-  } catch {
-    return DEFAULT_FLAGS[flag] ?? false;
+function parseEnvBoolean(value: string | undefined, defaultValue: boolean): boolean {
+  if (value === undefined || value === '') {
+    return defaultValue;
   }
+  return value.toLowerCase() === 'true' || value === '1';
 }
 
-export async function setFeatureFlag(
-  kv: KVNamespace,
-  flag: FeatureFlag,
-  value: boolean
-): Promise<void> {
-  await kv.put(flag, value.toString());
+export function getFeatureFlag(flag: FeatureFlag): boolean {
+  const envVar = FLAG_ENV_MAP[flag];
+  const envValue = process.env[envVar];
+  return parseEnvBoolean(envValue, DEFAULT_FLAGS[flag]);
 }
 
-export async function getAllFeatureFlags(
-  kv: KVNamespace | undefined
-): Promise<Record<FeatureFlag, boolean>> {
+export function getAllFeatureFlags(): Record<FeatureFlag, boolean> {
   const flags: Record<FeatureFlag, boolean> = { ...DEFAULT_FLAGS };
-
-  if (!kv) {
-    return flags;
-  }
 
   const flagKeys: FeatureFlag[] = [
     'module_ev',
@@ -57,11 +46,9 @@ export async function getAllFeatureFlags(
     'auth_credentials',
   ];
 
-  await Promise.all(
-    flagKeys.map(async (key) => {
-      flags[key] = await getFeatureFlag(kv, key);
-    })
-  );
+  for (const key of flagKeys) {
+    flags[key] = getFeatureFlag(key);
+  }
 
   return flags;
 }

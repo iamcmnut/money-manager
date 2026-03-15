@@ -1,8 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
-import { createMockKV } from '@/test/setup';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   getFeatureFlag,
-  setFeatureFlag,
   getAllFeatureFlags,
   getDefaultFlags,
   type FeatureFlag,
@@ -31,71 +29,79 @@ describe('getDefaultFlags', () => {
 });
 
 describe('getFeatureFlag', () => {
-  it('should return default value when KV is undefined', async () => {
-    const result = await getFeatureFlag(undefined, 'module_ev');
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    vi.resetModules();
+    process.env = { ...originalEnv };
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  it('should return default value when env var is not set', () => {
+    delete process.env.FEATURE_MODULE_EV;
+    const result = getFeatureFlag('module_ev');
     expect(result).toBe(true);
   });
 
-  it('should return default false for auth flags when KV is undefined', async () => {
-    const googleResult = await getFeatureFlag(undefined, 'auth_google');
-    const credentialsResult = await getFeatureFlag(undefined, 'auth_credentials');
+  it('should return default false for auth flags when env var is not set', () => {
+    delete process.env.FEATURE_AUTH_GOOGLE;
+    delete process.env.FEATURE_AUTH_CREDENTIALS;
+
+    const googleResult = getFeatureFlag('auth_google');
+    const credentialsResult = getFeatureFlag('auth_credentials');
 
     expect(googleResult).toBe(false);
     expect(credentialsResult).toBe(false);
   });
 
-  it('should return value from KV when set to true', async () => {
-    const kv = createMockKV({ module_ev: 'true' });
-
-    const result = await getFeatureFlag(kv, 'module_ev');
+  it('should return true when env var is set to "true"', () => {
+    process.env.FEATURE_AUTH_GOOGLE = 'true';
+    const result = getFeatureFlag('auth_google');
     expect(result).toBe(true);
-    expect(kv.get).toHaveBeenCalledWith('module_ev');
   });
 
-  it('should return value from KV when set to false', async () => {
-    const kv = createMockKV({ module_ev: 'false' });
+  it('should return true when env var is set to "1"', () => {
+    process.env.FEATURE_AUTH_GOOGLE = '1';
+    const result = getFeatureFlag('auth_google');
+    expect(result).toBe(true);
+  });
 
-    const result = await getFeatureFlag(kv, 'module_ev');
+  it('should return false when env var is set to "false"', () => {
+    process.env.FEATURE_MODULE_EV = 'false';
+    const result = getFeatureFlag('module_ev');
     expect(result).toBe(false);
   });
 
-  it('should return default value when flag not in KV', async () => {
-    const kv = createMockKV({});
-
-    const result = await getFeatureFlag(kv, 'module_ev');
+  it('should return default when env var is empty string', () => {
+    process.env.FEATURE_MODULE_EV = '';
+    const result = getFeatureFlag('module_ev');
     expect(result).toBe(true); // default for module_ev
-  });
-
-  it('should return default value when KV throws error', async () => {
-    const kv = createMockKV({});
-    vi.mocked(kv.get).mockRejectedValueOnce(new Error('KV error'));
-
-    const result = await getFeatureFlag(kv, 'module_ev');
-    expect(result).toBe(true); // falls back to default
-  });
-});
-
-describe('setFeatureFlag', () => {
-  it('should set flag to true', async () => {
-    const kv = createMockKV({});
-
-    await setFeatureFlag(kv, 'auth_google', true);
-
-    expect(kv.put).toHaveBeenCalledWith('auth_google', 'true');
-  });
-
-  it('should set flag to false', async () => {
-    const kv = createMockKV({});
-
-    await setFeatureFlag(kv, 'module_ev', false);
-
-    expect(kv.put).toHaveBeenCalledWith('module_ev', 'false');
   });
 });
 
 describe('getAllFeatureFlags', () => {
-  it('should return all default flags when KV is undefined', async () => {
-    const flags = await getAllFeatureFlags(undefined);
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    vi.resetModules();
+    process.env = { ...originalEnv };
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  it('should return all default flags when no env vars are set', () => {
+    delete process.env.FEATURE_MODULE_EV;
+    delete process.env.FEATURE_MODULE_LIVING_COST;
+    delete process.env.FEATURE_MODULE_SAVINGS;
+    delete process.env.FEATURE_AUTH_GOOGLE;
+    delete process.env.FEATURE_AUTH_CREDENTIALS;
+
+    const flags = getAllFeatureFlags();
 
     expect(flags).toEqual({
       module_ev: true,
@@ -106,13 +112,11 @@ describe('getAllFeatureFlags', () => {
     });
   });
 
-  it('should return flags from KV when available', async () => {
-    const kv = createMockKV({
-      module_ev: 'false',
-      auth_google: 'true',
-    });
+  it('should return flags from env vars when set', () => {
+    process.env.FEATURE_MODULE_EV = 'false';
+    process.env.FEATURE_AUTH_GOOGLE = 'true';
 
-    const flags = await getAllFeatureFlags(kv);
+    const flags = getAllFeatureFlags();
 
     expect(flags.module_ev).toBe(false);
     expect(flags.auth_google).toBe(true);
@@ -120,19 +124,6 @@ describe('getAllFeatureFlags', () => {
     expect(flags.module_living_cost).toBe(true);
     expect(flags.module_savings).toBe(true);
     expect(flags.auth_credentials).toBe(false);
-  });
-
-  it('should call KV.get for each flag', async () => {
-    const kv = createMockKV({});
-
-    await getAllFeatureFlags(kv);
-
-    expect(kv.get).toHaveBeenCalledTimes(5);
-    expect(kv.get).toHaveBeenCalledWith('module_ev');
-    expect(kv.get).toHaveBeenCalledWith('module_living_cost');
-    expect(kv.get).toHaveBeenCalledWith('module_savings');
-    expect(kv.get).toHaveBeenCalledWith('auth_google');
-    expect(kv.get).toHaveBeenCalledWith('auth_credentials');
   });
 });
 

@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/providers/theme-provider';
 import { SessionProvider } from '@/components/providers/session-provider';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { CookieConsent } from '@/components/layout/cookie-consent';
 import { WebsiteJsonLd } from '@/components/seo/json-ld';
 import { routing } from '@/i18n/routing';
 import { geistSans, geistMono } from '../layout';
@@ -117,6 +118,7 @@ export default async function LocaleLayout({ children, params }: Props) {
                 <main className="flex-1">{children}</main>
                 <Footer />
               </div>
+              <CookieConsent />
             </NextIntlClientProvider>
           </ThemeProvider>
         </SessionProvider>

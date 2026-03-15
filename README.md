@@ -12,17 +12,20 @@ A modular personal finance web application built with Next.js, TypeScript, and d
 | Auth | Auth.js (Google OAuth + Email/Password) |
 | Database | Cloudflare D1 (SQLite) |
 | ORM | Drizzle ORM |
-| Feature Flags | Cloudflare KV |
+| i18n | next-intl (Thai & English) |
 | Deployment | Cloudflare Pages |
 | CI/CD | GitHub Actions |
 
 ## Features
 
+- **Multi-Language Support** - Thai and English with URL-based locale routing
 - **EV Calculator** - Calculate and compare electric vehicle charging costs
 - **Living Cost Tracker** - Track and manage monthly living expenses
 - **Savings Planner** - Plan and track savings goals
-- **Admin Panel** - Manage users and feature flags
-- **Authentication** - Google OAuth and Email/Password sign-in (toggleable via feature flags)
+- **Admin Panel** - Manage users and view feature flags
+- **Authentication** - Google OAuth and Email/Password sign-in
+- **Cookie Consent** - GDPR-compliant cookie consent banner
+- **Dark Mode** - System-aware theme switching
 
 ## Local Development
 
@@ -30,11 +33,7 @@ A modular personal finance web application built with Next.js, TypeScript, and d
 
 - **Node.js 18+** - [Download](https://nodejs.org/)
 - **npm** - Comes with Node.js
-- **Wrangler CLI** - Cloudflare's CLI tool for local development
-  ```bash
-  npm install -g wrangler
-  ```
-- **Git** - For version control
+- **Wrangler CLI** - Cloudflare's CLI tool (installed as dev dependency)
 
 ### Quick Start
 
@@ -52,263 +51,163 @@ cp .env.example .env.local
 # 4. Generate AUTH_SECRET and add to .env.local
 openssl rand -base64 32
 
-# 5. Apply database migrations (creates local D1 database)
-npm run db:migrate:local
+# 5. Setup database (migrations + seed admin account)
+npm run db:setup:local
 
-# 6. Run development server
-npm run dev
+# 6. Run development server with Cloudflare emulation
+npm run dev:cf
 ```
 
 The application will be available at `http://localhost:3000`.
 
-### Step-by-Step Setup
+### Development Commands
 
-#### 1. Install Dependencies
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Next.js dev server (no database) |
+| `npm run dev:cf` | Start dev server with Cloudflare D1 emulation |
+| `npm run build` | Build for production |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run TypeScript check |
+| `npm run test:run` | Run tests |
+| `npm run db:generate` | Generate Drizzle migrations |
+| `npm run db:migrate:local` | Apply migrations to local D1 |
+| `npm run db:seed:local` | Seed default admin account locally |
+| `npm run db:setup:local` | Migrate + seed local database |
+| `npm run db:studio` | Open Drizzle Studio |
 
-```bash
-npm install --legacy-peer-deps
-```
+### Environment Variables
 
-> **Note:** The `--legacy-peer-deps` flag is required due to peer dependency conflicts with `@cloudflare/next-on-pages` and Next.js 16.
-
-#### 2. Configure Environment Variables
-
-Create a `.env.local` file in the project root:
+Create a `.env.local` file:
 
 ```env
 # Auth.js secret (required)
-# Generate with: openssl rand -base64 32
 AUTH_SECRET=your_generated_secret_here
 
 # App URL (required for OAuth callbacks)
 NEXTAUTH_URL=http://localhost:3000
 
-# Google OAuth (optional - only needed if Google sign-in is enabled)
+# Google OAuth (optional)
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Feature Flags (true/false)
+FEATURE_MODULE_EV=true
+FEATURE_MODULE_LIVING_COST=true
+FEATURE_MODULE_SAVINGS=true
+FEATURE_AUTH_GOOGLE=false
+FEATURE_AUTH_CREDENTIALS=true
 ```
 
-#### 3. Set Up Local Database
+### Feature Flags
 
-The project uses Cloudflare D1 (SQLite) for the database. For local development, Wrangler creates a local SQLite database automatically.
+Feature flags are configured via environment variables:
 
-```bash
-# Apply all migrations to create tables
-npm run db:migrate:local
-
-# (Optional) View database in Drizzle Studio
-npm run db:studio
-```
-
-#### 4. Start Development Server
-
-```bash
-npm run dev
-```
-
-This starts the Next.js development server with Cloudflare bindings support.
-
-#### 5. Create First Admin User
-
-Since authentication is disabled by default, you need to:
-
-1. **Option A: Use Drizzle Studio**
-   ```bash
-   npm run db:studio
-   ```
-   Navigate to the `users` table and manually insert an admin user.
-
-2. **Option B: Enable credentials auth via API**
-   ```bash
-   # Seed default feature flags (enables auth_credentials)
-   curl -X POST http://localhost:3000/api/admin/flags
-   ```
-   Then register via the sign-in page at `/auth/signin`.
-
-3. **Option C: Direct database insert**
-   ```bash
-   wrangler d1 execute manage-money-db --local --command "INSERT INTO users (id, email, name, role) VALUES ('admin-1', 'admin@example.com', 'Admin', 'admin')"
-   ```
-
-### Environment Variables Reference
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `AUTH_SECRET` | Yes | Secret key for Auth.js session encryption |
-| `NEXTAUTH_URL` | Yes | Base URL of your application |
-| `GOOGLE_CLIENT_ID` | No | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | No | Google OAuth client secret |
-
-### NPM Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server with Cloudflare bindings |
-| `npm run build` | Build for production |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
-| `npm run typecheck` | Run TypeScript check |
-| `npm run format` | Format code with Prettier |
-| `npm run test` | Run tests in watch mode |
-| `npm run test:run` | Run tests once |
-| `npm run test:coverage` | Run tests with coverage report |
-| `npm run db:generate` | Generate Drizzle migrations after schema changes |
-| `npm run db:migrate:local` | Apply migrations to local D1 database |
-| `npm run db:migrate:prod` | Apply migrations to production D1 database |
-| `npm run db:studio` | Open Drizzle Studio to browse database |
+| Environment Variable | Default | Description |
+|---------------------|---------|-------------|
+| `FEATURE_MODULE_EV` | `true` | Enable EV Calculator module |
+| `FEATURE_MODULE_LIVING_COST` | `true` | Enable Living Cost module |
+| `FEATURE_MODULE_SAVINGS` | `true` | Enable Savings module |
+| `FEATURE_AUTH_GOOGLE` | `false` | Enable Google OAuth sign-in |
+| `FEATURE_AUTH_CREDENTIALS` | `false` | Enable Email/Password sign-in |
 
 ### Troubleshooting
 
-#### "Database not available" errors
+#### "Database not available" error
 
-Make sure you've run migrations:
+You need to run with Cloudflare emulation:
+
 ```bash
+# Apply migrations first
 npm run db:migrate:local
-```
 
-#### Port 3000 already in use
-
-Kill the process or use a different port:
-```bash
-# Find and kill process on port 3000
-lsof -i :3000 | grep LISTEN | awk '{print $2}' | xargs kill -9
-
-# Or use a different port
-PORT=3001 npm run dev
+# Run with D1 support
+npm run dev:cf
 ```
 
 #### Peer dependency warnings
 
 Use the legacy peer deps flag:
+
 ```bash
 npm install --legacy-peer-deps
 ```
 
-#### Wrangler authentication issues
+## Multi-Language Support (i18n)
 
-Login to Cloudflare (only needed for remote operations):
-```bash
-wrangler login
-```
+The application supports Thai and English with URL-based locale routing.
 
-### Development Workflow
+### URL Structure
 
-1. **Make code changes** - Edit files in `src/`
-2. **Check types** - `npm run typecheck`
-3. **Lint code** - `npm run lint`
-4. **Format code** - `npm run format`
-5. **Run tests** - `npm run test:run`
-6. **Test locally** - `npm run dev`
-7. **Database changes** - Edit `src/lib/db/schema.ts`, then run:
-   ```bash
-   npm run db:generate
-   npm run db:migrate:local
-   ```
+- `/en` - English home
+- `/th` - Thai home
+- `/en/ev` - English EV Calculator
+- `/th/boss-office` - Thai Admin Panel
 
-## Testing
+### Adding Translations
 
-The project uses [Vitest](https://vitest.dev/) with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) for unit and component testing.
-
-### Running Tests
-
-```bash
-# Run tests in watch mode (recommended during development)
-npm run test
-
-# Run tests once
-npm run test:run
-
-# Run tests with coverage report
-npm run test:coverage
-```
-
-### Test Structure
+Translation files are located in `src/messages/`:
 
 ```
-src/
-├── lib/
-│   ├── password.test.ts      # Password utility tests
-│   ├── feature-flags.test.ts # Feature flag tests
-│   └── utils.test.ts         # Utility function tests
-├── components/
-│   └── ui/
-│       └── button.test.tsx   # Button component tests
-└── test/
-    ├── setup.ts              # Test setup and mocks
-    └── vitest.d.ts           # TypeScript declarations
+src/messages/
+├── en.json    # English translations
+└── th.json    # Thai translations
 ```
 
-### Writing Tests
+### Language Switcher
 
-- Place test files next to the code they test with `.test.ts` or `.test.tsx` extension
-- Use `describe` blocks to group related tests
-- Use `it` or `test` for individual test cases
-- Mock external dependencies using `vi.fn()` and `vi.mock()`
-
-Example:
-```typescript
-import { describe, it, expect } from 'vitest';
-import { myFunction } from './myModule';
-
-describe('myFunction', () => {
-  it('should return expected result', () => {
-    expect(myFunction('input')).toBe('expected');
-  });
-});
-```
+A language switcher with country flags is available in the header. User preference is saved to localStorage.
 
 ## Project Structure
 
 ```
 manager.money/
-├── .github/workflows/        # GitHub Actions CI/CD
-├── drizzle/                  # Database migrations
-├── public/                   # Static assets
 ├── src/
 │   ├── app/
-│   │   ├── (public)/         # Public pages
-│   │   │   ├── page.tsx      # Home
-│   │   │   ├── ev/           # EV Calculator
-│   │   │   ├── living-cost/  # Living Cost
-│   │   │   └── savings/      # Savings
-│   │   ├── auth/             # Auth pages
-│   │   │   ├── signin/       # Sign-in page
-│   │   │   └── error/        # Auth error page
-│   │   ├── boss-office/      # Admin panel (protected)
-│   │   └── api/
-│   │       ├── auth/         # Auth endpoints
-│   │       │   ├── [...nextauth]/ # NextAuth handler
-│   │       │   ├── register/     # User registration
-│   │       │   └── status/       # Auth status
-│   │       └── admin/        # Admin endpoints
-│   │           ├── flags/    # Feature flags CRUD
-│   │           └── users/    # User management
+│   │   ├── [locale]/              # Locale-based routes
+│   │   │   ├── layout.tsx         # Locale layout with providers
+│   │   │   ├── page.tsx           # Home page
+│   │   │   ├── ev/                # EV Calculator
+│   │   │   ├── living-cost/       # Living Cost
+│   │   │   ├── savings/           # Savings
+│   │   │   ├── auth/              # Auth pages
+│   │   │   │   ├── signin/
+│   │   │   │   └── error/
+│   │   │   └── boss-office/       # Admin panel (protected)
+│   │   ├── api/                   # API routes (no locale)
+│   │   │   ├── auth/
+│   │   │   └── admin/
+│   │   ├── layout.tsx             # Root layout
+│   │   └── sitemap.ts             # Multi-locale sitemap
 │   ├── components/
-│   │   ├── auth/             # Auth components
-│   │   ├── layout/           # Layout (header, footer, nav)
-│   │   ├── providers/        # Context providers
-│   │   ├── seo/              # SEO components
-│   │   └── ui/               # shadcn/ui components
+│   │   ├── auth/                  # Auth components
+│   │   ├── layout/                # Header, footer, nav, cookie consent
+│   │   ├── providers/             # Context providers
+│   │   └── ui/                    # shadcn/ui components
+│   ├── i18n/                      # Internationalization config
+│   │   ├── config.ts              # Locale definitions
+│   │   ├── routing.ts             # URL routing config
+│   │   ├── request.ts             # Server-side locale resolution
+│   │   └── navigation.ts          # Locale-aware navigation
 │   ├── lib/
-│   │   ├── db/               # Database schema
-│   │   ├── server/           # Server utilities (D1, KV)
-│   │   ├── auth.ts           # Auth.js configuration
-│   │   ├── cloudflare.ts     # Cloudflare bindings
-│   │   ├── feature-flags.ts  # Feature flag utilities
-│   │   ├── password.ts       # Password hashing
-│   │   └── utils.ts          # General utilities
-│   └── types/                # TypeScript definitions
-├── wrangler.toml             # Cloudflare configuration
-└── drizzle.config.ts         # Drizzle ORM configuration
+│   │   ├── db/                    # Database schema
+│   │   ├── server/                # Server utilities (D1)
+│   │   ├── auth.ts                # Auth.js configuration
+│   │   ├── feature-flags.ts       # Feature flag utilities
+│   │   └── utils.ts               # General utilities
+│   └── messages/                  # Translation files
+│       ├── en.json
+│       └── th.json
+├── drizzle/                       # Database migrations
+├── wrangler.toml                  # Cloudflare configuration
+└── next.config.ts                 # Next.js + next-intl config
 ```
 
 ## Authentication
 
-Authentication is controlled via feature flags and supports two methods:
-
 ### Email/Password Authentication
 
-Users can register and sign in with email and password.
+Enable by setting `FEATURE_AUTH_CREDENTIALS=true` in `.env.local`.
 
 **Password Requirements:**
 - Minimum 8 characters
@@ -318,25 +217,13 @@ Users can register and sign in with email and password.
 
 ### Google OAuth
 
-Users can sign in with their Google account.
+Enable by setting `FEATURE_AUTH_GOOGLE=true` and configuring Google credentials.
 
 **Setup:**
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create OAuth 2.0 credentials
 3. Add authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
 4. Add credentials to `.env.local`
-
-### Enabling Authentication
-
-Both authentication methods are **disabled by default**. To enable:
-
-1. Go to `/boss-office` (Admin Panel)
-2. Toggle **Email/Password Sign-in** and/or **Google Sign-in**
-3. Click **Save Changes**
-
-## API Documentation
-
-For detailed API documentation including all endpoints, request/response formats, and error codes, see [docs/api.md](docs/api.md).
 
 ## Database
 
@@ -346,7 +233,7 @@ The application uses Cloudflare D1 with Drizzle ORM.
 
 | Table | Description |
 |-------|-------------|
-| `users` | User accounts (id, email, password, name, role, etc.) |
+| `users` | User accounts (id, email, password, name, role) |
 | `accounts` | OAuth provider accounts |
 | `sessions` | User sessions |
 | `verification_tokens` | Email verification tokens |
@@ -364,71 +251,75 @@ npm run db:migrate:local
 npm run db:migrate:prod
 ```
 
-## Feature Flags
-
-Feature flags are stored in Cloudflare KV and managed via the Admin Panel.
-
-### Module Flags
-
-| Flag | Default | Description |
-|------|---------|-------------|
-| `module_ev` | `true` | Enable EV Calculator module |
-| `module_living_cost` | `true` | Enable Living Cost module |
-| `module_savings` | `true` | Enable Savings module |
-
-### Authentication Flags
-
-| Flag | Default | Description |
-|------|---------|-------------|
-| `auth_google` | `false` | Enable Google OAuth sign-in |
-| `auth_credentials` | `false` | Enable Email/Password sign-in |
-
 ## Deployment
 
 ### GitHub Actions
 
-The project uses GitHub Actions for CI/CD. On push to `main`:
-
-1. **Lint & Typecheck** - Runs ESLint and TypeScript checks
-2. **Build** - Builds the Next.js application
-3. **Deploy** - Deploys to Cloudflare Pages
+On push to `main`:
+1. Lint & Typecheck
+2. Build
+3. Deploy to Cloudflare Pages
 
 ### Required GitHub Secrets
 
 | Secret | Description |
 |--------|-------------|
-| `CLOUDFLARE_API_TOKEN` | Cloudflare API token with Pages permissions |
-| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID |
-| `AUTH_SECRET` | Auth.js secret key (required) |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID (optional) |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret (optional) |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
+| `AUTH_SECRET` | Auth.js secret key |
 
-### Manual Deployment
+### Production Environment Variables
 
-```bash
-# Build the application
-npm run build
+Set these in Cloudflare Pages dashboard:
 
-# Deploy to Cloudflare Pages
-wrangler pages deploy .next --project-name=manager-money
 ```
-
-### Production Setup
-
-1. Create D1 database on Cloudflare
-2. Create KV namespace on Cloudflare
-3. Update `wrangler.toml` with production IDs
-4. Run migrations: `npm run db:migrate:prod`
-5. Deploy application
+AUTH_SECRET=<your-secret>
+FEATURE_AUTH_CREDENTIALS=true
+FEATURE_AUTH_GOOGLE=false
+# ... other feature flags
+```
 
 ## Admin Panel
 
-Access the admin panel at `/boss-office` (requires authentication).
+Access at `/{locale}/boss-office` (e.g., `/en/boss-office`).
 
-Features:
-- **User Management** - View users, change roles (user/admin)
-- **Feature Flags** - Toggle modules and authentication methods
-- **Session Info** - View current user session details
+### Default Admin Account
+
+A default admin account is created when running the seed script:
+
+| Field | Value |
+|-------|-------|
+| Email | `admin@admin` |
+| Password | `admin` |
+| Role | `admin` |
+
+Run the seed with:
+```bash
+# Local
+npm run db:seed:local
+
+# Production
+npm run db:seed:prod
+```
+
+**Features:**
+- View registered users
+- Change user roles (user/admin)
+- View feature flag status (read-only, configured via env vars)
+- View current session info
+
+## Testing
+
+```bash
+# Run tests once
+npm run test:run
+
+# Run tests in watch mode
+npm run test
+
+# Run with coverage
+npm run test:coverage
+```
 
 ## License
 

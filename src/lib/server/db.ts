@@ -17,12 +17,15 @@ export function createDatabase(d1: D1Database): Database {
 export async function getDatabase(): Promise<Database | null> {
   try {
     const { getRequestContext } = await import('@cloudflare/next-on-pages');
-    const { env } = getRequestContext();
-    if (env?.DB) {
-      return createDatabase(env.DB);
+    const ctx = getRequestContext();
+    console.log('[DB] Request context:', !!ctx);
+    console.log('[DB] Env:', !!ctx?.env);
+    console.log('[DB] DB binding:', !!ctx?.env?.DB);
+    if (ctx?.env?.DB) {
+      return createDatabase(ctx.env.DB);
     }
-  } catch {
-    // Not in Cloudflare environment
+  } catch (error) {
+    console.log('[DB] Error getting context:', error);
   }
   return null;
 }

@@ -1,8 +1,7 @@
 import { Metadata } from 'next';
 import { useTranslations } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { PiggyBank } from 'lucide-react';
+import { PiggyBank, Target, BarChart3, Percent, Trophy, Clock } from 'lucide-react';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -28,36 +27,72 @@ export default async function SavingsPage({ params }: Props) {
 function SavingsPageContent() {
   const t = useTranslations('modules.savings');
 
+  const features = [
+    { icon: Target, label: t('features.goalSetting'), color: 'from-green-500 to-emerald-500' },
+    { icon: BarChart3, label: t('features.progressTracking'), color: 'from-teal-500 to-green-500' },
+    { icon: Percent, label: t('features.interestCalculations'), color: 'from-emerald-500 to-teal-500' },
+    { icon: Trophy, label: t('features.milestones'), color: 'from-lime-500 to-green-500' },
+  ];
+
   return (
-    <div className="container py-8 md:py-12">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-              <PiggyBank className="h-6 w-6 text-primary" />
+    <div className="relative overflow-x-hidden">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-gradient-to-b from-green-500/10 via-emerald-500/5 to-transparent pb-12 pt-12 md:pb-16 md:pt-16">
+        {/* Background decoration */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute left-1/4 -top-10 h-[250px] w-[250px] md:h-[400px] md:w-[400px] rounded-full bg-green-500/20 blur-3xl" />
+          <div className="absolute right-1/4 bottom-0 h-[200px] w-[200px] md:h-[300px] md:w-[300px] rounded-full bg-emerald-500/20 blur-3xl" />
+        </div>
+
+        <div className="container">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg shadow-green-500/25">
+              <PiggyBank className="h-10 w-10 text-white" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('title')}</h1>
-              <p className="text-muted-foreground">{t('description')}</p>
+            <h1 className="bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl md:text-5xl">
+              {t('title')}
+            </h1>
+            <p className="mt-4 text-lg text-muted-foreground">
+              {t('description')}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Coming Soon Card */}
+      <div className="container -mt-4 pb-16">
+        <div className="mx-auto max-w-3xl">
+          <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-green-500/5 to-emerald-500/5 p-6 sm:p-8 shadow-lg">
+            <div className="absolute -right-10 -top-10 h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-500/20 blur-3xl" />
+
+            <div className="relative">
+              <div className="mb-6 flex items-center gap-2">
+                <Clock className="h-5 w-5 text-green-500" />
+                <span className="text-sm font-semibold uppercase tracking-wider text-green-600 dark:text-green-400">
+                  {t('comingSoon')}
+                </span>
+              </div>
+
+              <p className="mb-8 text-muted-foreground">
+                {t('comingSoonDescription')}
+              </p>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {features.map((feature, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
+                  >
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${feature.color} shadow-md`}>
+                      <feature.icon className="h-5 w-5 text-white" />
+                    </div>
+                    <span className="text-sm font-medium">{feature.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('comingSoon')}</CardTitle>
-            <CardDescription>{t('comingSoonDescription')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">{t('featuresPlanned')}</p>
-            <ul className="mt-2 list-inside list-disc text-sm text-muted-foreground">
-              <li>{t('features.goalSetting')}</li>
-              <li>{t('features.progressTracking')}</li>
-              <li>{t('features.interestCalculations')}</li>
-              <li>{t('features.milestones')}</li>
-            </ul>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

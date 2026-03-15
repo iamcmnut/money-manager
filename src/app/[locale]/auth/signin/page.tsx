@@ -4,9 +4,8 @@ import { Suspense, useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LogIn } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 
 interface AuthStatus {
   providers: {
@@ -103,7 +102,7 @@ function SignInForm() {
   const hasAnyAuth = authStatus?.providers.google || authStatus?.providers.credentials;
 
   return (
-    <CardContent className="space-y-4">
+    <div className="space-y-4">
       {loading ? (
         <div className="space-y-3">
           <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
@@ -201,18 +200,16 @@ function SignInForm() {
           )}
         </>
       )}
-    </CardContent>
+    </div>
   );
 }
 
 function SignInLoading() {
   return (
-    <CardContent>
-      <div className="space-y-3">
-        <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
-        <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
-      </div>
-    </CardContent>
+    <div className="space-y-3 p-6">
+      <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
+      <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
+    </div>
   );
 }
 
@@ -220,19 +217,36 @@ export default function SignInPage() {
   const t = useTranslations('auth');
 
   return (
-    <div className="container flex min-h-[60vh] items-center justify-center py-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <LogIn className="h-6 w-6 text-primary" />
+    <div className="relative min-h-[80vh] overflow-x-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute left-1/2 top-1/4 -translate-x-1/2 h-[300px] w-[300px] md:h-[500px] md:w-[500px] rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute -right-20 top-1/2 h-[200px] w-[200px] md:h-[300px] md:w-[300px] rounded-full bg-blue-500/10 blur-3xl" />
+        <div className="absolute -left-20 bottom-0 h-[200px] w-[200px] md:h-[300px] md:w-[300px] rounded-full bg-green-500/10 blur-3xl" />
+      </div>
+
+      <div className="container flex min-h-[80vh] items-center justify-center py-8">
+        <div className="w-full max-w-md">
+          <div className="relative overflow-hidden rounded-2xl border bg-background/80 p-6 sm:p-8 shadow-xl backdrop-blur-lg">
+            <div className="absolute -right-10 -top-10 h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-gradient-to-br from-primary/20 to-blue-500/20 blur-3xl" />
+
+            <div className="relative">
+              {/* Logo */}
+              <div className="mb-6 sm:mb-8 flex flex-col items-center">
+                <div className="mb-4 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25">
+                  <Wallet className="h-7 w-7 sm:h-8 sm:w-8 text-primary-foreground" />
+                </div>
+                <h1 className="text-xl sm:text-2xl font-bold">{t('signInTitle')}</h1>
+                <p className="mt-1 text-sm text-muted-foreground text-center">{t('signInDescription')}</p>
+              </div>
+
+              <Suspense fallback={<SignInLoading />}>
+                <SignInForm />
+              </Suspense>
+            </div>
           </div>
-          <CardTitle>{t('signInTitle')}</CardTitle>
-          <CardDescription>{t('signInDescription')}</CardDescription>
-        </CardHeader>
-        <Suspense fallback={<SignInLoading />}>
-          <SignInForm />
-        </Suspense>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
-import { getDatabase, getKVNamespace } from '@/lib/server';
+import { getDatabase } from '@/lib/server';
 import { getFeatureFlag } from '@/lib/feature-flags';
 import { users } from '@/lib/db/schema';
 import { hashPassword, validatePassword, validateEmail } from '@/lib/password';
@@ -14,8 +14,7 @@ interface RegisterBody {
 }
 
 export async function POST(request: Request) {
-  const kv = await getKVNamespace();
-  const credentialsEnabled = await getFeatureFlag(kv ?? undefined, 'auth_credentials');
+  const credentialsEnabled = getFeatureFlag('auth_credentials');
 
   if (!credentialsEnabled) {
     return NextResponse.json(

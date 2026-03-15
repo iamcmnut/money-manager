@@ -3,13 +3,12 @@ import { getFeatureFlag } from '@/lib/feature-flags';
 
 interface FeatureGateProps {
   flag: FeatureFlag;
-  kv?: KVNamespace;
   children: React.ReactNode;
   fallback?: React.ReactNode;
 }
 
-export async function FeatureGate({ flag, kv, children, fallback = null }: FeatureGateProps) {
-  const isEnabled = await getFeatureFlag(kv, flag);
+export function FeatureGate({ flag, children, fallback = null }: FeatureGateProps) {
+  const isEnabled = getFeatureFlag(flag);
 
   if (!isEnabled) {
     return <>{fallback}</>;

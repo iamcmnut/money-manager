@@ -16,8 +16,8 @@
   },
   "modules": {
     "ev": {
-      "title": "EV Calculator",
-      "description": "Calculate and compare electric vehicle charging costs",
+      "title": "EV Charging Price",
+      "description": "Track and compare electric vehicle charging costs",
       "pageDescription": "Calculate and compare electric vehicle charging costs. Plan your EV expenses efficiently.",
       "comingSoon": "Coming Soon",
       "comingSoonDescription": "This module is under development. Check back soon for EV cost calculations.",
@@ -27,6 +27,71 @@
         "publicCharging": "Public charging comparison",
         "monthlyExpense": "Monthly expense tracking",
         "costPerKm": "Cost per kilometer analysis"
+      },
+      "form": {
+        "addRecord": "Add Charging Record",
+        "editRecord": "Edit Charging Record",
+        "brand": "Charging Network",
+        "datetime": "Date & Time",
+        "chargedKwh": "Energy Charged (kWh)",
+        "costThb": "Cost (THB)",
+        "avgUnitPrice": "Avg. Unit Price",
+        "mileageKm": "Mileage (km)",
+        "notes": "Notes",
+        "notesPlaceholder": "Optional notes about this charging session...",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving...",
+        "failedToSave": "Failed to save record"
+      },
+      "stats": {
+        "failedToLoad": "Failed to load statistics",
+        "totalSessions": "Total Sessions",
+        "totalKwh": "Total Energy",
+        "totalCost": "Total Cost",
+        "avgPricePerKwh": "Avg. Price/kWh",
+        "avgCostPerKm": "Avg. Cost/km",
+        "mostUsedNetwork": "Most Used",
+        "sessions": "sessions"
+      },
+      "chart": {
+        "title": "Price Comparison by Network",
+        "description": "Average price per kWh across different charging networks",
+        "avgPrice": "Avg. Price",
+        "failedToLoad": "Failed to load chart data",
+        "noData": "No charging data to display"
+      },
+      "history": {
+        "title": "Charging History",
+        "add": "Add",
+        "loading": "Loading records...",
+        "failedToLoad": "Failed to load records",
+        "failedToDelete": "Failed to delete record",
+        "confirmDelete": "Are you sure you want to delete this record?",
+        "noRecords": "No charging records yet",
+        "noRecordsHint": "Add your first charging session to start tracking",
+        "import": {
+          "button": "Import",
+          "importing": "Importing...",
+          "failed": "Failed to import records",
+          "success": "Imported {count} of {total} records",
+          "warnings": "Warnings",
+          "rowError": "Row {row}",
+          "moreErrors": "...and more errors",
+          "downloadSample": "Download sample"
+        },
+        "pagination": {
+          "showing": "{from}-{to} of {total}"
+        }
+      },
+      "networks": {
+        "title": "Network Comparison",
+        "failedToLoad": "Failed to load network data",
+        "noData": "No charging data to compare",
+        "cheapest": "Cheapest",
+        "sessions": "sessions",
+        "moreExpensive": "more expensive",
+        "website": "Website"
       }
     },
     "livingCost": {
@@ -110,24 +175,53 @@
     "saving": "Saving...",
     "enabled": "Enabled",
     "disabled": "Disabled",
-    "flagsSavedKV": "Flags saved to KV storage",
-    "flagsUpdatedLocal": "Flags updated (local only)",
-    "failedToSave": "Failed to save",
-    "failedToSaveFlags": "Failed to save flags",
+    "flagsEnvNote": "Feature flags are configured via environment variables.",
     "flags": {
-      "module_ev": "EV Calculator Module",
+      "module_ev": "EV Charging Price Module",
       "module_living_cost": "Living Cost Module",
       "module_savings": "Savings Module",
       "auth_google": "Google Sign-in",
       "auth_credentials": "Email/Password Sign-in"
+    },
+    "evNetworks": {
+      "title": "EV Charging Networks",
+      "description": "Manage charging network providers",
+      "loading": "Loading networks...",
+      "failedToLoad": "Failed to load networks",
+      "failedToSave": "Failed to save network",
+      "failedToDelete": "Failed to delete network",
+      "confirmDelete": "Are you sure you want to delete this network?",
+      "noNetworks": "No charging networks found",
+      "add": "Add Network",
+      "addNetwork": "Add Network",
+      "editNetwork": "Edit Network",
+      "name": "Name",
+      "slug": "Slug",
+      "website": "Website",
+      "phone": "Phone",
+      "brandColor": "Brand Color",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "chargingRecords": {
+      "title": "Charging Records",
+      "description": "View all user charging sessions",
+      "loading": "Loading records...",
+      "failedToLoad": "Failed to load records",
+      "noRecords": "No charging records found"
     }
   },
-  "footer": {
-    "builtWith": "Built with Next.js. Deployed on Cloudflare."
-  },
+  "footer": {},
   "language": {
     "en": "English",
     "th": "ภาษาไทย",
     "switchLanguage": "Switch language"
+  },
+  "cookies": {
+    "title": "Cookie Notice",
+    "description": "We use cookies to enhance your browsing experience and analyze site traffic. By clicking \"Accept\", you consent to our use of cookies.",
+    "accept": "Accept",
+    "decline": "Decline"
   }
 }

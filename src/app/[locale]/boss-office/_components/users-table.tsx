@@ -92,18 +92,18 @@ export function UsersTable() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {users.map((user) => (
-        <div key={user.id} className="flex items-center justify-between rounded-lg border p-3">
+        <div key={user.id} className="flex items-center justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md">
           <div className="flex items-center gap-3">
-            <Avatar className="h-8 w-8">
+            <Avatar className="h-10 w-10 ring-2 ring-primary/10">
               <AvatarImage src={user.image ?? undefined} alt={user.name ?? ''} />
-              <AvatarFallback>
-                {user.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white">
+                {user.name?.charAt(0).toUpperCase() || <User className="h-5 w-5" />}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium">{user.name || t('unknown')}</p>
+              <p className="font-medium">{user.name || t('unknown')}</p>
               <p className="text-xs text-muted-foreground">{user.email}</p>
             </div>
           </div>
@@ -112,6 +112,7 @@ export function UsersTable() {
             size="sm"
             disabled={updatingId === user.id}
             onClick={() => toggleRole(user.id, user.role)}
+            className={user.role === 'admin' ? 'bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : ''}
           >
             {updatingId === user.id ? '...' : user.role}
           </Button>

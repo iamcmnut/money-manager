@@ -139,8 +139,8 @@ function createBaseConfig(options?: AuthConfigOptions): NextAuthConfig {
       },
     },
     pages: {
-      signIn: '/auth/signin',
-      error: '/auth/error',
+      signIn: '/en/auth/signin',
+      error: '/en/auth/error',
     },
     session: {
       // Always use JWT for credentials provider compatibility

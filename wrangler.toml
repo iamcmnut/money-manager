@@ -6,13 +6,13 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "manager-money-db"
-database_id = "local-dev-id" # Replace with actual ID for production
+database_id = "4ffeee39-cf1b-453e-bb12-bef1ad521003"
 migrations_dir = "drizzle"
 
 # KV Namespace for Feature Flags
 [[kv_namespaces]]
 binding = "FEATURE_FLAGS"
-id = "local-kv-id" # Replace with actual ID for production
+id = "ad6ecec556d74f7484a94f188bf4a8eb"
 
 [vars]
-ENVIRONMENT = "development"
+ENVIRONMENT = "production"

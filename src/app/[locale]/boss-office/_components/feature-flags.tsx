@@ -2,23 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
 import { type FeatureFlag } from '@/lib/feature-flags';
 
 type FlagsState = Record<FeatureFlag, boolean>;
-
-interface SaveResponse {
-  success?: boolean;
-  persisted?: boolean;
-  error?: string;
-}
 
 export function FeatureFlagsPanel() {
   const t = useTranslations('admin');
   const [flags, setFlags] = useState<FlagsState | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     fetchFlags();
@@ -38,42 +29,6 @@ export function FeatureFlagsPanel() {
     }
   };
 
-  const toggleFlag = (flag: FeatureFlag) => {
-    if (!flags) return;
-    setFlags((prev) => (prev ? { ...prev, [flag]: !prev[flag] } : null));
-    setMessage(null);
-  };
-
-  const saveFlags = async () => {
-    if (!flags) return;
-    setSaving(true);
-    setMessage(null);
-
-    try {
-      const response = await fetch('/api/admin/flags', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(flags),
-      });
-
-      const data = (await response.json()) as SaveResponse;
-
-      if (response.ok) {
-        setMessage({
-          type: 'success',
-          text: data.persisted ? t('flagsSavedKV') : t('flagsUpdatedLocal'),
-        });
-      } else {
-        setMessage({ type: 'error', text: data.error || t('failedToSave') });
-      }
-    } catch (error) {
-      console.error('Failed to save flags:', error);
-      setMessage({ type: 'error', text: t('failedToSaveFlags') });
-    } finally {
-      setSaving(false);
-    }
-  };
-
   if (loading) {
     return <div className="text-sm text-muted-foreground">{t('loadingFlags')}</div>;
   }
@@ -83,31 +38,25 @@ export function FeatureFlagsPanel() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {(Object.keys(flags) as FeatureFlag[]).map((flag) => (
-        <div key={flag} className="flex items-center justify-between">
-          <span className="text-sm">{t(`flags.${flag}`)}</span>
-          <Button
-            variant={flags[flag] ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => toggleFlag(flag)}
+        <div key={flag} className="flex items-center justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80">
+          <span className="font-medium">{t(`flags.${flag}`)}</span>
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              flags[flag]
+                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-sm'
+                : 'bg-muted text-muted-foreground'
+            }`}
           >
             {flags[flag] ? t('enabled') : t('disabled')}
-          </Button>
+          </span>
         </div>
       ))}
 
-      {message && (
-        <p className={`text-sm ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-          {message.text}
-        </p>
-      )}
-
-      <div className="pt-4">
-        <Button onClick={saveFlags} disabled={saving} className="w-full">
-          {saving ? t('saving') : t('saveChanges')}
-        </Button>
-      </div>
+      <p className="mt-4 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+        {t('flagsEnvNote')}
+      </p>
     </div>
   );
 }
