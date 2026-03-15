@@ -133,12 +133,20 @@ export function ChargingNetworksTable() {
               className="flex items-center justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
             >
               <div className="flex items-center gap-3">
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-lg text-white font-bold text-sm"
-                  style={{ backgroundColor: network.brandColor || '#6B7280' }}
-                >
-                  {network.name.charAt(0)}
-                </div>
+                {network.logo ? (
+                  <img
+                    src={network.logo}
+                    alt={network.name}
+                    className="h-10 w-10 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-lg text-white font-bold text-sm"
+                    style={{ backgroundColor: network.brandColor || '#6B7280' }}
+                  >
+                    {network.name.charAt(0)}
+                  </div>
+                )}
                 <div>
                   <p className="font-medium">{network.name}</p>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">

@@ -5,8 +5,6 @@ import { getFeatureFlag } from '@/lib/feature-flags';
 import { users } from '@/lib/db/schema';
 import { hashPassword, validatePassword, validateEmail } from '@/lib/password';
 
-export const runtime = 'edge';
-
 interface RegisterBody {
   email: string;
   password: string;

@@ -4,8 +4,6 @@ import { getDatabase } from '@/lib/server';
 import { chargingNetworks } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
-export const runtime = 'edge';
-
 interface RouteParams {
   params: Promise<{ id: string }>;
 }

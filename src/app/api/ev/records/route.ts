@@ -4,8 +4,6 @@ import { getDatabase } from '@/lib/server';
 import { chargingRecords, chargingNetworks } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
 
-export const runtime = 'edge';
-
 export async function GET() {
   const session = await auth();
 
@@ -26,6 +24,7 @@ export async function GET() {
         brandId: chargingRecords.brandId,
         brandName: chargingNetworks.name,
         brandColor: chargingNetworks.brandColor,
+        brandLogo: chargingNetworks.logo,
         chargingDatetime: chargingRecords.chargingDatetime,
         chargedKwh: chargingRecords.chargedKwh,
         costThb: chargingRecords.costThb,

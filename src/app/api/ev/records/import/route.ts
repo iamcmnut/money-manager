@@ -4,8 +4,6 @@ import { getDatabase } from '@/lib/server';
 import { chargingRecords, chargingNetworks } from '@/lib/db/schema';
 import * as XLSX from 'xlsx';
 
-export const runtime = 'edge';
-
 interface ImportRow {
   brand?: string;
   brandId?: string;

@@ -11,6 +11,7 @@ interface RecordData {
   brandId: string;
   brandName: string | null;
   brandColor: string | null;
+  brandLogo: string | null;
   chargingDatetime: string;
   chargedKwh: number;
   costThb: number;
@@ -294,12 +295,20 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
-                  <div
-                    className="flex h-10 w-10 items-center justify-center rounded-lg text-white"
-                    style={{ backgroundColor: record.brandColor || '#6B7280' }}
-                  >
-                    <Zap className="h-5 w-5" />
-                  </div>
+                  {record.brandLogo ? (
+                    <img
+                      src={record.brandLogo}
+                      alt={record.brandName || ''}
+                      className="h-10 w-10 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div
+                      className="flex h-10 w-10 items-center justify-center rounded-lg text-white"
+                      style={{ backgroundColor: record.brandColor || '#6B7280' }}
+                    >
+                      <Zap className="h-5 w-5" />
+                    </div>
+                  )}
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{record.brandName || record.brandId}</p>

@@ -210,6 +210,15 @@
       "loading": "Loading records...",
       "failedToLoad": "Failed to load records",
       "noRecords": "No charging records found"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "mismatch": "Passwords do not match",
+      "save": "Reset Password",
+      "success": "Password updated successfully",
+      "failed": "Failed to reset password"
     }
   },
   "footer": {},

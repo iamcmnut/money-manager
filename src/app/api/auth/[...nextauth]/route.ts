@@ -6,7 +6,6 @@ import { getDatabase } from '@/lib/server';
 import { getFeatureFlag } from '@/lib/feature-flags';
 import { users } from '@/lib/db/schema';
 
-export const runtime = 'edge';
 
 async function getAuthHandlers() {
   const db = await getDatabase();

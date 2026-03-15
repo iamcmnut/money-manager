@@ -4,8 +4,6 @@ import { getDatabase } from '@/lib/server';
 import { chargingNetworks } from '@/lib/db/schema';
 import { desc } from 'drizzle-orm';
 
-export const runtime = 'edge';
-
 export async function GET() {
   const session = await auth();
 

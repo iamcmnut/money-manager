@@ -4,8 +4,6 @@ import { getDatabase } from '@/lib/server';
 import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
-export const runtime = 'edge';
-
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
@@ -56,6 +54,7 @@ export async function GET(request: Request, { params }: RouteParams) {
 interface UpdateUserBody {
   role?: 'user' | 'admin';
   name?: string;
+  password?: string;
 }
 
 export async function PATCH(request: Request, { params }: RouteParams) {
@@ -86,6 +85,15 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     if (body.name !== undefined) {
       updateData.name = body.name;
+    }
+
+    if (body.password !== undefined) {
+      const { validatePassword, hashPassword } = await import('@/lib/password');
+      const validation = validatePassword(body.password);
+      if (!validation.valid) {
+        return NextResponse.json({ error: validation.message }, { status: 400 });
+      }
+      updateData.password = await hashPassword(body.password);
     }
 
     if (Object.keys(updateData).length === 0) {

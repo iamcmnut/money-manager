@@ -4,8 +4,6 @@ import { getDatabase } from '@/lib/server';
 import { chargingNetworks } from '@/lib/db/schema';
 import { asc } from 'drizzle-orm';
 
-export const runtime = 'edge';
-
 export async function GET() {
   const session = await auth();
 
@@ -25,6 +23,7 @@ export async function GET() {
         id: chargingNetworks.id,
         name: chargingNetworks.name,
         brandColor: chargingNetworks.brandColor,
+        logo: chargingNetworks.logo,
       })
       .from(chargingNetworks)
       .orderBy(asc(chargingNetworks.name));

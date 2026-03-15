@@ -117,20 +117,20 @@ export function NetworkComparisonCards({ refreshKey }: NetworkComparisonCardsPro
 
             {/* Brand header */}
             <div className="mt-6 flex items-center gap-3">
-              <div
-                className="flex h-12 w-12 items-center justify-center rounded-xl text-white font-bold text-lg"
-                style={{ backgroundColor: brand.brandColor || '#6B7280' }}
-              >
-                {brand.brandLogo ? (
-                  <img
-                    src={brand.brandLogo}
-                    alt={brand.brandName || ''}
-                    className="h-8 w-8 object-contain"
-                  />
-                ) : (
-                  brand.brandName?.charAt(0) || '?'
-                )}
-              </div>
+              {brand.brandLogo ? (
+                <img
+                  src={brand.brandLogo}
+                  alt={brand.brandName || ''}
+                  className="h-12 w-12 rounded-xl object-cover"
+                />
+              ) : (
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-xl text-white font-bold text-lg"
+                  style={{ backgroundColor: brand.brandColor || '#6B7280' }}
+                >
+                  {brand.brandName?.charAt(0) || '?'}
+                </div>
+              )}
               <div>
                 <h3 className="font-semibold">{brand.brandName}</h3>
                 <p className="text-xs text-muted-foreground">
