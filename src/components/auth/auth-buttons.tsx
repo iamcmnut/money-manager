@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserMenu } from './user-menu';
 
@@ -45,8 +46,11 @@ export function AuthButtons() {
   }
 
   return (
-    <Button variant="outline" asChild>
-      <Link href="/auth/signin">{t('signIn')}</Link>
+    <Button variant="outline" size="icon" className="md:w-auto md:px-4" asChild>
+      <Link href="/auth/signin">
+        <LogIn className="h-4 w-4" />
+        <span className="hidden md:inline">{t('signIn')}</span>
+      </Link>
     </Button>
   );
 }

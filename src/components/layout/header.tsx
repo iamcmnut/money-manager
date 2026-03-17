@@ -55,14 +55,14 @@ export function Header() {
           </nav>
         </div>
         <MobileNav />
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <Link href="/" className="flex items-center gap-2 md:hidden">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80">
+        <div className="flex min-w-0 flex-1 items-center justify-between md:justify-end">
+          <Link href="/" className="flex min-w-0 items-center gap-2 md:hidden">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80">
               <Wallet className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="font-bold">Manager.money</span>
+            <span className="truncate font-bold">Manager.money</span>
           </Link>
-          <nav className="flex items-center gap-1">
+          <nav className="flex shrink-0 items-center gap-1">
             <LanguageSwitcher />
             <ThemeToggle />
             <AuthButtons />
