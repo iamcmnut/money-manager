@@ -31,11 +31,7 @@ interface StatsResponse {
   error?: string;
 }
 
-interface NetworkComparisonCardsProps {
-  refreshKey?: number;
-}
-
-export function NetworkComparisonCards({ refreshKey }: NetworkComparisonCardsProps) {
+export function NetworkComparisonCards() {
   const t = useTranslations('modules.ev.networks');
   const [data, setData] = useState<BrandData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +61,7 @@ export function NetworkComparisonCards({ refreshKey }: NetworkComparisonCardsPro
 
   useEffect(() => {
     fetchData();
-  }, [fetchData, refreshKey]);
+  }, [fetchData]);
 
   if (loading) {
     return (

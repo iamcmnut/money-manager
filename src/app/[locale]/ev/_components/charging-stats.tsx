@@ -23,11 +23,7 @@ interface StatsResponse {
   error?: string;
 }
 
-interface ChargingStatsProps {
-  refreshKey?: number;
-}
-
-export function ChargingStats({ refreshKey }: ChargingStatsProps) {
+export function ChargingStats() {
   const t = useTranslations('modules.ev.stats');
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,7 +49,7 @@ export function ChargingStats({ refreshKey }: ChargingStatsProps) {
 
   useEffect(() => {
     fetchStats();
-  }, [fetchStats, refreshKey]);
+  }, [fetchStats]);
 
   if (loading) {
     return (

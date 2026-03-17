@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Upload, Trash2, Loader2 } from 'lucide-react';
 
 interface NetworkData {
   id: string;
@@ -25,9 +25,15 @@ interface ErrorResponse {
   error?: string;
 }
 
+interface UploadResponse {
+  url?: string;
+  error?: string;
+}
+
 export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNetworkFormProps) {
   const t = useTranslations('admin');
   const isEditing = !!network;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     name: network?.name || '',
@@ -36,8 +42,54 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
     phone: network?.phone || '',
     brandColor: network?.brandColor || '#6B7280',
   });
+  const [logoPreview, setLogoPreview] = useState<string | null>(network?.logo || null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoRemoved, setLogoRemoved] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLogoFile(file);
+    setLogoRemoved(false);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setLogoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveLogo = () => {
+    setLogoPreview(null);
+    setLogoFile(null);
+    setLogoRemoved(true);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const uploadLogo = async (file: File): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('folder', 'logos');
+
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = (await response.json()) as UploadResponse;
+
+    if (!response.ok || !data.url) {
+      throw new Error(data.error || 'Upload failed');
+    }
+
+    return data.url;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,17 +100,27 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
       ? `/api/admin/charging-networks/${network.id}`
       : '/api/admin/charging-networks';
 
+    const payload: Record<string, string | null> = {
+      name: formData.name,
+      slug: formData.slug,
+      website: formData.website || null,
+      phone: formData.phone || null,
+      brandColor: formData.brandColor || null,
+    };
+
     try {
+      if (logoFile) {
+        setUploading(true);
+        payload.logo = await uploadLogo(logoFile);
+        setUploading(false);
+      } else if (logoRemoved) {
+        payload.logo = null;
+      }
+
       const response = await fetch(url, {
         method: isEditing ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          slug: formData.slug,
-          website: formData.website || null,
-          phone: formData.phone || null,
-          brandColor: formData.brandColor || null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -72,6 +134,7 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
       setError(t('evNetworks.failedToSave'));
     } finally {
       setSaving(false);
+      setUploading(false);
     }
   };
 
@@ -81,6 +144,8 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
   };
+
+  const isBusy = saving || uploading;
 
   return (
     <div className="rounded-xl border bg-background/80 p-4 backdrop-blur-sm">
@@ -97,6 +162,55 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
         {error && (
           <div className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</div>
         )}
+
+        <div>
+          <label className="block text-sm font-medium mb-2">{t('evNetworks.logo')}</label>
+          <div className="flex items-center gap-4">
+            {logoPreview ? (
+              <img
+                src={logoPreview}
+                alt="Logo preview"
+                className="h-16 w-16 rounded-xl object-cover border"
+              />
+            ) : (
+              <div
+                className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-dashed text-muted-foreground"
+              >
+                <Upload className="h-6 w-6" />
+              </div>
+            )}
+            <div className="flex gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleLogoChange}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="mr-1 h-3 w-3" />
+                {logoPreview ? t('evNetworks.changeLogo') : t('evNetworks.uploadLogo')}
+              </Button>
+              {logoPreview && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRemoveLogo}
+                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                >
+                  <Trash2 className="mr-1 h-3 w-3" />
+                  {t('evNetworks.removeLogo')}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -178,10 +292,11 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
           </Button>
           <Button
             type="submit"
-            disabled={saving}
+            disabled={isBusy}
             className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
           >
-            {saving ? t('evNetworks.saving') : t('evNetworks.save')}
+            {isBusy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
+            {uploading ? t('evNetworks.uploading') : saving ? t('evNetworks.saving') : t('evNetworks.save')}
           </Button>
         </div>
       </form>

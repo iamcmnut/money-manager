@@ -1,16 +1,9 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
 import { chargingNetworks } from '@/lib/db/schema';
 import { asc } from 'drizzle-orm';
 
 export async function GET() {
-  const session = await auth();
-
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const db = await getDatabase();
 
   if (!db) {

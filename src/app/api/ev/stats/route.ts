@@ -1,16 +1,9 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
 import { chargingRecords, chargingNetworks } from '@/lib/db/schema';
 import { eq, sql } from 'drizzle-orm';
 
 export async function GET() {
-  const session = await auth();
-
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const db = await getDatabase();
 
   if (!db) {
@@ -25,8 +18,7 @@ export async function GET() {
         totalKwh: sql<number>`COALESCE(SUM(${chargingRecords.chargedKwh}), 0)`,
         totalCost: sql<number>`COALESCE(SUM(${chargingRecords.costThb}), 0)`,
       })
-      .from(chargingRecords)
-      .where(eq(chargingRecords.userId, session.user.id));
+      .from(chargingRecords);
 
     const stats = overallStats[0];
     const totalKwhDecimal = stats.totalKwh / 100;
@@ -48,7 +40,6 @@ export async function GET() {
       })
       .from(chargingRecords)
       .leftJoin(chargingNetworks, eq(chargingRecords.brandId, chargingNetworks.id))
-      .where(eq(chargingRecords.userId, session.user.id))
       .groupBy(
         chargingRecords.brandId,
         chargingNetworks.name,
@@ -96,14 +87,12 @@ export async function GET() {
       : null;
 
     // Calculate total distance traveled and cost per km
-    // Get records with mileage sorted by date to calculate distance between sessions
     const recordsWithMileage = await db
       .select({
         mileageKm: chargingRecords.mileageKm,
         chargingDatetime: chargingRecords.chargingDatetime,
       })
       .from(chargingRecords)
-      .where(eq(chargingRecords.userId, session.user.id))
       .orderBy(chargingRecords.chargingDatetime);
 
     // Calculate total distance by finding the difference between max and min mileage
@@ -133,7 +122,6 @@ export async function GET() {
         sessions: sql<number>`COUNT(*)`,
       })
       .from(chargingRecords)
-      .where(eq(chargingRecords.userId, session.user.id))
       .groupBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`)
       .orderBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`);
 

@@ -19,6 +19,11 @@ migrations_dir = "drizzle"
 binding = "FEATURE_FLAGS"
 id = "ad6ecec556d74f7484a94f188bf4a8eb"
 
+# R2 Bucket for file uploads
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "manager-money"
+
 [vars]
 ENVIRONMENT = "production"
 FEATURE_AUTH_CREDENTIALS = "true"

@@ -27,11 +27,7 @@ interface StatsResponse {
   error?: string;
 }
 
-interface PriceComparisonChartProps {
-  refreshKey?: number;
-}
-
-export function PriceComparisonChart({ refreshKey }: PriceComparisonChartProps) {
+export function PriceComparisonChart() {
   const t = useTranslations('modules.ev.chart');
   const [data, setData] = useState<BrandData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +53,7 @@ export function PriceComparisonChart({ refreshKey }: PriceComparisonChartProps) 
 
   useEffect(() => {
     fetchData();
-  }, [fetchData, refreshKey]);
+  }, [fetchData]);
 
   if (loading) {
     return (

@@ -3,11 +3,12 @@ import { auth } from '@/lib/auth';
 import { redirect } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Settings, Users, Flag, Shield, Mail, UserCircle, BadgeCheck, Zap, FileText } from 'lucide-react';
+import { Settings, Users, Flag, Shield, Mail, UserCircle, BadgeCheck, Zap, FileText, History } from 'lucide-react';
 import { FeatureFlagsPanel } from './_components/feature-flags';
 import { UsersTable } from './_components/users-table';
 import { ChargingNetworksTable } from './_components/charging-networks-table';
 import { AdminChargingRecords } from './_components/admin-charging-records';
+import { ChargingRecordsList } from '@/app/[locale]/ev/_components/charging-records-list';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -147,6 +148,24 @@ function BossOfficePageContent({ session }: { session: Session }) {
                 </div>
                 <AdminChargingRecords />
               </div>
+            </div>
+          </div>
+
+          {/* My EV Charging History Card */}
+          <div className="mt-4 sm:mt-6 relative overflow-hidden rounded-2xl border bg-gradient-to-br from-blue-500/5 to-cyan-500/5 p-4 sm:p-6 shadow-lg">
+            <div className="absolute -right-10 -top-10 h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 blur-3xl" />
+
+            <div className="relative">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-md">
+                  <History className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold">{t('evHistory.title')}</h2>
+                  <p className="text-sm text-muted-foreground">{t('evHistory.description')}</p>
+                </div>
+              </div>
+              <ChargingRecordsList />
             </div>
           </div>
 

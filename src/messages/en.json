@@ -200,9 +200,18 @@
       "website": "Website",
       "phone": "Phone",
       "brandColor": "Brand Color",
+      "logo": "Logo",
+      "uploadLogo": "Upload Logo",
+      "changeLogo": "Change",
+      "removeLogo": "Remove",
       "cancel": "Cancel",
       "save": "Save",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "uploading": "Uploading..."
+    },
+    "evHistory": {
+      "title": "My EV Charging History",
+      "description": "Add, edit, and manage your charging records"
     },
     "chargingRecords": {
       "title": "Charging Records",

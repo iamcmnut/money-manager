@@ -200,9 +200,18 @@
       "website": "เว็บไซต์",
       "phone": "โทรศัพท์",
       "brandColor": "สีแบรนด์",
+      "logo": "โลโก้",
+      "uploadLogo": "อัปโหลดโลโก้",
+      "changeLogo": "เปลี่ยน",
+      "removeLogo": "ลบ",
       "cancel": "ยกเลิก",
       "save": "บันทึก",
-      "saving": "กำลังบันทึก..."
+      "saving": "กำลังบันทึก...",
+      "uploading": "กำลังอัปโหลด..."
+    },
+    "evHistory": {
+      "title": "ประวัติการชาร์จ EV",
+      "description": "เพิ่ม แก้ไข และจัดการรายการชาร์จของคุณ"
     },
     "chargingRecords": {
       "title": "รายการชาร์จ",

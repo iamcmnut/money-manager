@@ -5,6 +5,7 @@ import * as schema from './db/schema';
 export interface CloudflareEnv {
   DB: D1Database;
   FEATURE_FLAGS: KVNamespace;
+  R2: R2Bucket;
 }
 
 function getCloudflareContextFromGlobal(): { env?: Record<string, unknown> } | undefined {

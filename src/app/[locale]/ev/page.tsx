@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import { useTranslations } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { auth } from '@/lib/auth';
-import { redirect } from '@/i18n/navigation';
 import { Car } from 'lucide-react';
 import { EVDashboard } from './_components/ev-dashboard';
 
@@ -23,13 +21,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function EVPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect({ href: '/auth/signin?callbackUrl=/ev', locale });
-    return null;
-  }
 
   return <EVPageContent />;
 }
