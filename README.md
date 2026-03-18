@@ -43,22 +43,32 @@ git clone https://github.com/your-username/manager.money.git
 cd manager.money
 
 # 2. Install dependencies
-npm install --legacy-peer-deps
+npm install
 
-# 3. Copy environment file
-cp .env.example .env.local
+# 3. Create .env.local with required variables
+cat <<EOF > .env.local
+AUTH_SECRET=$(openssl rand -base64 32)
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+FEATURE_AUTH_CREDENTIALS=true
+FEATURE_AUTH_GOOGLE=false
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+FEATURE_MODULE_EV=true
+FEATURE_MODULE_LIVING_COST=true
+FEATURE_MODULE_SAVINGS=true
+EOF
 
-# 4. Generate AUTH_SECRET and add to .env.local
-openssl rand -base64 32
-
-# 5. Setup database (migrations + seed admin account)
+# 4. Setup database (migrations + seed admin account)
 npm run db:setup:local
+
+# 5. Build the Cloudflare worker (required before dev:cf)
+npm run build:worker
 
 # 6. Run development server with Cloudflare emulation
 npm run dev:cf
 ```
 
-The application will be available at `http://localhost:3000`.
+The application will be available at `http://localhost:8788` (Cloudflare proxy) and `http://localhost:3000` (Next.js).
 
 ### Development Commands
 
@@ -66,7 +76,9 @@ The application will be available at `http://localhost:3000`.
 |---------|-------------|
 | `npm run dev` | Start Next.js dev server (no database) |
 | `npm run dev:cf` | Start dev server with Cloudflare D1 emulation |
-| `npm run build` | Build for production |
+| `npm run build` | Build Next.js for production |
+| `npm run build:worker` | Build OpenNext worker (required before `dev:cf`) |
+| `npm run preview` | Build worker + preview locally |
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Run TypeScript check |
 | `npm run test:run` | Run tests |
@@ -81,15 +93,15 @@ The application will be available at `http://localhost:3000`.
 Create a `.env.local` file:
 
 ```env
-# Auth.js secret (required)
+# Auth.js secret (required — generate with: openssl rand -base64 32)
 AUTH_SECRET=your_generated_secret_here
 
-# App URL (required for OAuth callbacks)
-NEXTAUTH_URL=http://localhost:3000
+# App URL
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
-# Google OAuth (optional)
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
+# Google OAuth (required if FEATURE_AUTH_GOOGLE=true)
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 
 # Feature Flags (true/false)
 FEATURE_MODULE_EV=true
@@ -112,6 +124,15 @@ Feature flags are configured via environment variables:
 | `FEATURE_AUTH_CREDENTIALS` | `false` | Enable Email/Password sign-in |
 
 ### Troubleshooting
+
+#### `.open-next/assets` directory not found
+
+`dev:cf` requires the OpenNext worker build output. Run the worker build first:
+
+```bash
+npm run build:worker
+npm run dev:cf
+```
 
 #### "Database not available" error
 
