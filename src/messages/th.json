@@ -230,7 +230,9 @@
       "failed": "ไม่สามารถรีเซ็ตรหัสผ่านได้"
     }
   },
-  "footer": {},
+  "footer": {
+    "contactUs": "ติดต่อเรา"
+  },
   "language": {
     "en": "English",
     "th": "ภาษาไทย",

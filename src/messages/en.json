@@ -230,7 +230,9 @@
       "failed": "Failed to reset password"
     }
   },
-  "footer": {},
+  "footer": {
+    "contactUs": "Contact us"
+  },
   "language": {
     "en": "English",
     "th": "ภาษาไทย",
