@@ -52,3 +52,13 @@ next-env.d.ts
 drizzle/meta/_journal.json
 
 .open-next
+
+# A.I.
+.agents/
+.claude/
+.codex/
+.cursor/
+.gemini/
+.kiro/
+.opencode/
+.pi/
