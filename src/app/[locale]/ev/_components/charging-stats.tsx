@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Zap, Wallet, TrendingUp, Hash, Building2, Gauge } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface StatsData {
   totalSessions: number;
@@ -53,81 +54,79 @@ export function ChargingStats() {
 
   if (loading) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-24 animate-pulse rounded-xl border bg-muted/50" />
+          <div key={i} className="h-24 animate-pulse rounded-lg border bg-muted/50" />
         ))}
       </div>
     );
   }
 
   if (error) {
-    return <div className="text-sm text-red-600">{error}</div>;
+    return (
+      <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+        {error}
+      </div>
+    );
   }
 
   if (!stats) {
     return null;
   }
 
-  const statCards = [
+  const statCards: { icon: LucideIcon; label: string; value: string; subtitle?: string; highlight?: boolean }[] = [
     {
       icon: Hash,
       label: t('totalSessions'),
       value: stats.totalSessions.toString(),
-      color: 'from-purple-500 to-pink-500',
     },
     {
       icon: Zap,
       label: t('totalKwh'),
       value: `${stats.totalKwh.toFixed(2)} kWh`,
-      color: 'from-yellow-500 to-orange-500',
     },
     {
       icon: Wallet,
       label: t('totalCost'),
       value: `฿${stats.totalCost.toFixed(2)}`,
-      color: 'from-green-500 to-emerald-500',
+      highlight: true,
     },
     {
       icon: TrendingUp,
       label: t('avgPricePerKwh'),
       value: `฿${stats.avgPricePerKwh.toFixed(2)}/kWh`,
-      color: 'from-blue-500 to-cyan-500',
+      highlight: true,
     },
     {
       icon: Gauge,
       label: t('avgCostPerKm'),
       value: stats.avgCostPerKm > 0 ? `฿${stats.avgCostPerKm.toFixed(2)}/km` : '-',
       subtitle: stats.totalDistanceKm > 0 ? `${stats.totalDistanceKm.toLocaleString()} km` : undefined,
-      color: 'from-rose-500 to-pink-500',
     },
     {
       icon: Building2,
       label: t('mostUsedNetwork'),
       value: stats.mostUsedNetwork?.brandName || '-',
       subtitle: stats.mostUsedNetwork ? `${stats.mostUsedNetwork.sessions} ${t('sessions')}` : undefined,
-      color: 'from-violet-500 to-purple-500',
     },
   ];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
       {statCards.map((stat, index) => (
         <div
           key={index}
-          className="relative overflow-hidden rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
+          className="rounded-lg border bg-card p-4 transition-colors hover:bg-accent/30"
         >
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs text-muted-foreground">{stat.label}</p>
-              <p className="mt-1 text-lg font-bold">{stat.value}</p>
+              <p className={`mt-1 text-lg font-bold ${stat.highlight ? 'text-primary' : ''}`}>{stat.value}</p>
               {stat.subtitle && (
                 <p className="text-xs text-muted-foreground">{stat.subtitle}</p>
               )}
             </div>
-            <div className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${stat.color}`}>
-              <stat.icon className="h-5 w-5 text-white" />
-            </div>
+            <stat.icon className="h-4 w-4 text-muted-foreground/60" />
           </div>
         </div>
       ))}

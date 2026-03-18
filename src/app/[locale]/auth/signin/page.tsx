@@ -143,7 +143,7 @@ function SignInForm() {
                 className="w-full rounded-md border bg-background px-3 py-2 text-sm"
               />
 
-              {error && <p className="text-sm text-red-600">{error}</p>}
+              {error && <p className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">{error}</p>}
 
               <Button type="submit" className="w-full" disabled={submitting}>
                 {submitting ? t('pleaseWait') : isRegister ? t('createAccount') : t('signIn')}
@@ -217,33 +217,22 @@ export default function SignInPage() {
   const t = useTranslations('auth');
 
   return (
-    <div className="relative min-h-[80vh] overflow-x-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute left-1/2 top-1/4 -translate-x-1/2 h-[300px] w-[300px] md:h-[500px] md:w-[500px] rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -right-20 top-1/2 h-[200px] w-[200px] md:h-[300px] md:w-[300px] rounded-full bg-blue-500/10 blur-3xl" />
-        <div className="absolute -left-20 bottom-0 h-[200px] w-[200px] md:h-[300px] md:w-[300px] rounded-full bg-green-500/10 blur-3xl" />
-      </div>
-
+    <div className="min-h-[80vh]">
       <div className="container flex min-h-[80vh] items-center justify-center py-8">
-        <div className="w-full max-w-md">
-          <div className="relative overflow-hidden rounded-2xl border bg-background/80 p-6 sm:p-8 shadow-xl backdrop-blur-lg">
-            <div className="absolute -right-10 -top-10 h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-gradient-to-br from-primary/20 to-blue-500/20 blur-3xl" />
-
-            <div className="relative">
-              {/* Logo */}
-              <div className="mb-6 sm:mb-8 flex flex-col items-center">
-                <div className="mb-4 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25">
-                  <Wallet className="h-7 w-7 sm:h-8 sm:w-8 text-primary-foreground" />
-                </div>
-                <h1 className="text-xl sm:text-2xl font-bold">{t('signInTitle')}</h1>
-                <p className="mt-1 text-sm text-muted-foreground text-center">{t('signInDescription')}</p>
+        <div className="w-full max-w-sm">
+          <div className="rounded-xl border bg-card p-6 sm:p-8">
+            {/* Logo */}
+            <div className="mb-6 sm:mb-8 flex flex-col items-center">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
+                <Wallet className="h-6 w-6 text-primary-foreground" />
               </div>
-
-              <Suspense fallback={<SignInLoading />}>
-                <SignInForm />
-              </Suspense>
+              <h1 className="text-xl sm:text-2xl font-bold">{t('signInTitle')}</h1>
+              <p className="mt-1 text-sm text-muted-foreground text-center">{t('signInDescription')}</p>
             </div>
+
+            <Suspense fallback={<SignInLoading />}>
+              <SignInForm />
+            </Suspense>
           </div>
         </div>
       </div>

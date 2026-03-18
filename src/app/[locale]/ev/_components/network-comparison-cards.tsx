@@ -67,14 +67,18 @@ export function NetworkComparisonCards() {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-40 animate-pulse rounded-xl border bg-muted/50" />
+          <div key={i} className="h-40 animate-pulse rounded-lg border bg-muted/50" />
         ))}
       </div>
     );
   }
 
   if (error) {
-    return <div className="text-sm text-red-600">{error}</div>;
+    return (
+      <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+        {error}
+      </div>
+    );
   }
 
   if (data.length === 0) {
@@ -92,10 +96,10 @@ export function NetworkComparisonCards() {
         {data.map((brand, index) => (
           <div
             key={brand.brandId}
-            className={`relative overflow-hidden rounded-xl border p-4 transition-all hover:shadow-md ${
+            className={`relative rounded-lg border p-4 transition-colors hover:bg-accent/30 ${
               brand.isCheapest
-                ? 'bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/30'
-                : 'bg-background/50'
+                ? 'border-green-600/30 bg-green-50/50 dark:bg-green-950/20'
+                : 'bg-card'
             }`}
           >
             {/* Cheapest badge */}

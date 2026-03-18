@@ -57,17 +57,21 @@ export function PriceComparisonChart() {
 
   if (loading) {
     return (
-      <div className="h-64 animate-pulse rounded-xl border bg-muted/50" />
+      <div className="h-64 animate-pulse rounded-lg border bg-muted/50" />
     );
   }
 
   if (error) {
-    return <div className="text-sm text-red-600">{error}</div>;
+    return (
+      <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+        {error}
+      </div>
+    );
   }
 
   if (data.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl border bg-muted/20 text-muted-foreground">
+      <div className="flex h-64 items-center justify-center rounded-lg border text-muted-foreground">
         {t('noData')}
       </div>
     );
@@ -83,7 +87,7 @@ export function PriceComparisonChart() {
     .sort((a, b) => a.avgPrice - b.avgPrice);
 
   return (
-    <div className="rounded-xl border bg-background/50 p-4 backdrop-blur-sm">
+    <div className="rounded-lg border bg-card p-4">
       <h3 className="mb-4 font-semibold">{t('title')}</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">

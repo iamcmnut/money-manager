@@ -29,26 +29,24 @@ function EVPageContent() {
   const t = useTranslations('modules.ev');
 
   return (
-    <div className="relative overflow-x-hidden">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-blue-500/10 via-cyan-500/5 to-transparent pb-6 pt-8 md:pb-12 md:pt-16">
-        {/* Background decoration */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute left-1/4 -top-10 h-[250px] w-[250px] md:h-[400px] md:w-[400px] rounded-full bg-blue-500/20 blur-3xl" />
-          <div className="absolute right-1/4 bottom-0 h-[200px] w-[200px] md:h-[300px] md:w-[300px] rounded-full bg-cyan-500/20 blur-3xl" />
-        </div>
-
+    <div>
+      {/* Header */}
+      <div className="pb-6 pt-8 md:pb-10 md:pt-14">
         <div className="container">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-3 md:mb-6 inline-flex h-14 w-14 md:h-20 md:w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/25">
-              <Car className="h-8 w-8 md:h-10 md:w-10 text-white" />
+          <div className="mx-auto max-w-6xl">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
+                <Car className="h-5 w-5 text-accent-foreground" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                  {t('title')}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {t('description')}
+                </p>
+              </div>
             </div>
-            <h1 className="bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl md:text-5xl">
-              {t('title')}
-            </h1>
-            <p className="mt-2 md:mt-4 text-base md:text-lg text-muted-foreground">
-              {t('description')}
-            </p>
           </div>
         </div>
       </div>

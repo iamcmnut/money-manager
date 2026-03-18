@@ -190,7 +190,7 @@ export function UsersTable() {
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10 ring-2 ring-primary/10">
                 <AvatarImage src={user.image ?? undefined} alt={user.name ?? ''} />
-                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white">
+                <AvatarFallback className="bg-secondary text-foreground/70">
                   {user.name?.charAt(0).toUpperCase() || <User className="h-5 w-5" />}
                 </AvatarFallback>
               </Avatar>
