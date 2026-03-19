@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   BarChart,
@@ -12,49 +11,16 @@ import {
   Cell,
 } from 'recharts';
 import { formatNumber, formatBaht } from '@/lib/format';
+import type { BrandData } from './types';
 
-interface BrandData {
-  brandId: string;
-  brandName: string | null;
-  brandColor: string | null;
-  sessions: number;
-  totalKwh: number;
-  totalCost: number;
-  avgPricePerKwh: number;
-}
-
-interface StatsResponse {
+interface PriceComparisonChartProps {
   brandComparison?: BrandData[];
-  error?: string;
+  loading: boolean;
+  error: string | null;
 }
 
-export function PriceComparisonChart() {
+export function PriceComparisonChart({ brandComparison, loading, error }: PriceComparisonChartProps) {
   const t = useTranslations('modules.ev.chart');
-  const [data, setData] = useState<BrandData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchData = useCallback(async () => {
-    try {
-      const response = await fetch('/api/ev/stats');
-      const result = (await response.json()) as StatsResponse;
-
-      if (response.ok && result.brandComparison) {
-        setData(result.brandComparison);
-      } else {
-        setError(result.error || t('failedToLoad'));
-      }
-    } catch (err) {
-      console.error('Failed to fetch chart data:', err);
-      setError(t('failedToLoad'));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
 
   if (loading) {
     return (
@@ -70,7 +36,7 @@ export function PriceComparisonChart() {
     );
   }
 
-  if (data.length === 0) {
+  if (!brandComparison || brandComparison.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center rounded-lg border text-muted-foreground">
         {t('noData')}
@@ -78,7 +44,7 @@ export function PriceComparisonChart() {
     );
   }
 
-  const chartData = data
+  const chartData = brandComparison
     .map((item) => ({
       name: item.brandName || item.brandId,
       avgPrice: Math.round(item.avgPricePerKwh * 100) / 100,

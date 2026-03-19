@@ -1,68 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Phone, ExternalLink, Trophy, TrendingUp } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
+import type { BrandData } from './types';
 
-interface BrandData {
-  brandId: string;
-  brandName: string | null;
-  brandColor: string | null;
-  brandLogo: string | null;
-  brandPhone: string | null;
-  brandWebsite: string | null;
-  sessions: number;
-  totalKwh: number;
-  totalCost: number;
-  avgPricePerKwh: number;
-  isCheapest: boolean;
-  priceDiffPercent: number;
-}
-
-interface StatsResponse {
+interface NetworkComparisonCardsProps {
   brandComparison?: BrandData[];
-  stats?: {
-    cheapestNetwork?: {
-      brandId: string;
-      brandName: string;
-      avgPricePerKwh: number;
-    } | null;
-  };
-  error?: string;
+  loading: boolean;
+  error: string | null;
 }
 
-export function NetworkComparisonCards() {
+export function NetworkComparisonCards({ brandComparison, loading, error }: NetworkComparisonCardsProps) {
   const t = useTranslations('modules.ev.networks');
-  const [data, setData] = useState<BrandData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchData = useCallback(async () => {
-    try {
-      const response = await fetch('/api/ev/stats');
-      const result = (await response.json()) as StatsResponse;
-
-      if (response.ok && result.brandComparison) {
-        // Sort by avgPricePerKwh (cheapest first)
-        const sorted = [...result.brandComparison].sort(
-          (a, b) => a.avgPricePerKwh - b.avgPricePerKwh
-        );
-        setData(sorted);
-      } else {
-        setError(result.error || t('failedToLoad'));
-      }
-    } catch (err) {
-      console.error('Failed to fetch network data:', err);
-      setError(t('failedToLoad'));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
 
   if (loading) {
     return (
@@ -82,13 +32,18 @@ export function NetworkComparisonCards() {
     );
   }
 
-  if (data.length === 0) {
+  if (!brandComparison || brandComparison.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         {t('noData')}
       </div>
     );
   }
+
+  // Sort by avgPricePerKwh (cheapest first)
+  const data = [...brandComparison].sort(
+    (a, b) => a.avgPricePerKwh - b.avgPricePerKwh
+  );
 
   return (
     <div className="space-y-4">

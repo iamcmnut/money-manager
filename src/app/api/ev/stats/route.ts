@@ -144,6 +144,10 @@ export async function GET() {
       },
       brandComparison,
       monthlyData,
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
     });
   } catch (error) {
     console.error('Failed to fetch charging stats:', error);

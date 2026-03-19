@@ -1,57 +1,19 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Zap, Wallet, TrendingUp, Hash, Building2, Gauge } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
+import type { StatsData } from './types';
 
-interface StatsData {
-  totalSessions: number;
-  totalKwh: number;
-  totalCost: number;
-  avgPricePerKwh: number;
-  totalDistanceKm: number;
-  avgCostPerKm: number;
-  mostUsedNetwork: {
-    brandId: string;
-    brandName: string;
-    sessions: number;
-  } | null;
-}
-
-interface StatsResponse {
+interface ChargingStatsProps {
   stats?: StatsData;
-  error?: string;
+  loading: boolean;
+  error: string | null;
 }
 
-export function ChargingStats() {
+export function ChargingStats({ stats, loading, error }: ChargingStatsProps) {
   const t = useTranslations('modules.ev.stats');
-  const [stats, setStats] = useState<StatsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchStats = useCallback(async () => {
-    try {
-      const response = await fetch('/api/ev/stats');
-      const data = (await response.json()) as StatsResponse;
-
-      if (response.ok && data.stats) {
-        setStats(data.stats);
-      } else {
-        setError(data.error || t('failedToLoad'));
-      }
-    } catch (err) {
-      console.error('Failed to fetch stats:', err);
-      setError(t('failedToLoad'));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
 
   if (loading) {
     return (
