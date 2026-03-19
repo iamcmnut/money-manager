@@ -59,7 +59,14 @@
         "description": "Average price per kWh across different charging networks",
         "avgPrice": "Avg. Price",
         "failedToLoad": "Failed to load chart data",
-        "noData": "No charging data to display"
+        "noData": "No charging data to display",
+        "sessions": "sessions",
+        "totalEnergy": "Total Energy",
+        "totalSpent": "Total Spent",
+        "cheapest": "Cheapest",
+        "moreExpensive": "more expensive",
+        "perKwh": "/kWh",
+        "tapToCompare": "Tap a network to see details"
       },
       "history": {
         "title": "Charging History",
