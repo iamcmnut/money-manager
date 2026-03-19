@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   BarChart,
@@ -11,69 +10,41 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
+import { formatNumber, formatBaht } from '@/lib/format';
+import type { BrandData } from './types';
 
-interface BrandData {
-  brandId: string;
-  brandName: string | null;
-  brandColor: string | null;
-  sessions: number;
-  totalKwh: number;
-  totalCost: number;
-  avgPricePerKwh: number;
-}
-
-interface StatsResponse {
+interface PriceComparisonChartProps {
   brandComparison?: BrandData[];
-  error?: string;
+  loading: boolean;
+  error: string | null;
 }
 
-export function PriceComparisonChart() {
+export function PriceComparisonChart({ brandComparison, loading, error }: PriceComparisonChartProps) {
   const t = useTranslations('modules.ev.chart');
-  const [data, setData] = useState<BrandData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchData = useCallback(async () => {
-    try {
-      const response = await fetch('/api/ev/stats');
-      const result = (await response.json()) as StatsResponse;
-
-      if (response.ok && result.brandComparison) {
-        setData(result.brandComparison);
-      } else {
-        setError(result.error || t('failedToLoad'));
-      }
-    } catch (err) {
-      console.error('Failed to fetch chart data:', err);
-      setError(t('failedToLoad'));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
 
   if (loading) {
     return (
-      <div className="h-64 animate-pulse rounded-xl border bg-muted/50" />
+      <div className="h-64 animate-pulse rounded-lg border bg-muted/50" />
     );
   }
 
   if (error) {
-    return <div className="text-sm text-red-600">{error}</div>;
+    return (
+      <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+        {error}
+      </div>
+    );
   }
 
-  if (data.length === 0) {
+  if (!brandComparison || brandComparison.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl border bg-muted/20 text-muted-foreground">
+      <div className="flex h-64 items-center justify-center rounded-lg border text-muted-foreground">
         {t('noData')}
       </div>
     );
   }
 
-  const chartData = data
+  const chartData = brandComparison
     .map((item) => ({
       name: item.brandName || item.brandId,
       avgPrice: Math.round(item.avgPricePerKwh * 100) / 100,
@@ -83,7 +54,7 @@ export function PriceComparisonChart() {
     .sort((a, b) => a.avgPrice - b.avgPrice);
 
   return (
-    <div className="rounded-xl border bg-background/50 p-4 backdrop-blur-sm">
+    <div className="rounded-lg border bg-card p-4">
       <h3 className="mb-4 font-semibold">{t('title')}</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
@@ -100,7 +71,7 @@ export function PriceComparisonChart() {
               interval={0}
             />
             <YAxis
-              tickFormatter={(value) => `฿${value}`}
+              tickFormatter={(value) => formatBaht(value)}
               domain={[0, 'dataMax + 1']}
               tick={{ fontSize: 11 }}
               width={45}
@@ -108,7 +79,7 @@ export function PriceComparisonChart() {
             <Tooltip
               formatter={(value) => {
                 const numValue = typeof value === 'number' ? value : 0;
-                return [`฿${numValue.toFixed(2)}/kWh`, t('avgPrice')];
+                return [`${formatBaht(numValue)}/kWh`, t('avgPrice')];
               }}
               labelFormatter={(label) => String(label)}
               contentStyle={{

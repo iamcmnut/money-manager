@@ -86,31 +86,22 @@ export async function GET() {
       ? brandComparison.reduce((prev, current) => (prev.sessions > current.sessions ? prev : current))
       : null;
 
-    // Calculate total distance traveled and cost per km
-    const recordsWithMileage = await db
+    // Get the latest mileage reading to calculate avg cost/km
+    const latestMileageResult = await db
       .select({
         mileageKm: chargingRecords.mileageKm,
-        chargingDatetime: chargingRecords.chargingDatetime,
       })
       .from(chargingRecords)
-      .orderBy(chargingRecords.chargingDatetime);
+      .where(sql`${chargingRecords.mileageKm} IS NOT NULL`)
+      .orderBy(sql`${chargingRecords.chargingDatetime} DESC`)
+      .limit(1);
 
-    // Calculate total distance by finding the difference between max and min mileage
-    const mileageValues = recordsWithMileage
-      .map((r) => r.mileageKm)
-      .filter((m): m is number => m !== null);
-
-    let totalDistanceKm = 0;
+    const latestMileageKm = latestMileageResult[0]?.mileageKm ?? 0;
+    let totalDistanceKm = latestMileageKm;
     let avgCostPerKm = 0;
 
-    if (mileageValues.length >= 2) {
-      const minMileage = Math.min(...mileageValues);
-      const maxMileage = Math.max(...mileageValues);
-      totalDistanceKm = maxMileage - minMileage;
-
-      if (totalDistanceKm > 0) {
-        avgCostPerKm = totalCostDecimal / totalDistanceKm;
-      }
+    if (latestMileageKm > 0) {
+      avgCostPerKm = totalCostDecimal / latestMileageKm;
     }
 
     // Get monthly trend (last 6 months)
@@ -153,6 +144,10 @@ export async function GET() {
       },
       brandComparison,
       monthlyData,
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
     });
   } catch (error) {
     console.error('Failed to fetch charging stats:', error);

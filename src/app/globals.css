@@ -1,48 +1,80 @@
 @import 'tailwindcss';
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 240 10% 3.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 240 10% 3.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 3.9%;
-  --primary: 240 5.9% 10%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 240 4.8% 95.9%;
-  --secondary-foreground: 240 5.9% 10%;
-  --muted: 240 4.8% 95.9%;
-  --muted-foreground: 240 3.8% 46.1%;
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 240 5.9% 90%;
-  --input: 240 5.9% 90%;
-  --ring: 240 5.9% 10%;
-  --radius: 0.5rem;
+  --background: 30 20% 98%;
+  --foreground: 20 10% 12%;
+  --card: 30 15% 99%;
+  --card-foreground: 20 10% 12%;
+  --popover: 30 15% 99%;
+  --popover-foreground: 20 10% 12%;
+  --primary: 168 40% 35%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 25 10% 94%;
+  --secondary-foreground: 20 10% 15%;
+  --muted: 25 10% 94%;
+  --muted-foreground: 20 5% 45%;
+  --accent: 168 25% 94%;
+  --accent-foreground: 168 40% 25%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 25 10% 89%;
+  --input: 25 10% 89%;
+  --ring: 168 40% 35%;
+  --radius: 0.625rem;
+
+  /* Semantic colors */
+  --success: 158 40% 38%;
+  --success-foreground: 158 50% 98%;
+  --success-muted: 158 30% 94%;
+  --warning: 35 75% 48%;
+  --warning-foreground: 35 80% 98%;
+  --warning-muted: 35 50% 94%;
+
+  /* Module identity colors */
+  --module-ev: 168 40% 35%;
+  --module-ev-muted: 168 30% 93%;
+  --module-living: 25 55% 48%;
+  --module-living-muted: 25 40% 93%;
+  --module-savings: 155 38% 38%;
+  --module-savings-muted: 155 28% 93%;
 }
 
 .dark {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 0 0% 98%;
-  --primary-foreground: 240 5.9% 10%;
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
+  --background: 20 12% 7%;
+  --foreground: 30 15% 93%;
+  --card: 20 10% 9%;
+  --card-foreground: 30 15% 93%;
+  --popover: 20 10% 9%;
+  --popover-foreground: 30 15% 93%;
+  --primary: 168 35% 55%;
+  --primary-foreground: 168 50% 8%;
+  --secondary: 20 8% 15%;
+  --secondary-foreground: 30 15% 93%;
+  --muted: 20 8% 15%;
+  --muted-foreground: 25 8% 58%;
+  --accent: 168 15% 14%;
+  --accent-foreground: 168 30% 75%;
   --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --ring: 240 4.9% 83.9%;
+  --destructive-foreground: 30 15% 93%;
+  --border: 20 8% 17%;
+  --input: 20 8% 17%;
+  --ring: 168 35% 55%;
+
+  /* Semantic colors */
+  --success: 158 35% 50%;
+  --success-foreground: 158 50% 8%;
+  --success-muted: 158 20% 14%;
+  --warning: 35 65% 55%;
+  --warning-foreground: 35 80% 8%;
+  --warning-muted: 35 30% 14%;
+
+  /* Module identity colors */
+  --module-ev: 168 35% 55%;
+  --module-ev-muted: 168 20% 14%;
+  --module-living: 25 50% 55%;
+  --module-living-muted: 25 25% 14%;
+  --module-savings: 155 32% 50%;
+  --module-savings-muted: 155 18% 14%;
 }
 
 @theme inline {
@@ -62,9 +94,21 @@
   --color-accent-foreground: hsl(var(--accent-foreground));
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-success-muted: hsl(var(--success-muted));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-warning-muted: hsl(var(--warning-muted));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
+  --color-module-ev: hsl(var(--module-ev));
+  --color-module-ev-muted: hsl(var(--module-ev-muted));
+  --color-module-living: hsl(var(--module-living));
+  --color-module-living-muted: hsl(var(--module-living-muted));
+  --color-module-savings: hsl(var(--module-savings));
+  --color-module-savings-muted: hsl(var(--module-savings-muted));
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

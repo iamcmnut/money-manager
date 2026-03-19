@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import { formatNumber } from '@/lib/format';
 
 interface NetworkData {
   id: string;
@@ -110,7 +111,7 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
 
   const chargedKwh = parseFloat(formData.chargedKwh) || 0;
   const costThb = parseFloat(formData.costThb) || 0;
-  const avgUnitPrice = chargedKwh > 0 ? (costThb / chargedKwh).toFixed(2) : '0.00';
+  const avgUnitPrice = chargedKwh > 0 ? formatNumber(costThb / chargedKwh, 2) : '0.00';
 
   return (
     <div className="rounded-xl border bg-background/80 p-4 backdrop-blur-sm">
@@ -125,7 +126,7 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</div>
+          <div className="text-sm text-destructive bg-destructive/5 border border-destructive/20 p-2 rounded-lg">{error}</div>
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -222,7 +223,7 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
           <Button
             type="submit"
             disabled={saving}
-            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+            className=""
           >
             {saving ? t('saving') : t('save')}
           </Button>

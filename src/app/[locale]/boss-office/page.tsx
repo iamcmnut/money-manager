@@ -50,170 +50,115 @@ function BossOfficePageContent({ session }: { session: Session }) {
   const t = useTranslations('admin');
 
   return (
-    <div className="relative overflow-x-hidden">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-violet-500/10 via-purple-500/5 to-transparent pb-12 pt-12 md:pb-16 md:pt-16">
-        {/* Background decoration */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute left-1/4 -top-10 h-[250px] w-[250px] md:h-[400px] md:w-[400px] rounded-full bg-violet-500/20 blur-3xl" />
-          <div className="absolute right-1/4 bottom-0 h-[200px] w-[200px] md:h-[300px] md:w-[300px] rounded-full bg-purple-500/20 blur-3xl" />
-        </div>
-
+    <div>
+      {/* Header */}
+      <div className="pb-6 pt-8 md:pb-10 md:pt-14">
         <div className="container">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg shadow-violet-500/25">
-              <Settings className="h-10 w-10 text-white" />
+          <div className="mx-auto max-w-6xl">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
+                <Settings className="h-5 w-5 text-accent-foreground" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                  {t('title')}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {t('description')}
+                </p>
+              </div>
             </div>
-            <h1 className="bg-gradient-to-r from-violet-600 via-purple-600 to-violet-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl md:text-5xl">
-              {t('title')}
-            </h1>
-            <p className="mt-4 text-lg text-muted-foreground">
-              {t('description')}
-            </p>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="container -mt-4 pb-16">
+      <div className="container pb-16">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             {/* Users Card */}
-            <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-blue-500/5 to-cyan-500/5 p-4 sm:p-6 shadow-lg">
-              <div className="absolute -right-10 -top-10 h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 blur-3xl" />
-
-              <div className="relative">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-md">
-                    <Users className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold">{t('users')}</h2>
-                    <p className="text-sm text-muted-foreground">{t('usersDescription')}</p>
-                  </div>
+            <div className="rounded-xl border bg-card p-4 sm:p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <Users className="h-5 w-5 text-primary" />
+                <div>
+                  <h2 className="text-base font-semibold">{t('users')}</h2>
+                  <p className="text-xs text-muted-foreground">{t('usersDescription')}</p>
                 </div>
-                <UsersTable />
               </div>
+              <UsersTable />
             </div>
 
             {/* Feature Flags Card */}
-            <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-amber-500/5 to-orange-500/5 p-4 sm:p-6 shadow-lg">
-              <div className="absolute -right-10 -top-10 h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 blur-3xl" />
-
-              <div className="relative">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 shadow-md">
-                    <Flag className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold">{t('featureFlags')}</h2>
-                    <p className="text-sm text-muted-foreground">{t('featureFlagsDescription')}</p>
-                  </div>
+            <div className="rounded-xl border bg-card p-4 sm:p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <Flag className="h-5 w-5 text-primary" />
+                <div>
+                  <h2 className="text-base font-semibold">{t('featureFlags')}</h2>
+                  <p className="text-xs text-muted-foreground">{t('featureFlagsDescription')}</p>
                 </div>
-                <FeatureFlagsPanel />
               </div>
+              <FeatureFlagsPanel />
             </div>
 
             {/* EV Charging Networks Card */}
-            <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-green-500/5 to-emerald-500/5 p-4 sm:p-6 shadow-lg">
-              <div className="absolute -right-10 -top-10 h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-500/20 blur-3xl" />
-
-              <div className="relative">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-md">
-                    <Zap className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold">{t('evNetworks.title')}</h2>
-                    <p className="text-sm text-muted-foreground">{t('evNetworks.description')}</p>
-                  </div>
+            <div className="rounded-xl border bg-card p-4 sm:p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <Zap className="h-5 w-5 text-primary" />
+                <div>
+                  <h2 className="text-base font-semibold">{t('evNetworks.title')}</h2>
+                  <p className="text-xs text-muted-foreground">{t('evNetworks.description')}</p>
                 </div>
-                <ChargingNetworksTable />
               </div>
+              <ChargingNetworksTable />
             </div>
 
             {/* EV Charging Records Card */}
-            <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-purple-500/5 to-pink-500/5 p-4 sm:p-6 shadow-lg">
-              <div className="absolute -right-10 -top-10 h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 blur-3xl" />
-
-              <div className="relative">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-md">
-                    <FileText className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold">{t('chargingRecords.title')}</h2>
-                    <p className="text-sm text-muted-foreground">{t('chargingRecords.description')}</p>
-                  </div>
+            <div className="rounded-xl border bg-card p-4 sm:p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <FileText className="h-5 w-5 text-primary" />
+                <div>
+                  <h2 className="text-base font-semibold">{t('chargingRecords.title')}</h2>
+                  <p className="text-xs text-muted-foreground">{t('chargingRecords.description')}</p>
                 </div>
-                <AdminChargingRecords />
               </div>
+              <AdminChargingRecords />
             </div>
           </div>
 
           {/* My EV Charging History Card */}
-          <div className="mt-4 sm:mt-6 relative overflow-hidden rounded-2xl border bg-gradient-to-br from-blue-500/5 to-cyan-500/5 p-4 sm:p-6 shadow-lg">
-            <div className="absolute -right-10 -top-10 h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 blur-3xl" />
-
-            <div className="relative">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-md">
-                  <History className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold">{t('evHistory.title')}</h2>
-                  <p className="text-sm text-muted-foreground">{t('evHistory.description')}</p>
-                </div>
+          <div className="mt-4 rounded-xl border bg-card p-4 sm:p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <History className="h-5 w-5 text-primary" />
+              <div>
+                <h2 className="text-base font-semibold">{t('evHistory.title')}</h2>
+                <p className="text-xs text-muted-foreground">{t('evHistory.description')}</p>
               </div>
-              <ChargingRecordsList />
             </div>
+            <ChargingRecordsList />
           </div>
 
-          {/* Session Info Card */}
-          <div className="mt-4 sm:mt-6 relative overflow-hidden rounded-2xl border bg-gradient-to-br from-green-500/5 to-emerald-500/5 p-4 sm:p-6 shadow-lg">
-            <div className="absolute -right-10 -top-10 h-32 w-32 sm:h-40 sm:w-40 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-500/20 blur-3xl" />
-
-            <div className="relative">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-md">
-                  <Shield className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold">{t('sessionInfo')}</h2>
-                  <p className="text-sm text-muted-foreground">{t('sessionInfoDescription')}</p>
-                </div>
+          {/* Session Info */}
+          <div className="mt-4 rounded-xl border bg-card p-4 sm:p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <Shield className="h-5 w-5 text-primary" />
+              <div>
+                <h2 className="text-base font-semibold">{t('sessionInfo')}</h2>
+                <p className="text-xs text-muted-foreground">{t('sessionInfoDescription')}</p>
               </div>
+            </div>
 
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div className="flex items-center gap-3 rounded-xl border bg-background/50 p-4 backdrop-blur-sm">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-500">
-                    <UserCircle className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t('name')}</p>
-                    <p className="font-medium">{session.user.name ?? t('na')}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 rounded-xl border bg-background/50 p-4 backdrop-blur-sm">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500">
-                    <Mail className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t('email')}</p>
-                    <p className="font-medium truncate">{session.user.email}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 rounded-xl border bg-background/50 p-4 backdrop-blur-sm">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-green-500 to-emerald-500">
-                    <BadgeCheck className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t('role')}</p>
-                    <p className="font-medium capitalize">{session.user.role}</p>
-                  </div>
-                </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">{t('name')}</p>
+                <p className="mt-0.5 text-sm font-medium">{session.user.name ?? t('na')}</p>
+              </div>
+              <div className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">{t('email')}</p>
+                <p className="mt-0.5 text-sm font-medium truncate">{session.user.email}</p>
+              </div>
+              <div className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">{t('role')}</p>
+                <p className="mt-0.5 text-sm font-medium capitalize">{session.user.role}</p>
               </div>
             </div>
           </div>

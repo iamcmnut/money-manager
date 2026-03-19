@@ -30,10 +30,10 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-8 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <Wallet className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-lg font-bold text-transparent">
+            <span className="text-lg font-bold">
               Manager.money
             </span>
           </Link>
@@ -45,7 +45,7 @@ export function Header() {
                 className={cn(
                   'rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
                   pathname === link.href
-                    ? 'bg-accent text-accent-foreground'
+                    ? 'text-primary font-semibold'
                     : 'text-muted-foreground'
                 )}
               >
@@ -57,7 +57,7 @@ export function Header() {
         <MobileNav />
         <div className="flex min-w-0 flex-1 items-center justify-between md:justify-end">
           <Link href="/" className="flex min-w-0 items-center gap-2 md:hidden">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
               <Wallet className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="truncate font-bold">Manager.money</span>

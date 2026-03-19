@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Trash2, Zap, Upload, X, FileSpreadsheet, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ChargingRecordForm } from './charging-record-form';
+import { formatCents, formatBahtCents } from '@/lib/format';
 
 interface RecordData {
   id: string;
@@ -164,7 +165,7 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
   }
 
   if (error) {
-    return <div className="text-sm text-red-600">{error}</div>;
+    return <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">{error}</div>;
   }
 
   return (
@@ -203,7 +204,7 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
               setEditingRecord(null);
               setShowForm(true);
             }}
-            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+            className=""
           >
             <Plus className="mr-1 h-4 w-4" />
             {t('add')}
@@ -216,8 +217,8 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
         <div
           className={`rounded-xl border p-4 ${
             importResult.error
-              ? 'bg-red-50 border-red-200 text-red-800'
-              : 'bg-green-50 border-green-200 text-green-800'
+              ? 'bg-destructive/5 border-destructive/20 text-destructive'
+              : 'bg-success-muted border-success/20 text-success'
           }`}
         >
           <div className="flex items-start justify-between">
@@ -233,7 +234,7 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
                     </p>
                     {importResult.errors && importResult.errors.length > 0 && (
                       <div className="mt-2 text-sm">
-                        <p className="font-medium text-amber-700">{t('import.warnings')}:</p>
+                        <p className="font-medium text-warning">{t('import.warnings')}:</p>
                         <ul className="mt-1 list-disc list-inside">
                           {importResult.errors.map((err, i) => (
                             <li key={i}>
@@ -323,15 +324,15 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
                 </div>
                 <div className="flex items-start gap-2">
                   <div className="text-right">
-                    <p className="font-semibold text-green-600">
-                      {(record.chargedKwh / 100).toFixed(2)} kWh
+                    <p className="font-semibold text-success">
+                      {formatCents(record.chargedKwh)} kWh
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      ฿{(record.costThb / 100).toFixed(2)}
+                      {formatBahtCents(record.costThb)}
                     </p>
                     {record.avgUnitPrice && (
                       <p className="text-xs text-muted-foreground">
-                        ฿{(record.avgUnitPrice / 100).toFixed(2)}/kWh
+                        {formatBahtCents(record.avgUnitPrice)}/kWh
                       </p>
                     )}
                   </div>
@@ -350,7 +351,7 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/5"
                       disabled={deletingId === record.id}
                       onClick={() => deleteRecord(record.id)}
                     >

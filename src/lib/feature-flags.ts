@@ -3,7 +3,8 @@ export type FeatureFlag =
   | 'module_living_cost'
   | 'module_savings'
   | 'auth_google'
-  | 'auth_credentials';
+  | 'auth_credentials'
+  | 'auth_registration';
 
 const DEFAULT_FLAGS: Record<FeatureFlag, boolean> = {
   module_ev: true,
@@ -11,6 +12,7 @@ const DEFAULT_FLAGS: Record<FeatureFlag, boolean> = {
   module_savings: true,
   auth_google: false,
   auth_credentials: false,
+  auth_registration: false,
 };
 
 // Map feature flags to environment variable names
@@ -20,6 +22,7 @@ const FLAG_ENV_MAP: Record<FeatureFlag, string> = {
   module_savings: 'FEATURE_MODULE_SAVINGS',
   auth_google: 'FEATURE_AUTH_GOOGLE',
   auth_credentials: 'FEATURE_AUTH_CREDENTIALS',
+  auth_registration: 'FEATURE_AUTH_REGISTRATION',
 };
 
 function parseEnvBoolean(value: string | undefined, defaultValue: boolean): boolean {
@@ -66,6 +69,7 @@ export function getAllFeatureFlags(): Record<FeatureFlag, boolean> {
     'module_savings',
     'auth_google',
     'auth_credentials',
+    'auth_registration',
   ];
 
   for (const key of flagKeys) {

@@ -1,89 +1,49 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Phone, ExternalLink, Trophy, TrendingUp } from 'lucide-react';
+import { formatNumber, formatBaht } from '@/lib/format';
+import type { BrandData } from './types';
 
-interface BrandData {
-  brandId: string;
-  brandName: string | null;
-  brandColor: string | null;
-  brandLogo: string | null;
-  brandPhone: string | null;
-  brandWebsite: string | null;
-  sessions: number;
-  totalKwh: number;
-  totalCost: number;
-  avgPricePerKwh: number;
-  isCheapest: boolean;
-  priceDiffPercent: number;
-}
-
-interface StatsResponse {
+interface NetworkComparisonCardsProps {
   brandComparison?: BrandData[];
-  stats?: {
-    cheapestNetwork?: {
-      brandId: string;
-      brandName: string;
-      avgPricePerKwh: number;
-    } | null;
-  };
-  error?: string;
+  loading: boolean;
+  error: string | null;
 }
 
-export function NetworkComparisonCards() {
+export function NetworkComparisonCards({ brandComparison, loading, error }: NetworkComparisonCardsProps) {
   const t = useTranslations('modules.ev.networks');
-  const [data, setData] = useState<BrandData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchData = useCallback(async () => {
-    try {
-      const response = await fetch('/api/ev/stats');
-      const result = (await response.json()) as StatsResponse;
-
-      if (response.ok && result.brandComparison) {
-        // Sort by avgPricePerKwh (cheapest first)
-        const sorted = [...result.brandComparison].sort(
-          (a, b) => a.avgPricePerKwh - b.avgPricePerKwh
-        );
-        setData(sorted);
-      } else {
-        setError(result.error || t('failedToLoad'));
-      }
-    } catch (err) {
-      console.error('Failed to fetch network data:', err);
-      setError(t('failedToLoad'));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
 
   if (loading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-40 animate-pulse rounded-xl border bg-muted/50" />
+          <div key={i} className="h-40 animate-pulse rounded-lg border bg-muted/50" />
         ))}
       </div>
     );
   }
 
   if (error) {
-    return <div className="text-sm text-red-600">{error}</div>;
+    return (
+      <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+        {error}
+      </div>
+    );
   }
 
-  if (data.length === 0) {
+  if (!brandComparison || brandComparison.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         {t('noData')}
       </div>
     );
   }
+
+  // Sort by avgPricePerKwh (cheapest first)
+  const data = [...brandComparison].sort(
+    (a, b) => a.avgPricePerKwh - b.avgPricePerKwh
+  );
 
   return (
     <div className="space-y-4">
@@ -92,15 +52,15 @@ export function NetworkComparisonCards() {
         {data.map((brand, index) => (
           <div
             key={brand.brandId}
-            className={`relative overflow-hidden rounded-xl border p-4 transition-all hover:shadow-md ${
+            className={`relative rounded-lg border p-4 transition-colors hover:bg-accent/30 ${
               brand.isCheapest
-                ? 'bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/30'
-                : 'bg-background/50'
+                ? 'border-success/30 bg-success-muted/50'
+                : 'bg-card'
             }`}
           >
             {/* Cheapest badge */}
             {brand.isCheapest && (
-              <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-green-500 px-2 py-0.5 text-xs font-medium text-white">
+              <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-success px-2 py-0.5 text-xs font-medium text-success-foreground">
                 <Trophy className="h-3 w-3" />
                 {t('cheapest')}
               </div>
@@ -130,7 +90,7 @@ export function NetworkComparisonCards() {
               <div>
                 <h3 className="font-semibold">{brand.brandName}</h3>
                 <p className="text-xs text-muted-foreground">
-                  {brand.sessions} {t('sessions')}
+                  {formatNumber(brand.sessions)} {t('sessions')}
                 </p>
               </div>
             </div>
@@ -139,16 +99,16 @@ export function NetworkComparisonCards() {
             <div className="mt-4">
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold">
-                  ฿{brand.avgPricePerKwh.toFixed(2)}
+                  {formatBaht(brand.avgPricePerKwh)}
                 </span>
                 <span className="text-sm text-muted-foreground">/kWh</span>
               </div>
 
               {/* Price difference */}
               {!brand.isCheapest && brand.priceDiffPercent > 0 && (
-                <div className="mt-1 flex items-center gap-1 text-sm text-amber-600">
+                <div className="mt-1 flex items-center gap-1 text-sm text-warning">
                   <TrendingUp className="h-3 w-3" />
-                  <span>+{brand.priceDiffPercent.toFixed(1)}% {t('moreExpensive')}</span>
+                  <span>+{formatNumber(brand.priceDiffPercent, 1)}% {t('moreExpensive')}</span>
                 </div>
               )}
             </div>
