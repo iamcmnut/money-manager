@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Trash2, Zap, Upload, X, FileSpreadsheet, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ChargingRecordForm } from './charging-record-form';
+import { formatCents, formatBahtCents } from '@/lib/format';
 
 interface RecordData {
   id: string;
@@ -324,14 +325,14 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
                 <div className="flex items-start gap-2">
                   <div className="text-right">
                     <p className="font-semibold text-success">
-                      {(record.chargedKwh / 100).toFixed(2)} kWh
+                      {formatCents(record.chargedKwh)} kWh
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      ฿{(record.costThb / 100).toFixed(2)}
+                      {formatBahtCents(record.costThb)}
                     </p>
                     {record.avgUnitPrice && (
                       <p className="text-xs text-muted-foreground">
-                        ฿{(record.avgUnitPrice / 100).toFixed(2)}/kWh
+                        {formatBahtCents(record.avgUnitPrice)}/kWh
                       </p>
                     )}
                   </div>

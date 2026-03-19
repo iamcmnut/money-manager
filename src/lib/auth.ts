@@ -39,6 +39,8 @@ interface AuthConfigOptions {
     name: string | null;
     role: 'user' | 'admin';
   } | null>;
+  /** Called after a credentials sign-in attempt (success or failure) */
+  onCredentialsSignIn?: (email: string, success: boolean) => Promise<void>;
 }
 
 /**
@@ -87,13 +89,26 @@ function createBaseConfig(options?: AuthConfigOptions): NextAuthConfig {
         const user = await options.getUserByEmail(email);
 
         if (!user || !user.password) {
+          // Record failed attempt (user not found)
+          if (options?.onCredentialsSignIn) {
+            await options.onCredentialsSignIn(email, false);
+          }
           throw new Error('Invalid email or password');
         }
 
         const isValid = await verifyPassword(password, user.password);
 
         if (!isValid) {
+          // Record failed attempt (wrong password)
+          if (options?.onCredentialsSignIn) {
+            await options.onCredentialsSignIn(email, false);
+          }
           throw new Error('Invalid email or password');
+        }
+
+        // Record successful attempt
+        if (options?.onCredentialsSignIn) {
+          await options.onCredentialsSignIn(email, true);
         }
 
         return {

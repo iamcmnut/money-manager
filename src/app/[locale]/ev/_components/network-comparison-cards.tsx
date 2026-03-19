@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Phone, ExternalLink, Trophy, TrendingUp } from 'lucide-react';
+import { formatNumber, formatBaht } from '@/lib/format';
 
 interface BrandData {
   brandId: string;
@@ -134,7 +135,7 @@ export function NetworkComparisonCards() {
               <div>
                 <h3 className="font-semibold">{brand.brandName}</h3>
                 <p className="text-xs text-muted-foreground">
-                  {brand.sessions} {t('sessions')}
+                  {formatNumber(brand.sessions)} {t('sessions')}
                 </p>
               </div>
             </div>
@@ -143,7 +144,7 @@ export function NetworkComparisonCards() {
             <div className="mt-4">
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold">
-                  ฿{brand.avgPricePerKwh.toFixed(2)}
+                  {formatBaht(brand.avgPricePerKwh)}
                 </span>
                 <span className="text-sm text-muted-foreground">/kWh</span>
               </div>
@@ -152,7 +153,7 @@ export function NetworkComparisonCards() {
               {!brand.isCheapest && brand.priceDiffPercent > 0 && (
                 <div className="mt-1 flex items-center gap-1 text-sm text-warning">
                   <TrendingUp className="h-3 w-3" />
-                  <span>+{brand.priceDiffPercent.toFixed(1)}% {t('moreExpensive')}</span>
+                  <span>+{formatNumber(brand.priceDiffPercent, 1)}% {t('moreExpensive')}</span>
                 </div>
               )}
             </div>

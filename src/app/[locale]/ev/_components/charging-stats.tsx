@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Zap, Wallet, TrendingUp, Hash, Building2, Gauge } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { formatNumber, formatBaht } from '@/lib/format';
 
 interface StatsData {
   totalSessions: number;
@@ -78,41 +79,41 @@ export function ChargingStats() {
     {
       icon: Hash,
       label: t('totalSessions'),
-      value: stats.totalSessions.toString(),
+      value: formatNumber(stats.totalSessions),
       iconColor: 'text-muted-foreground',
     },
     {
       icon: Zap,
       label: t('totalKwh'),
-      value: `${stats.totalKwh.toFixed(2)} kWh`,
+      value: `${formatNumber(stats.totalKwh, 2)} kWh`,
       iconColor: 'text-module-ev',
     },
     {
       icon: Wallet,
       label: t('totalCost'),
-      value: `฿${stats.totalCost.toFixed(2)}`,
+      value: formatBaht(stats.totalCost),
       highlight: true,
       iconColor: 'text-warning',
     },
     {
       icon: TrendingUp,
       label: t('avgPricePerKwh'),
-      value: `฿${stats.avgPricePerKwh.toFixed(2)}/kWh`,
+      value: `${formatBaht(stats.avgPricePerKwh)}/kWh`,
       highlight: true,
       iconColor: 'text-primary',
     },
     {
       icon: Gauge,
       label: t('avgCostPerKm'),
-      value: stats.avgCostPerKm > 0 ? `฿${stats.avgCostPerKm.toFixed(2)}/km` : '-',
-      subtitle: stats.totalDistanceKm > 0 ? `${stats.totalDistanceKm.toLocaleString()} km` : undefined,
+      value: stats.avgCostPerKm > 0 ? `${formatBaht(stats.avgCostPerKm)}/km` : '-',
+      subtitle: stats.totalDistanceKm > 0 ? `${formatNumber(stats.totalDistanceKm)} km` : undefined,
       iconColor: 'text-module-ev',
     },
     {
       icon: Building2,
       label: t('mostUsedNetwork'),
       value: stats.mostUsedNetwork?.brandName || '-',
-      subtitle: stats.mostUsedNetwork ? `${stats.mostUsedNetwork.sessions} ${t('sessions')}` : undefined,
+      subtitle: stats.mostUsedNetwork ? `${formatNumber(stats.mostUsedNetwork.sessions)} ${t('sessions')}` : undefined,
       iconColor: 'text-success',
     },
   ];

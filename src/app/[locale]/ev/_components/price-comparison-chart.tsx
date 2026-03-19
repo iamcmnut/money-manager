@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
+import { formatNumber, formatBaht } from '@/lib/format';
 
 interface BrandData {
   brandId: string;
@@ -104,7 +105,7 @@ export function PriceComparisonChart() {
               interval={0}
             />
             <YAxis
-              tickFormatter={(value) => `฿${value}`}
+              tickFormatter={(value) => formatBaht(value)}
               domain={[0, 'dataMax + 1']}
               tick={{ fontSize: 11 }}
               width={45}
@@ -112,7 +113,7 @@ export function PriceComparisonChart() {
             <Tooltip
               formatter={(value) => {
                 const numValue = typeof value === 'number' ? value : 0;
-                return [`฿${numValue.toFixed(2)}/kWh`, t('avgPrice')];
+                return [`${formatBaht(numValue)}/kWh`, t('avgPrice')];
               }}
               labelFormatter={(label) => String(label)}
               contentStyle={{

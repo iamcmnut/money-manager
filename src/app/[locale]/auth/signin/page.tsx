@@ -12,6 +12,7 @@ interface AuthStatus {
     google: boolean;
     credentials: boolean;
   };
+  registration: boolean;
 }
 
 function SignInForm() {
@@ -33,7 +34,7 @@ function SignInForm() {
         setAuthStatus(data);
       })
       .catch(() => {
-        setAuthStatus({ providers: { google: false, credentials: false } });
+        setAuthStatus({ providers: { google: false, credentials: false }, registration: false });
       })
       .finally(() => {
         setLoading(false);
@@ -149,16 +150,18 @@ function SignInForm() {
                 {submitting ? t('pleaseWait') : isRegister ? t('createAccount') : t('signIn')}
               </Button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setIsRegister(!isRegister);
-                  setError(null);
-                }}
-                className="w-full text-sm text-muted-foreground hover:underline"
-              >
-                {isRegister ? t('hasAccount') : t('noAccount')}
-              </button>
+              {authStatus?.registration && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRegister(!isRegister);
+                    setError(null);
+                  }}
+                  className="w-full text-sm text-muted-foreground hover:underline"
+                >
+                  {isRegister ? t('hasAccount') : t('noAccount')}
+                </button>
+              )}
             </form>
           )}
 

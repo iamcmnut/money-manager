@@ -86,6 +86,16 @@ export const chargingRecords = sqliteTable('charging_records', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
+// Login attempts tracking for brute force protection
+export const loginAttempts = sqliteTable('login_attempts', {
+  id: text('id').primaryKey(),
+  identifier: text('identifier').notNull(), // email or IP address
+  attemptType: text('attempt_type', { enum: ['login', 'register'] }).notNull(),
+  success: integer('success', { mode: 'boolean' }).notNull().default(false),
+  ipAddress: text('ip_address'),
+  attemptedAt: integer('attempted_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -95,3 +105,5 @@ export type ChargingNetwork = typeof chargingNetworks.$inferSelect;
 export type NewChargingNetwork = typeof chargingNetworks.$inferInsert;
 export type ChargingRecord = typeof chargingRecords.$inferSelect;
 export type NewChargingRecord = typeof chargingRecords.$inferInsert;
+export type LoginAttempt = typeof loginAttempts.$inferSelect;
+export type NewLoginAttempt = typeof loginAttempts.$inferInsert;

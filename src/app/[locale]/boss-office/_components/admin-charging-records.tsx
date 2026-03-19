@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Zap, User } from 'lucide-react';
+import { formatCents, formatBahtCents } from '@/lib/format';
 
 interface RecordData {
   id: string;
@@ -108,15 +109,15 @@ export function AdminChargingRecords() {
               </div>
             </div>
             <div className="text-right">
-              <p className="font-semibold text-green-600">
-                {(record.chargedKwh / 100).toFixed(2)} kWh
+              <p className="font-semibold text-success">
+                {formatCents(record.chargedKwh)} kWh
               </p>
               <p className="text-sm text-muted-foreground">
-                ฿{(record.costThb / 100).toFixed(2)}
+                {formatBahtCents(record.costThb)}
               </p>
               {record.avgUnitPrice && (
                 <p className="text-xs text-muted-foreground">
-                  ฿{(record.avgUnitPrice / 100).toFixed(2)}/kWh
+                  {formatBahtCents(record.avgUnitPrice)}/kWh
                 </p>
               )}
             </div>

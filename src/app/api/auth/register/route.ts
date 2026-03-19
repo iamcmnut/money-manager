@@ -4,6 +4,7 @@ import { getDatabase } from '@/lib/server';
 import { getFeatureFlag } from '@/lib/feature-flags';
 import { users } from '@/lib/db/schema';
 import { hashPassword, validatePassword, validateEmail } from '@/lib/password';
+import { checkRateLimit, recordAttempt, getClientIp } from '@/lib/rate-limit';
 
 interface RegisterBody {
   email: string;
@@ -12,9 +13,10 @@ interface RegisterBody {
 }
 
 export async function POST(request: Request) {
-  const credentialsEnabled = await getFeatureFlag('auth_credentials');
+  const credentialsEnabled = getFeatureFlag('auth_credentials');
+  const registrationEnabled = getFeatureFlag('auth_registration');
 
-  if (!credentialsEnabled) {
+  if (!credentialsEnabled || !registrationEnabled) {
     return NextResponse.json(
       { error: 'Registration is currently disabled' },
       { status: 403 }
@@ -42,6 +44,27 @@ export async function POST(request: Request) {
       );
     }
 
+    // Rate limit by IP address for registration
+    const ip = getClientIp(request);
+    if (ip) {
+      const ipRateLimit = await checkRateLimit(db, `ip:${ip}`, 'register');
+      if (!ipRateLimit.allowed) {
+        return NextResponse.json(
+          { error: `Too many registration attempts. Please try again in ${Math.ceil(ipRateLimit.retryAfterSeconds / 60)} minutes.` },
+          { status: 429, headers: { 'Retry-After': String(ipRateLimit.retryAfterSeconds) } }
+        );
+      }
+    }
+
+    // Rate limit by email for registration
+    const emailRateLimit = await checkRateLimit(db, email, 'register');
+    if (!emailRateLimit.allowed) {
+      return NextResponse.json(
+        { error: `Too many registration attempts for this email. Please try again later.` },
+        { status: 429, headers: { 'Retry-After': String(emailRateLimit.retryAfterSeconds) } }
+      );
+    }
+
     // Validate password
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.valid) {
@@ -59,6 +82,11 @@ export async function POST(request: Request) {
       .limit(1);
 
     if (existingUser.length > 0) {
+      // Record attempt to prevent enumeration attacks via repeated registration
+      await recordAttempt(db, email, 'register', false, ip);
+      if (ip) {
+        await recordAttempt(db, `ip:${ip}`, 'register', false, ip);
+      }
       return NextResponse.json(
         { error: 'An account with this email already exists' },
         { status: 409 }

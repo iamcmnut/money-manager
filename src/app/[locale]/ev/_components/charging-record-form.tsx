@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import { formatNumber } from '@/lib/format';
 
 interface NetworkData {
   id: string;
@@ -110,7 +111,7 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
 
   const chargedKwh = parseFloat(formData.chargedKwh) || 0;
   const costThb = parseFloat(formData.costThb) || 0;
-  const avgUnitPrice = chargedKwh > 0 ? (costThb / chargedKwh).toFixed(2) : '0.00';
+  const avgUnitPrice = chargedKwh > 0 ? formatNumber(costThb / chargedKwh, 2) : '0.00';
 
   return (
     <div className="rounded-xl border bg-background/80 p-4 backdrop-blur-sm">
