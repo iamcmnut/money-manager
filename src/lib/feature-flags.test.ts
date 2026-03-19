@@ -16,6 +16,7 @@ describe('getDefaultFlags', () => {
       module_savings: true,
       auth_google: false,
       auth_credentials: false,
+      auth_registration: false,
     });
   });
 
@@ -100,6 +101,7 @@ describe('getAllFeatureFlags', () => {
     delete process.env.FEATURE_MODULE_SAVINGS;
     delete process.env.FEATURE_AUTH_GOOGLE;
     delete process.env.FEATURE_AUTH_CREDENTIALS;
+    delete process.env.FEATURE_AUTH_REGISTRATION;
 
     const flags = getAllFeatureFlags();
 
@@ -109,6 +111,7 @@ describe('getAllFeatureFlags', () => {
       module_savings: true,
       auth_google: false,
       auth_credentials: false,
+      auth_registration: false,
     });
   });
 
@@ -135,8 +138,9 @@ describe('FeatureFlag type', () => {
       'module_savings',
       'auth_google',
       'auth_credentials',
+      'auth_registration',
     ];
 
-    expect(validFlags).toHaveLength(5);
+    expect(validFlags).toHaveLength(6);
   });
 });
