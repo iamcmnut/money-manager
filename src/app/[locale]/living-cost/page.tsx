@@ -41,8 +41,8 @@ function LivingCostPageContent() {
         <div className="container">
           <div className="mx-auto max-w-3xl">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
-                <Home className="h-5 w-5 text-accent-foreground" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-module-living-muted">
+                <Home className="h-5 w-5 text-module-living" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -78,7 +78,7 @@ function LivingCostPageContent() {
                   key={index}
                   className="flex items-center gap-3 rounded-lg border p-3"
                 >
-                  <feature.icon className="h-4 w-4 text-primary" />
+                  <feature.icon className="h-4 w-4 text-module-living" />
                   <span className="text-sm font-medium">{feature.label}</span>
                 </div>
               ))}

@@ -74,40 +74,46 @@ export function ChargingStats() {
     return null;
   }
 
-  const statCards: { icon: LucideIcon; label: string; value: string; subtitle?: string; highlight?: boolean }[] = [
+  const statCards: { icon: LucideIcon; label: string; value: string; subtitle?: string; highlight?: boolean; iconColor?: string }[] = [
     {
       icon: Hash,
       label: t('totalSessions'),
       value: stats.totalSessions.toString(),
+      iconColor: 'text-muted-foreground',
     },
     {
       icon: Zap,
       label: t('totalKwh'),
       value: `${stats.totalKwh.toFixed(2)} kWh`,
+      iconColor: 'text-module-ev',
     },
     {
       icon: Wallet,
       label: t('totalCost'),
       value: `฿${stats.totalCost.toFixed(2)}`,
       highlight: true,
+      iconColor: 'text-warning',
     },
     {
       icon: TrendingUp,
       label: t('avgPricePerKwh'),
       value: `฿${stats.avgPricePerKwh.toFixed(2)}/kWh`,
       highlight: true,
+      iconColor: 'text-primary',
     },
     {
       icon: Gauge,
       label: t('avgCostPerKm'),
       value: stats.avgCostPerKm > 0 ? `฿${stats.avgCostPerKm.toFixed(2)}/km` : '-',
       subtitle: stats.totalDistanceKm > 0 ? `${stats.totalDistanceKm.toLocaleString()} km` : undefined,
+      iconColor: 'text-module-ev',
     },
     {
       icon: Building2,
       label: t('mostUsedNetwork'),
       value: stats.mostUsedNetwork?.brandName || '-',
       subtitle: stats.mostUsedNetwork ? `${stats.mostUsedNetwork.sessions} ${t('sessions')}` : undefined,
+      iconColor: 'text-success',
     },
   ];
 
@@ -126,7 +132,7 @@ export function ChargingStats() {
                 <p className="text-xs text-muted-foreground">{stat.subtitle}</p>
               )}
             </div>
-            <stat.icon className="h-4 w-4 text-muted-foreground/60" />
+            <stat.icon className={`h-4 w-4 ${stat.iconColor || 'text-muted-foreground'}`} />
           </div>
         </div>
       ))}

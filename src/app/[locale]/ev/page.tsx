@@ -35,8 +35,8 @@ function EVPageContent() {
         <div className="container">
           <div className="mx-auto max-w-6xl">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
-                <Car className="h-5 w-5 text-accent-foreground" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-module-ev-muted">
+                <Car className="h-5 w-5 text-module-ev" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">

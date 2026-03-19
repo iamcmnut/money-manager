@@ -98,13 +98,13 @@ export function NetworkComparisonCards() {
             key={brand.brandId}
             className={`relative rounded-lg border p-4 transition-colors hover:bg-accent/30 ${
               brand.isCheapest
-                ? 'border-green-600/30 bg-green-50/50 dark:bg-green-950/20'
+                ? 'border-success/30 bg-success-muted/50'
                 : 'bg-card'
             }`}
           >
             {/* Cheapest badge */}
             {brand.isCheapest && (
-              <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-green-500 px-2 py-0.5 text-xs font-medium text-white">
+              <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-success px-2 py-0.5 text-xs font-medium text-success-foreground">
                 <Trophy className="h-3 w-3" />
                 {t('cheapest')}
               </div>
@@ -150,7 +150,7 @@ export function NetworkComparisonCards() {
 
               {/* Price difference */}
               {!brand.isCheapest && brand.priceDiffPercent > 0 && (
-                <div className="mt-1 flex items-center gap-1 text-sm text-amber-600">
+                <div className="mt-1 flex items-center gap-1 text-sm text-warning">
                   <TrendingUp className="h-3 w-3" />
                   <span>+{brand.priceDiffPercent.toFixed(1)}% {t('moreExpensive')}</span>
                 </div>

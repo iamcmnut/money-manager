@@ -125,7 +125,7 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</div>
+          <div className="text-sm text-destructive bg-destructive/5 border border-destructive/20 p-2 rounded-lg">{error}</div>
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -222,7 +222,7 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
           <Button
             type="submit"
             disabled={saving}
-            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+            className=""
           >
             {saving ? t('saving') : t('save')}
           </Button>
