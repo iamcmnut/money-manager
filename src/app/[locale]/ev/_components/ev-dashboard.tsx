@@ -37,6 +37,12 @@ export function EVDashboard() {
 
   return (
     <div className="space-y-6">
+      <PriceComparisonChart
+        brandComparison={data?.brandComparison}
+        loading={loading}
+        error={error}
+      />
+
       <NetworkComparisonCards
         brandComparison={data?.brandComparison}
         loading={loading}
@@ -45,12 +51,6 @@ export function EVDashboard() {
 
       <ChargingStats
         stats={data?.stats}
-        loading={loading}
-        error={error}
-      />
-
-      <PriceComparisonChart
-        brandComparison={data?.brandComparison}
         loading={loading}
         error={error}
       />

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { Trophy, TrendingUp, Zap, Wallet } from 'lucide-react';
+import { Trophy, TrendingUp, Zap, Wallet, ChevronDown } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
 import type { BrandData } from './types';
 
@@ -17,6 +17,7 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
   const t = useTranslations('modules.ev.chart');
   const [mounted, setMounted] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,6 +25,18 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
     const frame = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(frame);
   }, []);
+
+  // Auto-expand the cheapest card so users discover the expand pattern
+  useEffect(() => {
+    if (mounted && !hasAutoExpanded && brandComparison && brandComparison.length > 0) {
+      const cheapest = [...brandComparison].sort((a, b) => a.avgPricePerKwh - b.avgPricePerKwh)[0];
+      const timer = setTimeout(() => {
+        setExpandedId(cheapest.brandId);
+        setHasAutoExpanded(true);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [mounted, hasAutoExpanded, brandComparison]);
 
   if (loading) {
     return (
@@ -74,7 +87,7 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
     <div ref={containerRef} className="rounded-lg border bg-card p-5">
       <div className="mb-1 flex items-baseline justify-between">
         <h3 className="font-semibold">{t('title')}</h3>
-        <p className="text-xs text-muted-foreground hidden sm:block">
+        <p className="text-xs text-muted-foreground">
           {t('tapToCompare')}
         </p>
       </div>
@@ -87,6 +100,8 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
             : 0;
           const isExpanded = expandedId === brand.brandId;
           const price = Math.round(brand.avgPricePerKwh * 100) / 100;
+          const rank = index + 1;
+          const medals = ['🥇', '🥈', '🥉'];
 
           return (
             <button
@@ -107,6 +122,17 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
             >
               {/* Main row */}
               <div className="flex items-center gap-3">
+                {/* Rank */}
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center" aria-label={`Rank ${rank}`}>
+                  {rank <= 3 ? (
+                    <span className="text-lg leading-none">{medals[rank - 1]}</span>
+                  ) : (
+                    <span className="text-xs font-semibold tabular-nums text-muted-foreground">
+                      {rank}
+                    </span>
+                  )}
+                </div>
+
                 {/* Brand avatar */}
                 {brand.brandLogo ? (
                   <Image
@@ -172,14 +198,21 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
                   </div>
                 </div>
 
-                {/* Session count */}
-                <div className="shrink-0 text-right">
-                  <span className="text-xs tabular-nums text-muted-foreground">
-                    {formatNumber(brand.sessions)}
-                  </span>
-                  <p className="text-[10px] text-muted-foreground/70">
-                    {t('sessions')}
-                  </p>
+                {/* Session count + chevron */}
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <div className="text-right">
+                    <span className="text-xs tabular-nums text-muted-foreground">
+                      {formatNumber(brand.sessions)}
+                    </span>
+                    <p className="text-[10px] text-muted-foreground/70">
+                      {t('sessions')}
+                    </p>
+                  </div>
+                  <ChevronDown
+                    className={`h-4 w-4 text-muted-foreground/50 transition-transform duration-200 ${
+                      isExpanded ? 'rotate-180' : ''
+                    }`}
+                  />
                 </div>
               </div>
 
