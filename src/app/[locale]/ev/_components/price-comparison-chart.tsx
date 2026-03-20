@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Trophy, TrendingUp, Zap, Wallet } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
@@ -29,7 +30,7 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
       <div className="rounded-lg border bg-card p-5">
         <div className="mb-5 h-5 w-48 animate-pulse rounded bg-muted/50" />
         <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
+          {Array.from({ length: 3 }, (_, i) => (
             <div key={i} className="flex items-center gap-3">
               <div className="h-10 w-10 shrink-0 animate-pulse rounded-lg bg-muted/50" />
               <div className="flex-1">
@@ -108,9 +109,11 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
               <div className="flex items-center gap-3">
                 {/* Brand avatar */}
                 {brand.brandLogo ? (
-                  <img
+                  <Image
                     src={brand.brandLogo}
                     alt=""
+                    width={36}
+                    height={36}
                     className="h-9 w-9 shrink-0 rounded-lg object-cover"
                   />
                 ) : (

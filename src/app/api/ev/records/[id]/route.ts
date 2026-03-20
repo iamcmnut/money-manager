@@ -89,13 +89,26 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     // Recalculate avgUnitPrice if kWh or cost changed
     if (updateData.chargedKwh !== undefined || updateData.costThb !== undefined) {
-      const chargedKwh = updateData.chargedKwh;
-      const costThb = updateData.costThb;
+      let finalKwh = updateData.chargedKwh;
+      let finalCost = updateData.costThb;
 
-      // If only one value changed, we need to get the other from the existing record
-      if (chargedKwh !== undefined && costThb !== undefined) {
-        updateData.avgUnitPrice = chargedKwh > 0 ? Math.round(costThb / chargedKwh * 100) : null;
+      // If only one value changed, fetch the other from the existing record
+      if (finalKwh === undefined || finalCost === undefined) {
+        const existing = await db
+          .select({ chargedKwh: chargingRecords.chargedKwh, costThb: chargingRecords.costThb })
+          .from(chargingRecords)
+          .where(and(eq(chargingRecords.id, id), eq(chargingRecords.userId, session.user.id)))
+          .limit(1);
+
+        if (existing.length === 0) {
+          return NextResponse.json({ error: 'Record not found' }, { status: 404 });
+        }
+
+        finalKwh = finalKwh ?? existing[0].chargedKwh;
+        finalCost = finalCost ?? existing[0].costThb;
       }
+
+      updateData.avgUnitPrice = finalKwh > 0 ? Math.round(finalCost / finalKwh * 100) : null;
     }
 
     if (Object.keys(updateData).length === 0) {

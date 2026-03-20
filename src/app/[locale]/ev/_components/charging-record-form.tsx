@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -72,7 +72,8 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
       }
     };
     fetchNetworks();
-  }, [record, formData.brandId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [record]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,9 +110,11 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
     }
   };
 
-  const chargedKwh = parseFloat(formData.chargedKwh) || 0;
-  const costThb = parseFloat(formData.costThb) || 0;
-  const avgUnitPrice = chargedKwh > 0 ? formatNumber(costThb / chargedKwh, 2) : '0.00';
+  const avgUnitPrice = useMemo(() => {
+    const kWh = parseFloat(formData.chargedKwh) || 0;
+    const cost = parseFloat(formData.costThb) || 0;
+    return kWh > 0 ? formatNumber(cost / kWh, 2) : '0.00';
+  }, [formData.chargedKwh, formData.costThb]);
 
   return (
     <div className="rounded-xl border bg-background/80 p-4 backdrop-blur-sm">

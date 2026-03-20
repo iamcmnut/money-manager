@@ -20,45 +20,69 @@ export async function GET() {
   }
 
   try {
-    // Get overall stats
-    const overallStats = await db
-      .select({
-        totalSessions: sql<number>`COUNT(*)`,
-        totalKwh: sql<number>`COALESCE(SUM(${chargingRecords.chargedKwh}), 0)`,
-        totalCost: sql<number>`COALESCE(SUM(${chargingRecords.costThb}), 0)`,
-      })
-      .from(chargingRecords)
-      .where(eq(chargingRecords.userId, userId));
+    // Run all queries in parallel
+    const [overallStats, brandStats, latestMileageResult, monthlyTrend] = await Promise.all([
+      // Overall stats
+      db
+        .select({
+          totalSessions: sql<number>`COUNT(*)`,
+          totalKwh: sql<number>`COALESCE(SUM(${chargingRecords.chargedKwh}), 0)`,
+          totalCost: sql<number>`COALESCE(SUM(${chargingRecords.costThb}), 0)`,
+        })
+        .from(chargingRecords)
+        .where(eq(chargingRecords.userId, userId)),
+
+      // Stats per brand
+      db
+        .select({
+          brandId: chargingRecords.brandId,
+          brandName: chargingNetworks.name,
+          brandColor: chargingNetworks.brandColor,
+          brandLogo: chargingNetworks.logo,
+          brandPhone: chargingNetworks.phone,
+          brandWebsite: chargingNetworks.website,
+          sessions: sql<number>`COUNT(*)`,
+          totalKwh: sql<number>`SUM(${chargingRecords.chargedKwh})`,
+          totalCost: sql<number>`SUM(${chargingRecords.costThb})`,
+        })
+        .from(chargingRecords)
+        .where(eq(chargingRecords.userId, userId))
+        .leftJoin(chargingNetworks, eq(chargingRecords.brandId, chargingNetworks.id))
+        .groupBy(
+          chargingRecords.brandId,
+          chargingNetworks.name,
+          chargingNetworks.brandColor,
+          chargingNetworks.logo,
+          chargingNetworks.phone,
+          chargingNetworks.website
+        ),
+
+      // Latest mileage
+      db
+        .select({ mileageKm: chargingRecords.mileageKm })
+        .from(chargingRecords)
+        .where(and(eq(chargingRecords.userId, userId), sql`${chargingRecords.mileageKm} IS NOT NULL`))
+        .orderBy(sql`${chargingRecords.chargingDatetime} DESC`)
+        .limit(1),
+
+      // Monthly trend
+      db
+        .select({
+          month: sql<string>`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`,
+          totalKwh: sql<number>`SUM(${chargingRecords.chargedKwh})`,
+          totalCost: sql<number>`SUM(${chargingRecords.costThb})`,
+          sessions: sql<number>`COUNT(*)`,
+        })
+        .from(chargingRecords)
+        .where(eq(chargingRecords.userId, userId))
+        .groupBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`)
+        .orderBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`),
+    ]);
 
     const stats = overallStats[0];
     const totalKwhDecimal = stats.totalKwh / 100;
     const totalCostDecimal = stats.totalCost / 100;
     const avgPricePerKwh = totalKwhDecimal > 0 ? totalCostDecimal / totalKwhDecimal : 0;
-
-    // Get stats per brand (for comparison chart)
-    const brandStats = await db
-      .select({
-        brandId: chargingRecords.brandId,
-        brandName: chargingNetworks.name,
-        brandColor: chargingNetworks.brandColor,
-        brandLogo: chargingNetworks.logo,
-        brandPhone: chargingNetworks.phone,
-        brandWebsite: chargingNetworks.website,
-        sessions: sql<number>`COUNT(*)`,
-        totalKwh: sql<number>`SUM(${chargingRecords.chargedKwh})`,
-        totalCost: sql<number>`SUM(${chargingRecords.costThb})`,
-      })
-      .from(chargingRecords)
-      .where(eq(chargingRecords.userId, userId))
-      .leftJoin(chargingNetworks, eq(chargingRecords.brandId, chargingNetworks.id))
-      .groupBy(
-        chargingRecords.brandId,
-        chargingNetworks.name,
-        chargingNetworks.brandColor,
-        chargingNetworks.logo,
-        chargingNetworks.phone,
-        chargingNetworks.website
-      );
 
     // Calculate avg price for each brand
     const brandData = brandStats.map((brand) => ({
@@ -97,16 +121,6 @@ export async function GET() {
       ? brandComparison.reduce((prev, current) => (prev.sessions > current.sessions ? prev : current))
       : null;
 
-    // Get the latest mileage reading to calculate avg cost/km
-    const latestMileageResult = await db
-      .select({
-        mileageKm: chargingRecords.mileageKm,
-      })
-      .from(chargingRecords)
-      .where(and(eq(chargingRecords.userId, userId), sql`${chargingRecords.mileageKm} IS NOT NULL`))
-      .orderBy(sql`${chargingRecords.chargingDatetime} DESC`)
-      .limit(1);
-
     const latestMileageKm = latestMileageResult[0]?.mileageKm ?? 0;
     let totalDistanceKm = latestMileageKm;
     let avgCostPerKm = 0;
@@ -114,19 +128,6 @@ export async function GET() {
     if (latestMileageKm > 0) {
       avgCostPerKm = totalCostDecimal / latestMileageKm;
     }
-
-    // Get monthly trend (last 6 months)
-    const monthlyTrend = await db
-      .select({
-        month: sql<string>`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`,
-        totalKwh: sql<number>`SUM(${chargingRecords.chargedKwh})`,
-        totalCost: sql<number>`SUM(${chargingRecords.costThb})`,
-        sessions: sql<number>`COUNT(*)`,
-      })
-      .from(chargingRecords)
-      .where(eq(chargingRecords.userId, userId))
-      .groupBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`)
-      .orderBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`);
 
     const monthlyData = monthlyTrend.map((month) => ({
       month: month.month,
@@ -158,7 +159,7 @@ export async function GET() {
       monthlyData,
     }, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'Cache-Control': 'private, max-age=60, stale-while-revalidate=300',
       },
     });
   } catch (error) {
