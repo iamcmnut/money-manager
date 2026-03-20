@@ -40,27 +40,26 @@ export function ChargingStats({ stats, loading, error }: ChargingStatsProps) {
   }
 
   if (!stats) {
-    return null;
+    return (
+      <div className="space-y-4">
+        <h3 className="font-semibold">{t('title')}</h3>
+        <div className="py-6 text-center">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted/50">
+            <Wallet className="h-5 w-5 text-muted-foreground/50" />
+          </div>
+          <p className="text-sm font-medium text-muted-foreground">{t('noData')}</p>
+          <p className="mt-1 text-xs text-muted-foreground/70">{t('noDataHint')}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
       <h3 className="font-semibold">{t('title')}</h3>
 
-      {/* Primary stats — the numbers users care about most */}
+      {/* Primary stats — the cost numbers users care about most */}
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border bg-card p-5">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <TrendingUp className="h-4 w-4 text-primary" />
-            </div>
-            <p className="text-sm text-muted-foreground">{t('avgPricePerKwh')}</p>
-          </div>
-          <p className="mt-3 text-2xl font-bold text-primary tabular-nums">
-            {formatBaht(stats.avgPricePerKwh)}/kWh
-          </p>
-        </div>
-
         <div className="rounded-lg border bg-card p-5">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning/10">
@@ -70,6 +69,18 @@ export function ChargingStats({ stats, loading, error }: ChargingStatsProps) {
           </div>
           <p className="mt-3 text-2xl font-bold tabular-nums">
             {formatBaht(stats.totalCost)}
+          </p>
+        </div>
+
+        <div className="rounded-lg border bg-card p-5">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-module-ev/10">
+              <Gauge className="h-4 w-4 text-module-ev" />
+            </div>
+            <p className="text-sm text-muted-foreground">{t('avgCostPerKm')}</p>
+          </div>
+          <p className="mt-3 text-2xl font-bold tabular-nums">
+            {stats.avgCostPerKm > 0 ? `${formatBaht(stats.avgCostPerKm)}/km` : '-'}
           </p>
         </div>
       </div>
@@ -93,12 +104,10 @@ export function ChargingStats({ stats, loading, error }: ChargingStatsProps) {
         </div>
 
         <div className="flex items-center gap-2.5 rounded-lg bg-muted/30 px-3 py-2.5">
-          <Gauge className="h-3.5 w-3.5 shrink-0 text-module-ev" />
+          <TrendingUp className="h-3.5 w-3.5 shrink-0 text-primary" />
           <div className="min-w-0">
-            <p className="text-[10px] text-muted-foreground">{t('avgCostPerKm')}</p>
-            <p className="text-sm font-semibold tabular-nums">
-              {stats.avgCostPerKm > 0 ? `${formatBaht(stats.avgCostPerKm)}/km` : '-'}
-            </p>
+            <p className="text-[10px] text-muted-foreground">{t('avgPricePerKwh')}</p>
+            <p className="text-sm font-semibold tabular-nums">{formatBaht(stats.avgPricePerKwh)}/kWh</p>
           </div>
         </div>
 

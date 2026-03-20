@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Trophy, TrendingUp, Zap, Wallet, ChevronDown, Phone, ExternalLink } from 'lucide-react';
@@ -14,15 +14,19 @@ interface PriceComparisonChartProps {
   error: string | null;
 }
 
+const rankStyles = [
+  'border border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-400',
+  'border border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-400',
+  'border border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-400',
+];
+
 export function PriceComparisonChart({ brandComparison, loading, error }: PriceComparisonChartProps) {
   const t = useTranslations('modules.ev.chart');
   const [mounted, setMounted] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Trigger bar animations after mount
     const frame = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(frame);
   }, []);
@@ -43,14 +47,16 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
     return (
       <div className="rounded-lg border bg-card p-5">
         <div className="mb-5 h-5 w-48 animate-pulse rounded bg-muted/50" />
-        <div className="space-y-4">
+        <div className="space-y-3">
           {Array.from({ length: 3 }, (_, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div className="h-10 w-10 shrink-0 animate-pulse rounded-lg bg-muted/50" />
+            <div key={i} className="flex items-center gap-3 rounded-lg bg-muted/30 p-3">
+              <div className="h-7 w-7 shrink-0 animate-pulse rounded-full bg-muted/50" />
+              <div className="h-9 w-9 shrink-0 animate-pulse rounded-lg bg-muted/50" />
               <div className="flex-1">
                 <div className="mb-2 h-3 w-24 animate-pulse rounded bg-muted/50" />
-                <div className="h-7 animate-pulse rounded-md bg-muted/50" />
+                <div className="h-6 animate-pulse rounded-md bg-muted/50" />
               </div>
+              <div className="h-4 w-16 animate-pulse rounded bg-muted/50" />
             </div>
           ))}
         </div>
@@ -68,8 +74,15 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
 
   if (!brandComparison || brandComparison.length === 0) {
     return (
-      <div className="flex h-48 items-center justify-center rounded-lg border text-muted-foreground">
-        {t('noData')}
+      <div className="rounded-lg border bg-card p-5">
+        <h3 className="mb-1 font-semibold">{t('title')}</h3>
+        <div className="py-8 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted/50">
+            <Zap className="h-6 w-6 text-muted-foreground/50" />
+          </div>
+          <p className="font-medium text-muted-foreground">{t('noData')}</p>
+          <p className="mt-1 text-sm text-muted-foreground/70">{t('noDataHint')}</p>
+        </div>
       </div>
     );
   }
@@ -85,10 +98,8 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
   };
 
   return (
-    <div ref={containerRef} className="rounded-lg border bg-card p-5">
-      <div className="mb-1">
-        <h3 className="font-semibold">{t('title')}</h3>
-      </div>
+    <div className="rounded-lg border bg-card p-5">
+      <h3 className="mb-1 font-semibold">{t('title')}</h3>
       <p className="mb-5 text-xs text-muted-foreground">{t('description')}</p>
 
       <div className="space-y-3">
@@ -99,7 +110,6 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
           const isExpanded = expandedId === brand.brandId;
           const price = Math.round(brand.avgPricePerKwh * 100) / 100;
           const rank = index + 1;
-          const medals = ['🥇', '🥈', '🥉'];
 
           return (
             <button
@@ -108,7 +118,7 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
               onClick={() => handleToggle(brand.brandId)}
               className={`
                 group w-full rounded-lg border p-3 text-left
-                transition-all duration-200 ease-out
+                transition-colors duration-200 ease-out
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                 ${brand.isCheapest
                   ? 'border-success/30 bg-success-muted/40 hover:bg-success-muted/60'
@@ -120,15 +130,16 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
             >
               {/* Main row */}
               <div className="flex items-center gap-3">
-                {/* Rank */}
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center" aria-label={`Rank ${rank}`}>
-                  {rank <= 3 ? (
-                    <span className="text-lg leading-none">{medals[rank - 1]}</span>
-                  ) : (
-                    <span className="text-xs font-semibold tabular-nums text-muted-foreground">
-                      {rank}
-                    </span>
-                  )}
+                {/* Rank badge */}
+                <div
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                    rank <= 3
+                      ? rankStyles[rank - 1]
+                      : 'text-muted-foreground'
+                  }`}
+                  aria-label={`Rank ${rank}`}
+                >
+                  {rank}
                 </div>
 
                 {/* Brand avatar */}
@@ -151,11 +162,9 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
 
                 {/* Name + bar area */}
                 <div className="min-w-0 flex-1">
-                  <div className="mb-1.5 flex items-center gap-2">
-                    <span className="truncate text-sm font-medium">
-                      {brand.brandName || brand.brandId}
-                    </span>
-                  </div>
+                  <span className="mb-1.5 block truncate text-sm font-medium">
+                    {brand.brandName || brand.brandId}
+                  </span>
 
                   {/* Bar */}
                   <div className="relative h-6 w-full overflow-hidden rounded-md bg-muted/50">
@@ -165,37 +174,25 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
                         width: mounted ? `${Math.max(barPercent, 8)}%` : '0%',
                         backgroundColor: brand.brandColor || 'hsl(var(--primary))',
                         opacity: 0.75,
-                        transitionDelay: `${index * 80}ms`,
-                        transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+                        transitionDelay: `${index * 60}ms`,
+                        transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
                       }}
                     />
-                    {/* Price label over bar */}
-                    <div className="absolute inset-0 flex items-center px-2.5">
-                      <span
-                        className="text-xs font-semibold drop-shadow-sm"
-                        style={{
-                          color: mounted && barPercent > 30 ? '#fff' : 'hsl(var(--foreground))',
-                          transitionDelay: `${index * 80 + 300}ms`,
-                        }}
-                      >
-                        {formatBaht(price)}{t('perKwh')}
-                      </span>
-                    </div>
                   </div>
                 </div>
 
-                {/* Session count + chevron */}
-                <div className="flex shrink-0 items-center gap-1.5">
+                {/* Price + session count + chevron */}
+                <div className="flex shrink-0 items-center gap-2">
                   <div className="text-right">
-                    <span className="text-xs tabular-nums text-muted-foreground">
-                      {formatNumber(brand.sessions)}
+                    <span className="text-sm font-semibold tabular-nums">
+                      {formatBaht(price)}{t('perKwh')}
                     </span>
                     <p className="text-[10px] text-muted-foreground/70">
-                      {t('sessions')}
+                      {formatNumber(brand.sessions)} {t('sessions')}
                     </p>
                   </div>
                   <ChevronDown
-                    className={`h-4 w-4 text-muted-foreground/50 transition-transform duration-200 ${
+                    className={`h-4 w-4 text-muted-foreground/50 transition-transform duration-200 motion-reduce:transition-none ${
                       isExpanded ? 'rotate-180' : ''
                     }`}
                   />
