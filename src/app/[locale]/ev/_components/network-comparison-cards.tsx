@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Phone, ExternalLink, Trophy, TrendingUp } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
 import type { BrandData } from './types';
+import { sanitizeUrl } from '@/lib/sanitize-url';
 
 interface NetworkComparisonCardsProps {
   brandComparison?: BrandData[];
@@ -124,9 +125,9 @@ export function NetworkComparisonCards({ brandComparison, loading, error }: Netw
                   {brand.brandPhone}
                 </a>
               )}
-              {brand.brandWebsite && (
+              {brand.brandWebsite && sanitizeUrl(brand.brandWebsite) && (
                 <a
-                  href={brand.brandWebsite}
+                  href={sanitizeUrl(brand.brandWebsite)!}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs transition-colors hover:bg-primary/10 hover:text-primary"

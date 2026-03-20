@@ -35,10 +35,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'File size must be under 10MB' }, { status: 400 });
     }
 
-    const ext = file.name.split('.').pop() || 'png';
-    const key = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    // Validate magic bytes to prevent disguised file uploads
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const isJpeg = bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF;
+    const isPng = bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47;
+    const isGif = bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46;
+    const isWebp = bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46
+      && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
 
-    await r2.put(key, await file.arrayBuffer(), {
+    if (!isJpeg && !isPng && !isGif && !isWebp) {
+      return NextResponse.json({ error: 'Invalid image file' }, { status: 400 });
+    }
+
+    // Sanitize folder param — allow only alphanumeric and hyphens
+    const sanitizedFolder = /^[a-zA-Z0-9-]+$/.test(folder) ? folder : 'uploads';
+
+    const ext = file.name.split('.').pop() || 'png';
+    const key = `${sanitizedFolder}/${crypto.randomUUID()}.${ext}`;
+
+    await r2.put(key, bytes.buffer as ArrayBuffer, {
       httpMetadata: { contentType: file.type },
     });
 

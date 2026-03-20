@@ -1,9 +1,18 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
 import { chargingRecords, chargingNetworks } from '@/lib/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 
 export async function GET() {
+  const session = await auth();
+
+  if (!session?.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const userId = session.user.id;
+
   const db = await getDatabase();
 
   if (!db) {
@@ -18,7 +27,8 @@ export async function GET() {
         totalKwh: sql<number>`COALESCE(SUM(${chargingRecords.chargedKwh}), 0)`,
         totalCost: sql<number>`COALESCE(SUM(${chargingRecords.costThb}), 0)`,
       })
-      .from(chargingRecords);
+      .from(chargingRecords)
+      .where(eq(chargingRecords.userId, userId));
 
     const stats = overallStats[0];
     const totalKwhDecimal = stats.totalKwh / 100;
@@ -39,6 +49,7 @@ export async function GET() {
         totalCost: sql<number>`SUM(${chargingRecords.costThb})`,
       })
       .from(chargingRecords)
+      .where(eq(chargingRecords.userId, userId))
       .leftJoin(chargingNetworks, eq(chargingRecords.brandId, chargingNetworks.id))
       .groupBy(
         chargingRecords.brandId,
@@ -92,7 +103,7 @@ export async function GET() {
         mileageKm: chargingRecords.mileageKm,
       })
       .from(chargingRecords)
-      .where(sql`${chargingRecords.mileageKm} IS NOT NULL`)
+      .where(and(eq(chargingRecords.userId, userId), sql`${chargingRecords.mileageKm} IS NOT NULL`))
       .orderBy(sql`${chargingRecords.chargingDatetime} DESC`)
       .limit(1);
 
@@ -113,6 +124,7 @@ export async function GET() {
         sessions: sql<number>`COUNT(*)`,
       })
       .from(chargingRecords)
+      .where(eq(chargingRecords.userId, userId))
       .groupBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`)
       .orderBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`);
 

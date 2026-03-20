@@ -28,12 +28,12 @@ async function getAuthHandlers(request: NextRequest) {
 
   const getUserByEmail = db
     ? async (email: string) => {
-        console.log('[Auth] Looking up user:', email);
+        console.log('[Auth] Looking up user:', email.substring(0, 3) + '***');
 
         // Rate limit check before DB lookup
         const rateLimitResult = await checkRateLimit(db, email, 'login');
         if (!rateLimitResult.allowed) {
-          console.log('[Auth] Rate limited:', email);
+          console.log('[Auth] Rate limited');
           throw new Error(
             `Too many login attempts. Please try again in ${Math.ceil(rateLimitResult.retryAfterSeconds / 60)} minutes.`
           );
