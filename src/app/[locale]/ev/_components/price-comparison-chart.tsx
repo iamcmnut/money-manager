@@ -45,7 +45,7 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
 
   if (loading) {
     return (
-      <div className="rounded-lg border bg-card p-5">
+      <div>
         <div className="mb-5 h-5 w-48 animate-pulse rounded bg-muted/50" />
         <div className="space-y-3">
           {Array.from({ length: 3 }, (_, i) => (
@@ -74,7 +74,7 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
 
   if (!brandComparison || brandComparison.length === 0) {
     return (
-      <div className="rounded-lg border bg-card p-5">
+      <div>
         <h3 className="mb-1 font-semibold">{t('title')}</h3>
         <div className="py-8 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted/50">
@@ -98,7 +98,7 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
   };
 
   return (
-    <div className="rounded-lg border bg-card p-5">
+    <div>
       <h3 className="mb-1 font-semibold">{t('title')}</h3>
       <p className="mb-5 text-xs text-muted-foreground">{t('description')}</p>
 
