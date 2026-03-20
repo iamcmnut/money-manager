@@ -86,11 +86,8 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
 
   return (
     <div ref={containerRef} className="rounded-lg border bg-card p-5">
-      <div className="mb-1 flex items-baseline justify-between">
+      <div className="mb-1">
         <h3 className="font-semibold">{t('title')}</h3>
-        <p className="text-xs text-muted-foreground">
-          {t('tapToCompare')}
-        </p>
       </div>
       <p className="mb-5 text-xs text-muted-foreground">{t('description')}</p>
 

@@ -45,6 +45,7 @@
         "failedToSave": "Failed to save record"
       },
       "stats": {
+        "title": "Your Charging Summary",
         "failedToLoad": "Failed to load statistics",
         "totalSessions": "Total Sessions",
         "totalKwh": "Total Energy",
