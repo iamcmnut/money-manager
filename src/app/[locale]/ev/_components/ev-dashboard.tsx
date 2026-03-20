@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChargingStats } from './charging-stats';
 import { PriceComparisonChart } from './price-comparison-chart';
-import { NetworkComparisonCards } from './network-comparison-cards';
 import type { EVStatsResponse } from './types';
 
 export function EVDashboard() {
@@ -37,7 +36,7 @@ export function EVDashboard() {
 
   return (
     <div className="space-y-6">
-      <NetworkComparisonCards
+      <PriceComparisonChart
         brandComparison={data?.brandComparison}
         loading={loading}
         error={error}
@@ -45,12 +44,6 @@ export function EVDashboard() {
 
       <ChargingStats
         stats={data?.stats}
-        loading={loading}
-        error={error}
-      />
-
-      <PriceComparisonChart
-        brandComparison={data?.brandComparison}
         loading={loading}
         error={error}
       />

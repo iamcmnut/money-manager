@@ -45,6 +45,7 @@
         "failedToSave": "Failed to save record"
       },
       "stats": {
+        "title": "Your Charging Summary",
         "failedToLoad": "Failed to load statistics",
         "totalSessions": "Total Sessions",
         "totalKwh": "Total Energy",
@@ -52,21 +53,25 @@
         "avgPricePerKwh": "Avg. Price/kWh",
         "avgCostPerKm": "Avg. Cost/km",
         "mostUsedNetwork": "Most Used",
-        "sessions": "sessions"
+        "sessions": "sessions",
+        "noData": "Your cost summary will appear here",
+        "noDataHint": "Add your first charging session to see how much you're spending."
       },
       "chart": {
         "title": "Price Comparison by Network",
         "description": "Average price per kWh across different charging networks",
         "avgPrice": "Avg. Price",
         "failedToLoad": "Failed to load chart data",
-        "noData": "No charging data to display",
+        "noData": "No charging data yet",
+        "noDataHint": "Once you add charging sessions, we'll compare prices across networks so you can find the best deal.",
         "sessions": "sessions",
         "totalEnergy": "Total Energy",
         "totalSpent": "Total Spent",
         "cheapest": "Cheapest",
         "moreExpensive": "more expensive",
         "perKwh": "/kWh",
-        "tapToCompare": "Tap a network to see details"
+        "tapToCompare": "Tap a network to see details",
+        "website": "Website"
       },
       "history": {
         "title": "Charging History",

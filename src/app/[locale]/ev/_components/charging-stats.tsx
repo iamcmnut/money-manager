@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl';
 import { Zap, Wallet, TrendingUp, Hash, Building2, Gauge } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
 import type { StatsData } from './types';
 
@@ -17,10 +16,17 @@ export function ChargingStats({ stats, loading, error }: ChargingStatsProps) {
 
   if (loading) {
     return (
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        {Array.from({ length: 6 }, (_, i) => (
-          <div key={i} className="h-24 animate-pulse rounded-lg border bg-muted/50" />
-        ))}
+      <div className="space-y-4">
+        <div className="h-5 w-40 animate-pulse rounded bg-muted/50" />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="h-24 animate-pulse rounded-lg border bg-muted/50" />
+          <div className="h-24 animate-pulse rounded-lg border bg-muted/50" />
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {Array.from({ length: 4 }, (_, i) => (
+            <div key={i} className="h-16 animate-pulse rounded-lg bg-muted/30" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -34,71 +40,85 @@ export function ChargingStats({ stats, loading, error }: ChargingStatsProps) {
   }
 
   if (!stats) {
-    return null;
+    return (
+      <div className="space-y-4">
+        <h3 className="font-semibold">{t('title')}</h3>
+        <div className="py-6 text-center">
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted/50">
+            <Wallet className="h-5 w-5 text-muted-foreground/50" />
+          </div>
+          <p className="text-sm font-medium text-muted-foreground">{t('noData')}</p>
+          <p className="mt-1 text-xs text-muted-foreground/70">{t('noDataHint')}</p>
+        </div>
+      </div>
+    );
   }
 
-  const statCards: { icon: LucideIcon; label: string; value: string; subtitle?: string; highlight?: boolean; iconColor?: string }[] = [
-    {
-      icon: Hash,
-      label: t('totalSessions'),
-      value: formatNumber(stats.totalSessions),
-      iconColor: 'text-muted-foreground',
-    },
-    {
-      icon: Zap,
-      label: t('totalKwh'),
-      value: `${formatNumber(stats.totalKwh, 2)} kWh`,
-      iconColor: 'text-module-ev',
-    },
-    {
-      icon: Wallet,
-      label: t('totalCost'),
-      value: formatBaht(stats.totalCost),
-      highlight: true,
-      iconColor: 'text-warning',
-    },
-    {
-      icon: TrendingUp,
-      label: t('avgPricePerKwh'),
-      value: `${formatBaht(stats.avgPricePerKwh)}/kWh`,
-      highlight: true,
-      iconColor: 'text-primary',
-    },
-    {
-      icon: Gauge,
-      label: t('avgCostPerKm'),
-      value: stats.avgCostPerKm > 0 ? `${formatBaht(stats.avgCostPerKm)}/km` : '-',
-      subtitle: stats.totalDistanceKm > 0 ? `${formatNumber(stats.totalDistanceKm)} km` : undefined,
-      iconColor: 'text-module-ev',
-    },
-    {
-      icon: Building2,
-      label: t('mostUsedNetwork'),
-      value: stats.mostUsedNetwork?.brandName || '-',
-      subtitle: stats.mostUsedNetwork ? `${formatNumber(stats.mostUsedNetwork.sessions)} ${t('sessions')}` : undefined,
-      iconColor: 'text-success',
-    },
-  ];
-
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-      {statCards.map((stat, index) => (
-        <div
-          key={index}
-          className="rounded-lg border bg-card p-4 transition-all duration-200 hover:bg-accent/30 hover:shadow-sm hover:-translate-y-0.5"
-        >
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
-              <p className={`mt-1 text-lg font-bold ${stat.highlight ? 'text-primary' : ''}`}>{stat.value}</p>
-              {stat.subtitle && (
-                <p className="text-xs text-muted-foreground">{stat.subtitle}</p>
-              )}
+    <div className="space-y-4">
+      <h3 className="font-semibold">{t('title')}</h3>
+
+      {/* Primary stats — the cost numbers users care about most */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-lg border bg-card p-5">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning/10">
+              <Wallet className="h-4 w-4 text-warning" />
             </div>
-            <stat.icon className={`h-4 w-4 ${stat.iconColor || 'text-muted-foreground'}`} />
+            <p className="text-sm text-muted-foreground">{t('totalCost')}</p>
+          </div>
+          <p className="mt-3 text-2xl font-bold tabular-nums">
+            {formatBaht(stats.totalCost)}
+          </p>
+        </div>
+
+        <div className="rounded-lg border bg-card p-5">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-module-ev/10">
+              <Gauge className="h-4 w-4 text-module-ev" />
+            </div>
+            <p className="text-sm text-muted-foreground">{t('avgCostPerKm')}</p>
+          </div>
+          <p className="mt-3 text-2xl font-bold tabular-nums">
+            {stats.avgCostPerKm > 0 ? `${formatBaht(stats.avgCostPerKm)}/km` : '-'}
+          </p>
+        </div>
+      </div>
+
+      {/* Secondary stats — supporting context, compact row */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="flex items-center gap-2.5 rounded-lg bg-muted/30 px-3 py-2.5">
+          <Hash className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          <div className="min-w-0">
+            <p className="text-[10px] text-muted-foreground">{t('totalSessions')}</p>
+            <p className="text-sm font-semibold tabular-nums">{formatNumber(stats.totalSessions)}</p>
           </div>
         </div>
-      ))}
+
+        <div className="flex items-center gap-2.5 rounded-lg bg-muted/30 px-3 py-2.5">
+          <Zap className="h-3.5 w-3.5 shrink-0 text-module-ev" />
+          <div className="min-w-0">
+            <p className="text-[10px] text-muted-foreground">{t('totalKwh')}</p>
+            <p className="text-sm font-semibold tabular-nums">{formatNumber(stats.totalKwh, 1)} kWh</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 rounded-lg bg-muted/30 px-3 py-2.5">
+          <TrendingUp className="h-3.5 w-3.5 shrink-0 text-primary" />
+          <div className="min-w-0">
+            <p className="text-[10px] text-muted-foreground">{t('avgPricePerKwh')}</p>
+            <p className="text-sm font-semibold tabular-nums">{formatBaht(stats.avgPricePerKwh)}/kWh</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 rounded-lg bg-muted/30 px-3 py-2.5">
+          <Building2 className="h-3.5 w-3.5 shrink-0 text-success" />
+          <div className="min-w-0">
+            <p className="text-[10px] text-muted-foreground">{t('mostUsedNetwork')}</p>
+            <p className="truncate text-sm font-semibold">{stats.mostUsedNetwork?.brandName || '-'}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
