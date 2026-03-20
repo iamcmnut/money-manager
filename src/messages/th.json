@@ -66,7 +66,8 @@
         "cheapest": "ถูกที่สุด",
         "moreExpensive": "แพงกว่า",
         "perKwh": "/kWh",
-        "tapToCompare": "แตะเครือข่ายเพื่อดูรายละเอียด"
+        "tapToCompare": "แตะเครือข่ายเพื่อดูรายละเอียด",
+        "website": "เว็บไซต์"
       },
       "history": {
         "title": "ประวัติการชาร์จ",

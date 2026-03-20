@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { Trophy, TrendingUp, Zap, Wallet, ChevronDown } from 'lucide-react';
+import { Trophy, TrendingUp, Zap, Wallet, ChevronDown, Phone, ExternalLink } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
+import { sanitizeUrl } from '@/lib/sanitize-url';
 import type { BrandData } from './types';
 
 interface PriceComparisonChartProps {
@@ -157,18 +158,6 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
                     <span className="truncate text-sm font-medium">
                       {brand.brandName || brand.brandId}
                     </span>
-                    {brand.isCheapest && (
-                      <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-success px-1.5 py-0.5 text-[10px] font-medium text-success-foreground">
-                        <Trophy className="h-2.5 w-2.5" />
-                        {t('cheapest')}
-                      </span>
-                    )}
-                    {!brand.isCheapest && brand.priceDiffPercent > 0 && (
-                      <span className="inline-flex shrink-0 items-center gap-0.5 text-[10px] text-warning">
-                        <TrendingUp className="h-2.5 w-2.5" />
-                        +{formatNumber(brand.priceDiffPercent, 1)}%
-                      </span>
-                    )}
                   </div>
 
                   {/* Bar */}
@@ -223,45 +212,76 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
                 }`}
               >
                 <div className="overflow-hidden">
-                  <div className="mt-3 grid grid-cols-2 gap-3 border-t border-border/50 pt-3 sm:grid-cols-3">
-                    <div className="flex items-center gap-2">
-                      <Zap className="h-3.5 w-3.5 text-module-ev" />
-                      <div>
-                        <p className="text-[10px] text-muted-foreground">{t('totalEnergy')}</p>
-                        <p className="text-sm font-medium tabular-nums">
-                          {formatNumber(brand.totalKwh, 1)} kWh
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Wallet className="h-3.5 w-3.5 text-warning" />
-                      <div>
-                        <p className="text-[10px] text-muted-foreground">{t('totalSpent')}</p>
-                        <p className="text-sm font-medium tabular-nums">
-                          {formatBaht(brand.totalCost)}
-                        </p>
-                      </div>
-                    </div>
-                    {!brand.isCheapest && brand.priceDiffPercent > 0 && (
+                  <div className="mt-3 border-t border-border/50 pt-3">
+                    {/* Stats row */}
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                       <div className="flex items-center gap-2">
-                        <TrendingUp className="h-3.5 w-3.5 text-warning" />
+                        <Zap className="h-3.5 w-3.5 text-module-ev" />
                         <div>
-                          <p className="text-[10px] text-muted-foreground">{t('moreExpensive')}</p>
+                          <p className="text-[10px] text-muted-foreground">{t('totalEnergy')}</p>
                           <p className="text-sm font-medium tabular-nums">
-                            +{formatNumber(brand.priceDiffPercent, 1)}%
+                            {formatNumber(brand.totalKwh, 1)} kWh
                           </p>
                         </div>
                       </div>
-                    )}
-                    {brand.isCheapest && (
                       <div className="flex items-center gap-2">
-                        <Trophy className="h-3.5 w-3.5 text-success" />
+                        <Wallet className="h-3.5 w-3.5 text-warning" />
                         <div>
-                          <p className="text-[10px] text-muted-foreground">{t('avgPrice')}</p>
-                          <p className="text-sm font-medium text-success tabular-nums">
-                            {t('cheapest')}
+                          <p className="text-[10px] text-muted-foreground">{t('totalSpent')}</p>
+                          <p className="text-sm font-medium tabular-nums">
+                            {formatBaht(brand.totalCost)}
                           </p>
                         </div>
+                      </div>
+                      {!brand.isCheapest && brand.priceDiffPercent > 0 && (
+                        <div className="flex items-center gap-2">
+                          <TrendingUp className="h-3.5 w-3.5 text-warning" />
+                          <div>
+                            <p className="text-[10px] text-muted-foreground">{t('moreExpensive')}</p>
+                            <p className="text-sm font-medium tabular-nums">
+                              +{formatNumber(brand.priceDiffPercent, 1)}%
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {brand.isCheapest && (
+                        <div className="flex items-center gap-2">
+                          <Trophy className="h-3.5 w-3.5 text-success" />
+                          <div>
+                            <p className="text-[10px] text-muted-foreground">{t('avgPrice')}</p>
+                            <p className="text-sm font-medium text-success tabular-nums">
+                              {t('cheapest')}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Contact info */}
+                    {(brand.brandPhone || brand.brandWebsite) && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {brand.brandPhone && (
+                          <a
+                            href={`tel:${brand.brandPhone.replace(/\s/g, '')}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
+                          >
+                            <Phone className="h-3 w-3" />
+                            {brand.brandPhone}
+                          </a>
+                        )}
+                        {brand.brandWebsite && sanitizeUrl(brand.brandWebsite) && (
+                          <a
+                            href={sanitizeUrl(brand.brandWebsite)!}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            {t('website')}
+                          </a>
+                        )}
                       </div>
                     )}
                   </div>
