@@ -145,12 +145,13 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
                   {/* Bar */}
                   <div className="relative h-6 w-full overflow-hidden rounded-md bg-muted/50">
                     <div
-                      className="absolute inset-y-0 left-0 rounded-md transition-[width] duration-700 ease-out motion-reduce:transition-none"
+                      className="absolute inset-y-0 left-0 rounded-md transition-[width] duration-700 motion-reduce:transition-none"
                       style={{
                         width: mounted ? `${Math.max(barPercent, 8)}%` : '0%',
                         backgroundColor: brand.brandColor || 'hsl(var(--primary))',
                         opacity: 0.75,
                         transitionDelay: `${index * 80}ms`,
+                        transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
                       }}
                     />
                     {/* Price label over bar */}

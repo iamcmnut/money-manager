@@ -85,7 +85,7 @@ export function ChargingStats({ stats, loading, error }: ChargingStatsProps) {
       {statCards.map((stat, index) => (
         <div
           key={index}
-          className="rounded-lg border bg-card p-4 transition-colors hover:bg-accent/30"
+          className="rounded-lg border bg-card p-4 transition-all duration-200 hover:bg-accent/30 hover:shadow-sm hover:-translate-y-0.5"
         >
           <div className="flex items-start justify-between">
             <div>

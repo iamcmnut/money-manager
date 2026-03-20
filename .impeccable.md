@@ -7,13 +7,13 @@
 - **Language**: Thai (primary) and English — the interface must feel native in both
 
 ### Brand Personality
-- **3 words**: Warm, friendly, approachable
+- **3 words**: Warm, friendly, playful
 - **Voice**: Like a knowledgeable friend who explains money simply — never condescending, never jargon-heavy
 - **Tone**: Encouraging and calm. Finance is stressful; this app should reduce anxiety, not add to it
-- **Emotional goal**: Users should feel "I understand my money better now" — confident, not overwhelmed
+- **Emotional goal**: Users should feel "I understand my money better now" — confident, not overwhelmed, and maybe even smile
 
 ### Aesthetic Direction
-- **Visual tone**: Soft & refined — subtle colors, gentle shadows, calm and trustworthy
+- **Visual tone**: Soft yet playful — warm colors, bouncy interactions, bubbly shapes, calm but with personality
 - **References**: Monzo (clarity), Notion (warmth), Headspace (approachability)
 - **Anti-references**: Bloomberg Terminal (too dense), generic AI dashboards (gradient rainbows, glassmorphism, blur orbs), overly corporate banking apps (cold, intimidating)
 - **Theme**: Light and dark mode, both feeling warm — avoid pure white (#fff) and pure black (#000). Use warm neutrals.
@@ -31,3 +31,5 @@
 4. **Inclusive by default** — WCAG AA compliance. The audience spans 20–60+ years old — text must be readable, touch targets generous, and color never the only way to convey meaning. Both Thai and English must feel like first-class citizens, not afterthoughts.
 
 5. **Earned complexity** — Start simple. Add density only where users need it (e.g., detailed price comparison tables). The home page should feel effortless; the deep pages can be richer.
+
+6. **Delightful details** — Small moments of joy (a hover bounce, a tactile press, a springy chart) make the app feel alive without distracting from the task.

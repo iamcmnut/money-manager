@@ -9,7 +9,7 @@ import { Footer } from '@/components/layout/footer';
 import { CookieConsent } from '@/components/layout/cookie-consent';
 import { WebsiteJsonLd } from '@/components/seo/json-ld';
 import { routing } from '@/i18n/routing';
-import { geistSans, geistMono } from '../layout';
+import { plexSans, plexSansThai, plexMono } from '../layout';
 
 type Props = {
   children: React.ReactNode;
@@ -109,7 +109,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <link rel="alternate" hrefLang="th" href={`${baseUrl}/th`} />
         <link rel="alternate" hrefLang="x-default" href={`${baseUrl}/en`} />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${plexSans.variable} ${plexSansThai.variable} ${plexMono.variable} antialiased`}>
         <SessionProvider>
           <ThemeProvider>
             <NextIntlClientProvider messages={messages}>

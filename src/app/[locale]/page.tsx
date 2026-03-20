@@ -69,9 +69,9 @@ function HomePageContent() {
           <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
             {modules.map((module) => (
               <Link key={module.href} href={module.href} className="group">
-                <div className="h-full rounded-xl border bg-card p-5 transition-colors hover:bg-accent/50">
-                  <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${module.iconBg}`}>
-                    <module.icon className={`h-5 w-5 ${module.iconColor}`} />
+                <div className="h-full rounded-2xl border bg-card p-5 transition-all duration-200 hover:bg-accent/50 hover:shadow-lg hover:-translate-y-0.5">
+                  <div className={`mb-3 flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-110 ${module.iconBg}`}>
+                    <module.icon className={`h-6 w-6 ${module.iconColor}`} />
                   </div>
                   <h3 className="mb-1.5 text-base font-semibold">{t(module.titleKey)}</h3>
                   <p className="mb-3 text-sm text-muted-foreground leading-relaxed">
@@ -79,7 +79,7 @@ function HomePageContent() {
                   </p>
                   <div className={`flex items-center gap-1.5 text-sm font-medium ${module.ctaColor}`}>
                     <span>{t('home.getStarted')}</span>
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>
               </Link>
