@@ -6,12 +6,7 @@ import { and, eq, sql } from 'drizzle-orm';
 
 export async function GET() {
   const session = await auth();
-
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const userId = session.user.id;
+  const userId = session?.user?.id;
 
   const db = await getDatabase();
 
@@ -21,6 +16,12 @@ export async function GET() {
 
   try {
     // Run all queries in parallel
+    // If logged in, scope to user's data; otherwise show all aggregated data
+    const userFilter = userId ? eq(chargingRecords.userId, userId) : undefined;
+    const mileageFilter = userId
+      ? and(eq(chargingRecords.userId, userId), sql`${chargingRecords.mileageKm} IS NOT NULL`)
+      : sql`${chargingRecords.mileageKm} IS NOT NULL`;
+
     const [overallStats, brandStats, latestMileageResult, monthlyTrend] = await Promise.all([
       // Overall stats
       db
@@ -30,7 +31,7 @@ export async function GET() {
           totalCost: sql<number>`COALESCE(SUM(${chargingRecords.costThb}), 0)`,
         })
         .from(chargingRecords)
-        .where(eq(chargingRecords.userId, userId)),
+        .where(userFilter),
 
       // Stats per brand
       db
@@ -46,7 +47,7 @@ export async function GET() {
           totalCost: sql<number>`SUM(${chargingRecords.costThb})`,
         })
         .from(chargingRecords)
-        .where(eq(chargingRecords.userId, userId))
+        .where(userFilter)
         .leftJoin(chargingNetworks, eq(chargingRecords.brandId, chargingNetworks.id))
         .groupBy(
           chargingRecords.brandId,
@@ -61,7 +62,7 @@ export async function GET() {
       db
         .select({ mileageKm: chargingRecords.mileageKm })
         .from(chargingRecords)
-        .where(and(eq(chargingRecords.userId, userId), sql`${chargingRecords.mileageKm} IS NOT NULL`))
+        .where(mileageFilter)
         .orderBy(sql`${chargingRecords.chargingDatetime} DESC`)
         .limit(1),
 
@@ -74,7 +75,7 @@ export async function GET() {
           sessions: sql<number>`COUNT(*)`,
         })
         .from(chargingRecords)
-        .where(eq(chargingRecords.userId, userId))
+        .where(userFilter)
         .groupBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`)
         .orderBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`),
     ]);
@@ -159,7 +160,9 @@ export async function GET() {
       monthlyData,
     }, {
       headers: {
-        'Cache-Control': 'private, max-age=60, stale-while-revalidate=300',
+        'Cache-Control': userId
+          ? 'private, max-age=60, stale-while-revalidate=300'
+          : 'public, s-maxage=60, stale-while-revalidate=300',
       },
     });
   } catch (error) {
