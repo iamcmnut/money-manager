@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import { Plus, Pencil, Trash2, Zap, Upload, X, FileSpreadsheet, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ChargingRecordForm } from './charging-record-form';
 import { formatCents, formatBahtCents } from '@/lib/format';
@@ -24,6 +25,9 @@ interface RecordData {
 
 interface RecordsResponse {
   records?: RecordData[];
+  total?: number;
+  page?: number;
+  limit?: number;
   error?: string;
 }
 
@@ -49,6 +53,7 @@ const ITEMS_PER_PAGE = 10;
 export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps) {
   const t = useTranslations('modules.ev.history');
   const [records, setRecords] = useState<RecordData[]>([]);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -59,13 +64,14 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
   const [currentPage, setCurrentPage] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchRecords = useCallback(async () => {
+  const fetchRecords = useCallback(async (page = 1) => {
     try {
-      const response = await fetch('/api/ev/records');
+      const response = await fetch(`/api/ev/records?page=${page}&limit=${ITEMS_PER_PAGE}`);
       const data = (await response.json()) as RecordsResponse;
 
       if (response.ok && data.records) {
         setRecords(data.records);
+        setTotalRecords(data.total ?? data.records.length);
       } else {
         setError(data.error || t('failedToLoad'));
       }
@@ -78,8 +84,8 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
   }, [t]);
 
   useEffect(() => {
-    fetchRecords();
-  }, [fetchRecords]);
+    fetchRecords(currentPage);
+  }, [fetchRecords, currentPage]);
 
   const deleteRecord = async (id: string) => {
     if (!confirm(t('confirmDelete'))) return;
@@ -109,7 +115,7 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
   const handleFormSuccess = () => {
     setShowForm(false);
     setEditingRecord(null);
-    fetchRecords();
+    fetchRecords(currentPage);
     onRecordChange?.();
   };
 
@@ -133,7 +139,7 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
 
       if (response.ok && result.success) {
         setImportResult(result);
-        fetchRecords();
+        fetchRecords(currentPage);
         onRecordChange?.();
       } else {
         setImportResult({ error: result.error || t('import.failed') });
@@ -283,13 +289,12 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
       ) : (
         <div className="space-y-3">
           {(() => {
-            const totalPages = Math.ceil(records.length / ITEMS_PER_PAGE);
+            const totalPages = Math.ceil(totalRecords / ITEMS_PER_PAGE);
             const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-            const paginatedRecords = records.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
             return (
               <>
-                {paginatedRecords.map((record) => (
+                {records.map((record) => (
             <div
               key={record.id}
               className="rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
@@ -297,9 +302,11 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
                   {record.brandLogo ? (
-                    <img
+                    <Image
                       src={record.brandLogo}
                       alt={record.brandName || ''}
+                      width={40}
+                      height={40}
                       className="h-10 w-10 rounded-lg object-cover"
                     />
                   ) : (
@@ -376,37 +383,35 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
                     </Button>
 
                     <div className="flex items-center gap-1">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                        // Show first, last, current, and adjacent pages
-                        const showPage =
-                          page === 1 ||
-                          page === totalPages ||
-                          Math.abs(page - currentPage) <= 1;
-
-                        if (!showPage) {
-                          // Show ellipsis
-                          if (page === 2 || page === totalPages - 1) {
-                            return (
-                              <span key={page} className="px-1 text-muted-foreground">
-                                ...
-                              </span>
-                            );
+                      {(() => {
+                        const pages: (number | 'ellipsis-start' | 'ellipsis-end')[] = [];
+                        if (totalPages <= 5) {
+                          for (let i = 1; i <= totalPages; i++) pages.push(i);
+                        } else {
+                          pages.push(1);
+                          if (currentPage > 3) pages.push('ellipsis-start');
+                          for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+                            pages.push(i);
                           }
-                          return null;
+                          if (currentPage < totalPages - 2) pages.push('ellipsis-end');
+                          pages.push(totalPages);
                         }
-
-                        return (
-                          <Button
-                            key={page}
-                            variant={currentPage === page ? 'default' : 'outline'}
-                            size="sm"
-                            className="w-8 h-8 p-0"
-                            onClick={() => setCurrentPage(page)}
-                          >
-                            {page}
-                          </Button>
+                        return pages.map((page) =>
+                          typeof page === 'string' ? (
+                            <span key={page} className="px-1 text-muted-foreground">...</span>
+                          ) : (
+                            <Button
+                              key={page}
+                              variant={currentPage === page ? 'default' : 'outline'}
+                              size="sm"
+                              className="w-8 h-8 p-0"
+                              onClick={() => setCurrentPage(page)}
+                            >
+                              {page}
+                            </Button>
+                          )
                         );
-                      })}
+                      })()}
                     </div>
 
                     <Button
@@ -421,8 +426,8 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
                     <span className="ml-2 text-sm text-muted-foreground">
                       {t('pagination.showing', {
                         from: startIndex + 1,
-                        to: Math.min(startIndex + ITEMS_PER_PAGE, records.length),
-                        total: records.length,
+                        to: Math.min(startIndex + ITEMS_PER_PAGE, totalRecords),
+                        total: totalRecords,
                       })}
                     </span>
                   </div>

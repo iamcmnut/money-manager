@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import { Plus, Pencil, Trash2, ExternalLink, Phone } from 'lucide-react';
 import { ChargingNetworkForm } from './charging-network-form';
 import { sanitizeUrl } from '@/lib/sanitize-url';
@@ -135,9 +136,11 @@ export function ChargingNetworksTable() {
             >
               <div className="flex items-center gap-3">
                 {network.logo ? (
-                  <img
+                  <Image
                     src={network.logo}
                     alt={network.name}
+                    width={40}
+                    height={40}
                     className="h-10 w-10 rounded-lg object-cover"
                   />
                 ) : (

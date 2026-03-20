@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
 import { users } from '@/lib/db/schema';
-import { desc } from 'drizzle-orm';
+import { desc, sql } from 'drizzle-orm';
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await auth();
 
   if (!session?.user) {
@@ -22,19 +22,31 @@ export async function GET() {
   }
 
   try {
-    const allUsers = await db
-      .select({
-        id: users.id,
-        email: users.email,
-        name: users.name,
-        image: users.image,
-        role: users.role,
-        createdAt: users.createdAt,
-      })
-      .from(users)
-      .orderBy(desc(users.createdAt));
+    const url = new URL(request.url);
+    const page = Math.max(1, parseInt(url.searchParams.get('page') || '1'));
+    const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') || '50')));
+    const offset = (page - 1) * limit;
 
-    return NextResponse.json({ users: allUsers });
+    const [allUsers, countResult] = await Promise.all([
+      db
+        .select({
+          id: users.id,
+          email: users.email,
+          name: users.name,
+          image: users.image,
+          role: users.role,
+          createdAt: users.createdAt,
+        })
+        .from(users)
+        .orderBy(desc(users.createdAt))
+        .limit(limit)
+        .offset(offset),
+      db.select({ count: sql<number>`COUNT(*)` }).from(users),
+    ]);
+
+    const total = countResult[0].count;
+
+    return NextResponse.json({ users: allUsers, total, page, limit });
   } catch (error) {
     console.error('Failed to fetch users:', error);
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });

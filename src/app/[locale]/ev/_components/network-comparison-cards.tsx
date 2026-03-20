@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { Phone, ExternalLink, Trophy, TrendingUp } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
 import type { BrandData } from './types';
@@ -18,7 +19,7 @@ export function NetworkComparisonCards({ brandComparison, loading, error }: Netw
   if (loading) {
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[...Array(3)].map((_, i) => (
+        {Array.from({ length: 3 }, (_, i) => (
           <div key={i} className="h-40 animate-pulse rounded-lg border bg-muted/50" />
         ))}
       </div>
@@ -75,9 +76,11 @@ export function NetworkComparisonCards({ brandComparison, loading, error }: Netw
             {/* Brand header */}
             <div className="mt-6 flex items-center gap-3">
               {brand.brandLogo ? (
-                <img
+                <Image
                   src={brand.brandLogo}
                   alt={brand.brandName || ''}
+                  width={48}
+                  height={48}
                   className="h-12 w-12 rounded-xl object-cover"
                 />
               ) : (
