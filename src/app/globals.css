@@ -7,23 +7,23 @@
   --card-foreground: 20 10% 12%;
   --popover: 30 15% 99%;
   --popover-foreground: 20 10% 12%;
-  --primary: 168 40% 35%;
+  --primary: 168 50% 33%;
   --primary-foreground: 0 0% 100%;
   --secondary: 25 10% 94%;
   --secondary-foreground: 20 10% 15%;
   --muted: 25 10% 94%;
   --muted-foreground: 20 5% 45%;
-  --accent: 168 25% 94%;
+  --accent: 168 35% 93%;
   --accent-foreground: 168 40% 25%;
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
   --border: 25 10% 89%;
   --input: 25 10% 89%;
-  --ring: 168 40% 35%;
-  --radius: 0.625rem;
+  --ring: 168 50% 33%;
+  --radius: 0.875rem;
 
   /* Semantic colors */
-  --success: 158 40% 38%;
+  --success: 158 48% 36%;
   --success-foreground: 158 50% 98%;
   --success-muted: 158 30% 94%;
   --warning: 35 75% 48%;
@@ -31,12 +31,12 @@
   --warning-muted: 35 50% 94%;
 
   /* Module identity colors */
-  --module-ev: 168 40% 35%;
-  --module-ev-muted: 168 30% 93%;
-  --module-living: 25 55% 48%;
-  --module-living-muted: 25 40% 93%;
-  --module-savings: 155 38% 38%;
-  --module-savings-muted: 155 28% 93%;
+  --module-ev: 168 50% 33%;
+  --module-ev-muted: 168 38% 92%;
+  --module-living: 25 65% 46%;
+  --module-living-muted: 25 50% 92%;
+  --module-savings: 155 48% 36%;
+  --module-savings-muted: 155 36% 92%;
 }
 
 .dark {
@@ -46,35 +46,35 @@
   --card-foreground: 30 15% 93%;
   --popover: 20 10% 9%;
   --popover-foreground: 30 15% 93%;
-  --primary: 168 35% 55%;
+  --primary: 168 45% 55%;
   --primary-foreground: 168 50% 8%;
   --secondary: 20 8% 15%;
   --secondary-foreground: 30 15% 93%;
   --muted: 20 8% 15%;
   --muted-foreground: 25 8% 58%;
-  --accent: 168 15% 14%;
+  --accent: 168 25% 14%;
   --accent-foreground: 168 30% 75%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 30 15% 93%;
   --border: 20 8% 17%;
   --input: 20 8% 17%;
-  --ring: 168 35% 55%;
+  --ring: 168 45% 55%;
 
   /* Semantic colors */
-  --success: 158 35% 50%;
+  --success: 158 43% 50%;
   --success-foreground: 158 50% 8%;
-  --success-muted: 158 20% 14%;
+  --success-muted: 158 28% 14%;
   --warning: 35 65% 55%;
   --warning-foreground: 35 80% 8%;
   --warning-muted: 35 30% 14%;
 
   /* Module identity colors */
-  --module-ev: 168 35% 55%;
-  --module-ev-muted: 168 20% 14%;
-  --module-living: 25 50% 55%;
-  --module-living-muted: 25 25% 14%;
-  --module-savings: 155 32% 50%;
-  --module-savings-muted: 155 18% 14%;
+  --module-ev: 168 43% 55%;
+  --module-ev-muted: 168 28% 14%;
+  --module-living: 25 58% 55%;
+  --module-living-muted: 25 33% 14%;
+  --module-savings: 155 40% 50%;
+  --module-savings-muted: 155 26% 14%;
 }
 
 @theme inline {
@@ -113,8 +113,30 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-plex-sans), var(--font-plex-sans-thai);
+  --font-mono: var(--font-plex-mono);
+
+  /* Animation keyframes */
+  --animate-bounce-sm: bounce-sm 0.4s ease-out;
+  --animate-scale-in: scale-in 0.25s ease-out;
+  --animate-slide-up-fade: slide-up-fade 0.3s ease-out;
+}
+
+@keyframes bounce-sm {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-2px); }
+  70% { transform: translateY(1px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slide-up-fade {
+  0% { transform: translateY(8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
 }
 
 * {

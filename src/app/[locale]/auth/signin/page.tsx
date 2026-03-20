@@ -15,11 +15,16 @@ interface AuthStatus {
   registration: boolean;
 }
 
+function sanitizeCallbackUrl(url: string | null): string {
+  if (!url || !url.startsWith('/') || url.startsWith('//')) return '/';
+  return url;
+}
+
 function SignInForm() {
   const t = useTranslations('auth');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const callbackUrl = sanitizeCallbackUrl(searchParams.get('callbackUrl'));
   const [authStatus, setAuthStatus] = useState<AuthStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [isRegister, setIsRegister] = useState(false);

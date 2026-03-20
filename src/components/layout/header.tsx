@@ -30,7 +30,7 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-8 flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary transition-transform duration-200 hover:rotate-[-6deg]">
               <Wallet className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="text-lg font-bold">
@@ -57,7 +57,7 @@ export function Header() {
         <MobileNav />
         <div className="flex min-w-0 flex-1 items-center justify-between md:justify-end">
           <Link href="/" className="flex min-w-0 items-center gap-2 md:hidden">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary transition-transform duration-200 hover:rotate-[-6deg]">
               <Wallet className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="truncate font-bold">Manager.money</span>

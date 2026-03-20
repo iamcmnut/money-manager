@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       console.log('[Import] Form data parsed');
     } catch (e) {
       console.error('[Import] Form data error:', e);
-      return NextResponse.json({ error: `Failed to parse form data: ${e instanceof Error ? e.message : 'Unknown'}` }, { status: 400 });
+      return NextResponse.json({ error: 'Failed to parse form data' }, { status: 400 });
     }
 
     const file = formData.get('file') as File;
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
       console.log('[Import] Array buffer size:', arrayBuffer.byteLength);
     } catch (e) {
       console.error('[Import] File read error:', e);
-      return NextResponse.json({ error: `Failed to read file: ${e instanceof Error ? e.message : 'Unknown'}` }, { status: 400 });
+      return NextResponse.json({ error: 'Failed to read file' }, { status: 400 });
     }
 
     let workbook;
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
       console.log('[Import] Workbook sheets:', workbook.SheetNames);
     } catch (e) {
       console.error('[Import] Excel parse error:', e);
-      return NextResponse.json({ error: `Failed to parse Excel file: ${e instanceof Error ? e.message : 'Unknown'}` }, { status: 400 });
+      return NextResponse.json({ error: 'Failed to parse Excel file' }, { status: 400 });
     }
 
     // Get the first sheet
@@ -192,7 +192,7 @@ export async function POST(request: Request) {
           updatedAt: now,
         });
       } catch (err) {
-        errors.push({ row: rowNum, error: `Processing error: ${err instanceof Error ? err.message : 'Unknown'}` });
+        errors.push({ row: rowNum, error: 'Processing error' });
       }
     }
 
@@ -214,15 +214,14 @@ export async function POST(request: Request) {
 
     if (insertedCount === 0 && importedRecords.length > 0) {
       return NextResponse.json({
-        error: `Failed to insert any records. First error: ${insertErrors[0]?.error || 'Unknown'}`,
-        debug: { recordsParsed: importedRecords.length, insertErrors: insertErrors.slice(0, 5) }
+        error: 'Failed to insert any records',
       }, { status: 500 });
     }
 
     // Combine parse errors and insert errors
     const allErrors = [
       ...errors,
-      ...insertErrors.map(e => ({ row: e.index + 2, error: `Insert failed: ${e.error}` }))
+      ...insertErrors.map(e => ({ row: e.index + 2, error: 'Insert failed' }))
     ];
 
     return NextResponse.json({
@@ -234,7 +233,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('Failed to import charging records:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: `Failed to import records: ${errorMessage}` }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to import records' }, { status: 500 });
   }
 }

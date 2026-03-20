@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Phone, ExternalLink, Trophy, TrendingUp } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
 import type { BrandData } from './types';
+import { sanitizeUrl } from '@/lib/sanitize-url';
 
 interface NetworkComparisonCardsProps {
   brandComparison?: BrandData[];
@@ -67,7 +68,7 @@ export function NetworkComparisonCards({ brandComparison, loading, error }: Netw
             )}
 
             {/* Rank number */}
-            <div className="absolute top-2 left-2 flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-bold">
+            <div className="absolute top-2 left-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
               {index + 1}
             </div>
 
@@ -118,18 +119,18 @@ export function NetworkComparisonCards({ brandComparison, loading, error }: Netw
               {brand.brandPhone && (
                 <a
                   href={`tel:${brand.brandPhone.replace(/\s/g, '')}`}
-                  className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs hover:bg-muted/80"
+                  className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
                 >
                   <Phone className="h-3 w-3" />
                   {brand.brandPhone}
                 </a>
               )}
-              {brand.brandWebsite && (
+              {brand.brandWebsite && sanitizeUrl(brand.brandWebsite) && (
                 <a
-                  href={brand.brandWebsite}
+                  href={sanitizeUrl(brand.brandWebsite)!}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs hover:bg-muted/80"
+                  className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
                 >
                   <ExternalLink className="h-3 w-3" />
                   {t('website')}

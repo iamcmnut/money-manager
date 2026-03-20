@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Trash2, ExternalLink, Phone } from 'lucide-react';
 import { ChargingNetworkForm } from './charging-network-form';
+import { sanitizeUrl } from '@/lib/sanitize-url';
 
 interface NetworkData {
   id: string;
@@ -150,9 +151,9 @@ export function ChargingNetworksTable() {
                 <div>
                   <p className="font-medium">{network.name}</p>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    {network.website && (
+                    {network.website && sanitizeUrl(network.website) && (
                       <a
-                        href={network.website}
+                        href={sanitizeUrl(network.website)!}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1 hover:text-primary"
