@@ -36,6 +36,8 @@
         "chargedKwh": "พลังงานที่ชาร์จ (kWh)",
         "costThb": "ค่าใช้จ่าย (บาท)",
         "avgUnitPrice": "ราคาเฉลี่ยต่อหน่วย",
+        "chargingPowerKw": "กำลังชาร์จ (kW)",
+        "chargingFinishDatetime": "เวลาชาร์จเสร็จ",
         "mileageKm": "เลขไมล์ (กม.)",
         "notes": "หมายเหตุ",
         "notesPlaceholder": "หมายเหตุเพิ่มเติมเกี่ยวกับการชาร์จครั้งนี้...",

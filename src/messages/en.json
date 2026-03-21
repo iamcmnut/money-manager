@@ -36,6 +36,8 @@
         "chargedKwh": "Energy Charged (kWh)",
         "costThb": "Cost (THB)",
         "avgUnitPrice": "Avg. Unit Price",
+        "chargingPowerKw": "Charging Power (kW)",
+        "chargingFinishDatetime": "Finish Time",
         "mileageKm": "Mileage (km)",
         "notes": "Notes",
         "notesPlaceholder": "Optional notes about this charging session...",

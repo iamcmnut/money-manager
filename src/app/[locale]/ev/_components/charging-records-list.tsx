@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Plus, Pencil, Trash2, Zap, Upload, X, FileSpreadsheet, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ChargingRecordForm } from './charging-record-form';
-import { formatCents, formatBahtCents } from '@/lib/format';
+import { formatNumber, formatBaht } from '@/lib/format';
 
 interface RecordData {
   id: string;
@@ -18,6 +18,8 @@ interface RecordData {
   chargedKwh: number;
   costThb: number;
   avgUnitPrice: number | null;
+  chargingPowerKw: number | null;
+  chargingFinishDatetime: string | null;
   mileageKm: number | null;
   notes: string | null;
   createdAt: string | null;
@@ -332,14 +334,14 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
                 <div className="flex items-start gap-2">
                   <div className="text-right">
                     <p className="font-semibold text-success">
-                      {formatCents(record.chargedKwh)} kWh
+                      {formatNumber(record.chargedKwh, 2)} kWh
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {formatBahtCents(record.costThb)}
+                      {formatBaht(record.costThb)}
                     </p>
                     {record.avgUnitPrice && (
                       <p className="text-xs text-muted-foreground">
-                        {formatBahtCents(record.avgUnitPrice)}/kWh
+                        {formatBaht(record.avgUnitPrice)}/kWh
                       </p>
                     )}
                   </div>

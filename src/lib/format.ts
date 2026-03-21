@@ -16,19 +16,3 @@ export function formatNumber(value: number, decimals: number = 0): string {
 export function formatBaht(value: number, decimals: number = 2): string {
   return `฿${formatNumber(value, decimals)}`;
 }
-
-/**
- * Format a value stored as cents (÷100) with thousand separators.
- * Example: formatCents(123456) → "1,234.56"
- */
-export function formatCents(value: number, decimals: number = 2): string {
-  return formatNumber(value / 100, decimals);
-}
-
-/**
- * Format a value stored as cents as Thai Baht.
- * Example: formatBahtCents(123456) → "฿1,234.56"
- */
-export function formatBahtCents(value: number, decimals: number = 2): string {
-  return formatBaht(value / 100, decimals);
-}

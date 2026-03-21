@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { Header } from './header';
+import { Header, type EnabledModules } from './header';
 
 vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -30,9 +30,11 @@ vi.mock('@/components/auth/auth-buttons', () => ({
   AuthButtons: () => <div data-testid="auth-buttons" />,
 }));
 
+const allEnabled: EnabledModules = { ev: true, livingCost: true, savings: true };
+
 describe('Header', () => {
   it('renders navigation links', () => {
-    render(<Header />);
+    render(<Header enabledModules={allEnabled} />);
 
     expect(screen.getAllByText('home').length).toBeGreaterThan(0);
     expect(screen.getByText('ev')).toBeInTheDocument();
@@ -41,7 +43,7 @@ describe('Header', () => {
   });
 
   it('renders logo/brand', () => {
-    render(<Header />);
+    render(<Header enabledModules={allEnabled} />);
 
     const brandElements = screen.getAllByText('Manager.money');
     expect(brandElements.length).toBeGreaterThan(0);
@@ -49,7 +51,7 @@ describe('Header', () => {
 
   it('applies active styling to current route link', () => {
     mockUsePathname.mockReturnValue('/ev');
-    render(<Header />);
+    render(<Header enabledModules={allEnabled} />);
 
     const evLink = screen.getByText('ev');
     expect(evLink).toHaveClass('text-primary', 'font-semibold');
@@ -57,5 +59,13 @@ describe('Header', () => {
     const savingsLink = screen.getByText('savings');
     expect(savingsLink).toHaveClass('text-muted-foreground');
     expect(savingsLink).not.toHaveClass('text-primary');
+  });
+
+  it('hides nav links for disabled modules', () => {
+    render(<Header enabledModules={{ ev: true, livingCost: false, savings: false }} />);
+
+    expect(screen.getByText('ev')).toBeInTheDocument();
+    expect(screen.queryByText('livingCost')).not.toBeInTheDocument();
+    expect(screen.queryByText('savings')).not.toBeInTheDocument();
   });
 });

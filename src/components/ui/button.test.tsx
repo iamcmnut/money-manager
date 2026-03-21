@@ -94,7 +94,7 @@ describe('Button', () => {
     it('should render large size', () => {
       render(<Button size="lg">Large</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('h-10');
+      expect(button).toHaveClass('h-11');
     });
 
     it('should render icon size', () => {

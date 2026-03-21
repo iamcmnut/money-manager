@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, primaryKey } from 'drizzle-orm/sqlite-core';
 
 // Users table
 export const users = sqliteTable('users', {
@@ -77,10 +77,12 @@ export const chargingRecords = sqliteTable('charging_records', {
     .notNull()
     .references(() => chargingNetworks.id, { onDelete: 'restrict' }),
   chargingDatetime: integer('charging_datetime', { mode: 'timestamp' }).notNull(),
-  chargedKwh: integer('charged_kwh').notNull(), // Store as cents (value * 100)
-  costThb: integer('cost_thb').notNull(), // Store as satang (value * 100)
-  avgUnitPrice: integer('avg_unit_price'), // Computed: costThb / chargedKwh
-  mileageKm: integer('mileage_km'), // Optional
+  chargedKwh: real('charged_kwh').notNull(),
+  costThb: real('cost_thb').notNull(),
+  avgUnitPrice: real('avg_unit_price'),
+  chargingPowerKw: real('charging_power_kw'),
+  chargingFinishDatetime: integer('charging_finish_datetime', { mode: 'timestamp' }),
+  mileageKm: real('mileage_km'),
   notes: text('notes'),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),

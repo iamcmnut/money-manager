@@ -17,6 +17,12 @@ interface ImportRow {
   cost?: number | string;
   costThb?: number | string;
   price?: number | string;
+  power?: number | string;
+  chargingPowerKw?: number | string;
+  chargingPower?: number | string;
+  finishTime?: string | number | Date;
+  chargingFinishDatetime?: string | number | Date;
+  endTime?: string | number | Date;
   mileage?: number | string;
   mileageKm?: number | string;
   km?: number | string;
@@ -167,13 +173,32 @@ export async function POST(request: Request) {
           if (isNaN(mileageKm)) mileageKm = null;
         }
 
+        // Parse charging power (optional)
+        const powerValue = row.power || row.chargingPowerKw || row.chargingPower;
+        let chargingPowerKw: number | null = null;
+        if (powerValue !== undefined && powerValue !== null && powerValue !== '') {
+          chargingPowerKw = parseFloat(String(powerValue));
+          if (isNaN(chargingPowerKw)) chargingPowerKw = null;
+        }
+
+        // Parse charging finish time (optional)
+        const finishValue = row.finishTime || row.chargingFinishDatetime || row.endTime;
+        let chargingFinishDatetime: Date | null = null;
+        if (finishValue !== undefined && finishValue !== null && finishValue !== '') {
+          if (finishValue instanceof Date) {
+            chargingFinishDatetime = finishValue;
+          } else if (typeof finishValue === 'number') {
+            chargingFinishDatetime = new Date((finishValue - 25569) * 86400 * 1000);
+          } else if (typeof finishValue === 'string') {
+            const parsed = new Date(finishValue);
+            if (!isNaN(parsed.getTime())) chargingFinishDatetime = parsed;
+          }
+        }
+
         // Notes (optional)
         const notes = row.notes || row.note || null;
 
-        // Store as integers (cents/satang)
-        const chargedKwhCents = Math.round(chargedKwh * 100);
-        const costThbSatang = Math.round(costThb * 100);
-        const avgUnitPrice = chargedKwhCents > 0 ? Math.round(costThbSatang / chargedKwhCents * 100) : null;
+        const avgUnitPrice = chargedKwh > 0 ? costThb / chargedKwh : null;
 
         const id = `rec-${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${i}`;
         const now = new Date();
@@ -183,9 +208,11 @@ export async function POST(request: Request) {
           userId: session.user.id,
           brandId,
           chargingDatetime,
-          chargedKwh: chargedKwhCents,
-          costThb: costThbSatang,
+          chargedKwh,
+          costThb,
           avgUnitPrice,
+          chargingPowerKw: chargingPowerKw ?? null,
+          chargingFinishDatetime,
           mileageKm,
           notes: notes ? String(notes) : null,
           createdAt: now,

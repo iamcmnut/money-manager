@@ -35,6 +35,8 @@ export async function GET(request: Request) {
           chargedKwh: chargingRecords.chargedKwh,
           costThb: chargingRecords.costThb,
           avgUnitPrice: chargingRecords.avgUnitPrice,
+          chargingPowerKw: chargingRecords.chargingPowerKw,
+          chargingFinishDatetime: chargingRecords.chargingFinishDatetime,
           mileageKm: chargingRecords.mileageKm,
           notes: chargingRecords.notes,
           createdAt: chargingRecords.createdAt,
@@ -65,6 +67,8 @@ interface CreateRecordBody {
   chargingDatetime: string;
   chargedKwh: number;
   costThb: number;
+  chargingPowerKw?: number;
+  chargingFinishDatetime?: string;
   mileageKm?: number;
   notes?: string;
 }
@@ -92,10 +96,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Store as integers (cents/satang)
-    const chargedKwhCents = Math.round(body.chargedKwh * 100);
-    const costThbSatang = Math.round(body.costThb * 100);
-    const avgUnitPrice = chargedKwhCents > 0 ? Math.round(costThbSatang / chargedKwhCents * 100) : null;
+    const avgUnitPrice = body.chargedKwh > 0 ? body.costThb / body.chargedKwh : null;
 
     const id = `rec-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const now = new Date();
@@ -107,10 +108,12 @@ export async function POST(request: Request) {
         userId: session.user.id,
         brandId: body.brandId,
         chargingDatetime: new Date(body.chargingDatetime),
-        chargedKwh: chargedKwhCents,
-        costThb: costThbSatang,
+        chargedKwh: body.chargedKwh,
+        costThb: body.costThb,
         avgUnitPrice,
-        mileageKm: body.mileageKm ? Math.round(body.mileageKm) : null,
+        chargingPowerKw: body.chargingPowerKw ?? null,
+        chargingFinishDatetime: body.chargingFinishDatetime ? new Date(body.chargingFinishDatetime) : null,
+        mileageKm: body.mileageKm ?? null,
         notes: body.notes || null,
         createdAt: now,
         updatedAt: now,
