@@ -1,12 +1,15 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Plus, Pencil, Trash2, ExternalLink, Phone } from 'lucide-react';
 import { ChargingNetworkForm } from './charging-network-form';
 import { sanitizeUrl } from '@/lib/sanitize-url';
+import { Pagination } from '@/components/ui/pagination';
+
+const ITEMS_PER_PAGE = 10;
 
 interface NetworkData {
   id: string;
@@ -37,6 +40,7 @@ export function ChargingNetworksTable() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingNetwork, setEditingNetwork] = useState<NetworkData | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchNetworks = useCallback(async () => {
     try {
@@ -129,7 +133,9 @@ export function ChargingNetworksTable() {
         <div className="text-sm text-muted-foreground">{t('evNetworks.noNetworks')}</div>
       ) : (
         <div className="space-y-3">
-          {networks.map((network) => (
+          {networks
+            .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+            .map((network) => (
             <div
               key={network.id}
               className="flex items-center justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
@@ -197,6 +203,16 @@ export function ChargingNetworksTable() {
               </div>
             </div>
           ))}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={Math.ceil(networks.length / ITEMS_PER_PAGE)}
+            onPageChange={setCurrentPage}
+            showingLabel={t('pagination.showing', {
+              from: (currentPage - 1) * ITEMS_PER_PAGE + 1,
+              to: Math.min(currentPage * ITEMS_PER_PAGE, networks.length),
+              total: networks.length,
+            })}
+          />
         </div>
       )}
     </div>

@@ -4,9 +4,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Plus, Pencil, Trash2, Zap, Upload, X, FileSpreadsheet, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Pencil, Trash2, Zap, Upload, X, FileSpreadsheet, Download } from 'lucide-react';
 import { ChargingRecordForm } from './charging-record-form';
 import { formatNumber, formatBaht } from '@/lib/format';
+import { Pagination } from '@/components/ui/pagination';
 
 interface RecordData {
   id: string;
@@ -372,68 +373,16 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
             </div>
           ))}
 
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 pt-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-
-                    <div className="flex items-center gap-1">
-                      {(() => {
-                        const pages: (number | 'ellipsis-start' | 'ellipsis-end')[] = [];
-                        if (totalPages <= 5) {
-                          for (let i = 1; i <= totalPages; i++) pages.push(i);
-                        } else {
-                          pages.push(1);
-                          if (currentPage > 3) pages.push('ellipsis-start');
-                          for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-                            pages.push(i);
-                          }
-                          if (currentPage < totalPages - 2) pages.push('ellipsis-end');
-                          pages.push(totalPages);
-                        }
-                        return pages.map((page) =>
-                          typeof page === 'string' ? (
-                            <span key={page} className="px-1 text-muted-foreground">...</span>
-                          ) : (
-                            <Button
-                              key={page}
-                              variant={currentPage === page ? 'default' : 'outline'}
-                              size="sm"
-                              className="w-8 h-8 p-0"
-                              onClick={() => setCurrentPage(page)}
-                            >
-                              {page}
-                            </Button>
-                          )
-                        );
-                      })()}
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-
-                    <span className="ml-2 text-sm text-muted-foreground">
-                      {t('pagination.showing', {
-                        from: startIndex + 1,
-                        to: Math.min(startIndex + ITEMS_PER_PAGE, totalRecords),
-                        total: totalRecords,
-                      })}
-                    </span>
-                  </div>
-                )}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  showingLabel={t('pagination.showing', {
+                    from: startIndex + 1,
+                    to: Math.min(startIndex + ITEMS_PER_PAGE, totalRecords),
+                    total: totalRecords,
+                  })}
+                />
               </>
             );
           })()}

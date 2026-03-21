@@ -5,6 +5,9 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, KeyRound, X, Check } from 'lucide-react';
+import { Pagination } from '@/components/ui/pagination';
+
+const ITEMS_PER_PAGE = 10;
 
 interface UserData {
   id: string;
@@ -122,6 +125,7 @@ export function UsersTable() {
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [resetPasswordId, setResetPasswordId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -182,9 +186,13 @@ export function UsersTable() {
     return <div className="text-sm text-muted-foreground">{t('noUsers')}</div>;
   }
 
+  const totalPages = Math.ceil(users.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedUsers = users.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   return (
     <div className="space-y-3">
-      {users.map((user) => (
+      {paginatedUsers.map((user) => (
         <div key={user.id}>
           <div className="flex items-center justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md">
             <div className="flex items-center gap-3">
@@ -227,6 +235,16 @@ export function UsersTable() {
           )}
         </div>
       ))}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        showingLabel={t('pagination.showing', {
+          from: startIndex + 1,
+          to: Math.min(startIndex + ITEMS_PER_PAGE, users.length),
+          total: users.length,
+        })}
+      />
     </div>
   );
 }

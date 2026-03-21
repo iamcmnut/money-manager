@@ -234,6 +234,9 @@
       "failedToLoad": "ไม่สามารถโหลดรายการได้",
       "noRecords": "ไม่พบรายการชาร์จ"
     },
+    "pagination": {
+      "showing": "{from}-{to} จาก {total}"
+    },
     "resetPassword": {
       "title": "รีเซ็ตรหัสผ่าน",
       "newPassword": "รหัสผ่านใหม่",

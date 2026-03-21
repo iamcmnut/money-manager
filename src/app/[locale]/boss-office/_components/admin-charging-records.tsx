@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Zap, User } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
+import { Pagination } from '@/components/ui/pagination';
+
+const ITEMS_PER_PAGE = 10;
 
 interface RecordData {
   id: string;
@@ -32,6 +35,7 @@ export function AdminChargingRecords() {
   const [records, setRecords] = useState<RecordData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchRecords = useCallback(async () => {
     try {
@@ -77,9 +81,16 @@ export function AdminChargingRecords() {
     return <div className="text-sm text-muted-foreground">{t('chargingRecords.noRecords')}</div>;
   }
 
+  const totalPages = Math.ceil(records.length / ITEMS_PER_PAGE);
+  const paginatedRecords = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return records.slice(start, start + ITEMS_PER_PAGE);
+  }, [records, currentPage]);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+
   return (
     <div className="space-y-3">
-      {records.map((record) => (
+      {paginatedRecords.map((record) => (
         <div
           key={record.id}
           className="rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
@@ -124,6 +135,16 @@ export function AdminChargingRecords() {
           </div>
         </div>
       ))}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        showingLabel={t('pagination.showing', {
+          from: startIndex + 1,
+          to: Math.min(startIndex + ITEMS_PER_PAGE, records.length),
+          total: records.length,
+        })}
+      />
     </div>
   );
 }
