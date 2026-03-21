@@ -55,3 +55,70 @@ export function SoftwareApplicationJsonLd({
     />
   );
 }
+
+interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+interface BreadcrumbJsonLdProps {
+  items: BreadcrumbItem[];
+}
+
+export function BreadcrumbJsonLd({ items }: BreadcrumbJsonLdProps) {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
+}
+
+interface WebApplicationJsonLdProps {
+  name: string;
+  description: string;
+  url: string;
+  applicationCategory: string;
+  inLanguage: string[];
+}
+
+export function WebApplicationJsonLd({
+  name,
+  description,
+  url,
+  applicationCategory,
+  inLanguage,
+}: WebApplicationJsonLdProps) {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name,
+    description,
+    url,
+    applicationCategory,
+    inLanguage,
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'THB',
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
+}
