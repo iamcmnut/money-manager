@@ -234,6 +234,9 @@
       "failedToLoad": "Failed to load records",
       "noRecords": "No charging records found"
     },
+    "pagination": {
+      "showing": "{from}-{to} of {total}"
+    },
     "resetPassword": {
       "title": "Reset Password",
       "newPassword": "New password",
