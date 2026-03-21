@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { useTranslations } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PiggyBank, Target, BarChart3, Percent, Trophy, Clock } from 'lucide-react';
+import { FeatureGate } from '@/components/feature-gate';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -21,7 +22,11 @@ export default async function SavingsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <SavingsPageContent />;
+  return (
+    <FeatureGate flag="module_savings">
+      <SavingsPageContent />
+    </FeatureGate>
+  );
 }
 
 function SavingsPageContent() {

@@ -13,24 +13,34 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+import { type EnabledModules } from './header';
 
 type NavLink = {
   href: '/' | '/ev' | '/living-cost' | '/savings';
   labelKey: 'home' | 'ev' | 'livingCost' | 'savings';
   icon: React.ElementType;
+  moduleKey?: keyof EnabledModules;
 };
 
 const navLinks: NavLink[] = [
   { href: '/', labelKey: 'home', icon: LayoutGrid },
-  { href: '/ev', labelKey: 'ev', icon: Car },
-  { href: '/living-cost', labelKey: 'livingCost', icon: Home },
-  { href: '/savings', labelKey: 'savings', icon: PiggyBank },
+  { href: '/ev', labelKey: 'ev', icon: Car, moduleKey: 'ev' },
+  { href: '/living-cost', labelKey: 'livingCost', icon: Home, moduleKey: 'livingCost' },
+  { href: '/savings', labelKey: 'savings', icon: PiggyBank, moduleKey: 'savings' },
 ];
 
-export function MobileNav() {
+type MobileNavProps = {
+  enabledModules: EnabledModules;
+};
+
+export function MobileNav({ enabledModules }: MobileNavProps) {
   const t = useTranslations('nav');
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+
+  const visibleLinks = navLinks.filter(
+    (link) => !link.moduleKey || enabledModules[link.moduleKey]
+  );
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -52,7 +62,7 @@ export function MobileNav() {
           </SheetTitle>
         </SheetHeader>
         <nav className="flex flex-col gap-1 mt-6">
-          {navLinks.map((link) => {
+          {visibleLinks.map((link) => {
             const Icon = link.icon;
             return (
               <Link

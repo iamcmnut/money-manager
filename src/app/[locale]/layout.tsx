@@ -10,6 +10,7 @@ import { CookieConsent } from '@/components/layout/cookie-consent';
 import { WebsiteJsonLd } from '@/components/seo/json-ld';
 import { routing } from '@/i18n/routing';
 import { plexSans, plexSansThai, plexMono } from '../layout';
+import { getFeatureFlag } from '@/lib/feature-flags';
 
 type Props = {
   children: React.ReactNode;
@@ -85,7 +86,18 @@ export default async function LocaleLayout({ children, params }: Props) {
   // Enable static rendering
   setRequestLocale(locale);
 
-  const messages = await getMessages();
+  const [messages, evEnabled, livingCostEnabled, savingsEnabled] = await Promise.all([
+    getMessages(),
+    getFeatureFlag('module_ev'),
+    getFeatureFlag('module_living_cost'),
+    getFeatureFlag('module_savings'),
+  ]);
+
+  const enabledModules = {
+    ev: evEnabled,
+    livingCost: livingCostEnabled,
+    savings: savingsEnabled,
+  };
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -104,7 +116,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <ThemeProvider>
             <NextIntlClientProvider messages={messages}>
               <div className="relative flex min-h-screen flex-col">
-                <Header />
+                <Header enabledModules={enabledModules} />
                 <main className="flex-1">{children}</main>
                 <Footer />
               </div>

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { useTranslations } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Home, FolderTree, Target, LineChart, Bell, Clock } from 'lucide-react';
+import { FeatureGate } from '@/components/feature-gate';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -21,7 +22,11 @@ export default async function LivingCostPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <LivingCostPageContent />;
+  return (
+    <FeatureGate flag="module_living_cost">
+      <LivingCostPageContent />
+    </FeatureGate>
+  );
 }
 
 function LivingCostPageContent() {

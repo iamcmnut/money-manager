@@ -9,21 +9,36 @@ import { LanguageSwitcher } from './language-switcher';
 import { AuthButtons } from '@/components/auth/auth-buttons';
 import { Wallet } from 'lucide-react';
 
+export type EnabledModules = {
+  ev: boolean;
+  livingCost: boolean;
+  savings: boolean;
+};
+
 type NavLink = {
   href: '/' | '/ev' | '/living-cost' | '/savings';
   labelKey: 'home' | 'ev' | 'livingCost' | 'savings';
+  moduleKey?: keyof EnabledModules;
 };
 
 const navLinks: NavLink[] = [
   { href: '/', labelKey: 'home' },
-  { href: '/ev', labelKey: 'ev' },
-  { href: '/living-cost', labelKey: 'livingCost' },
-  { href: '/savings', labelKey: 'savings' },
+  { href: '/ev', labelKey: 'ev', moduleKey: 'ev' },
+  { href: '/living-cost', labelKey: 'livingCost', moduleKey: 'livingCost' },
+  { href: '/savings', labelKey: 'savings', moduleKey: 'savings' },
 ];
 
-export function Header() {
+type HeaderProps = {
+  enabledModules: EnabledModules;
+};
+
+export function Header({ enabledModules }: HeaderProps) {
   const t = useTranslations('nav');
   const pathname = usePathname();
+
+  const visibleLinks = navLinks.filter(
+    (link) => !link.moduleKey || enabledModules[link.moduleKey]
+  );
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
@@ -38,7 +53,7 @@ export function Header() {
             </span>
           </Link>
           <nav className="flex items-center gap-1">
-            {navLinks.map((link) => (
+            {visibleLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -54,7 +69,7 @@ export function Header() {
             ))}
           </nav>
         </div>
-        <MobileNav />
+        <MobileNav enabledModules={enabledModules} />
         <div className="flex min-w-0 flex-1 items-center justify-between md:justify-end">
           <Link href="/" className="flex min-w-0 items-center gap-2 md:hidden">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary transition-transform duration-200 hover:rotate-[-6deg]">
