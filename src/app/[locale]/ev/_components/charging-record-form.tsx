@@ -27,6 +27,8 @@ interface RecordData {
   chargingDatetime: string;
   chargedKwh: number;
   costThb: number;
+  chargingPowerKw: number | null;
+  chargingFinishDatetime: string | null;
   mileageKm: number | null;
   notes: string | null;
 }
@@ -47,8 +49,12 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
     chargingDatetime: record?.chargingDatetime
       ? new Date(record.chargingDatetime).toISOString().slice(0, 16)
       : new Date().toISOString().slice(0, 16),
-    chargedKwh: record ? (record.chargedKwh / 100).toString() : '',
-    costThb: record ? (record.costThb / 100).toString() : '',
+    chargedKwh: record ? record.chargedKwh.toString() : '',
+    costThb: record ? record.costThb.toString() : '',
+    chargingPowerKw: record?.chargingPowerKw ? record.chargingPowerKw.toString() : '',
+    chargingFinishDatetime: record?.chargingFinishDatetime
+      ? new Date(record.chargingFinishDatetime).toISOString().slice(0, 16)
+      : '',
     mileageKm: record?.mileageKm?.toString() || '',
     notes: record?.notes || '',
   });
@@ -91,6 +97,8 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
           chargingDatetime: formData.chargingDatetime,
           chargedKwh: parseFloat(formData.chargedKwh),
           costThb: parseFloat(formData.costThb),
+          chargingPowerKw: formData.chargingPowerKw ? parseFloat(formData.chargingPowerKw) : null,
+          chargingFinishDatetime: formData.chargingFinishDatetime || null,
           mileageKm: formData.mileageKm ? parseInt(formData.mileageKm) : null,
           notes: formData.notes || null,
         }),
@@ -193,6 +201,29 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
             <div className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2 text-sm">
               <span>฿{avgUnitPrice}/kWh</span>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">{t('chargingPowerKw')}</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.chargingPowerKw}
+              onChange={(e) => setFormData({ ...formData, chargingPowerKw: e.target.value })}
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              placeholder="150"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">{t('chargingFinishDatetime')}</label>
+            <input
+              type="datetime-local"
+              value={formData.chargingFinishDatetime}
+              onChange={(e) => setFormData({ ...formData, chargingFinishDatetime: e.target.value })}
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+            />
           </div>
 
           <div>

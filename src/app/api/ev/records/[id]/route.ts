@@ -33,6 +33,8 @@ export async function GET(request: Request, { params }: RouteParams) {
         chargedKwh: chargingRecords.chargedKwh,
         costThb: chargingRecords.costThb,
         avgUnitPrice: chargingRecords.avgUnitPrice,
+        chargingPowerKw: chargingRecords.chargingPowerKw,
+        chargingFinishDatetime: chargingRecords.chargingFinishDatetime,
         mileageKm: chargingRecords.mileageKm,
         notes: chargingRecords.notes,
         createdAt: chargingRecords.createdAt,
@@ -58,6 +60,8 @@ interface UpdateRecordBody {
   chargingDatetime?: string;
   chargedKwh?: number;
   costThb?: number;
+  chargingPowerKw?: number | null;
+  chargingFinishDatetime?: string | null;
   mileageKm?: number | null;
   notes?: string | null;
 }
@@ -82,9 +86,11 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     if (body.brandId !== undefined) updateData.brandId = body.brandId;
     if (body.chargingDatetime !== undefined) updateData.chargingDatetime = new Date(body.chargingDatetime);
-    if (body.chargedKwh !== undefined) updateData.chargedKwh = Math.round(body.chargedKwh * 100);
-    if (body.costThb !== undefined) updateData.costThb = Math.round(body.costThb * 100);
-    if (body.mileageKm !== undefined) updateData.mileageKm = body.mileageKm ? Math.round(body.mileageKm) : null;
+    if (body.chargedKwh !== undefined) updateData.chargedKwh = body.chargedKwh;
+    if (body.costThb !== undefined) updateData.costThb = body.costThb;
+    if (body.chargingPowerKw !== undefined) updateData.chargingPowerKw = body.chargingPowerKw;
+    if (body.chargingFinishDatetime !== undefined) updateData.chargingFinishDatetime = body.chargingFinishDatetime ? new Date(body.chargingFinishDatetime) : null;
+    if (body.mileageKm !== undefined) updateData.mileageKm = body.mileageKm;
     if (body.notes !== undefined) updateData.notes = body.notes;
 
     // Recalculate avgUnitPrice if kWh or cost changed
@@ -108,7 +114,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         finalCost = finalCost ?? existing[0].costThb;
       }
 
-      updateData.avgUnitPrice = finalKwh > 0 ? Math.round(finalCost / finalKwh * 100) : null;
+      updateData.avgUnitPrice = finalKwh > 0 ? finalCost / finalKwh : null;
     }
 
     if (Object.keys(updateData).length === 0) {

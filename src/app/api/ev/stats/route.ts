@@ -81,9 +81,7 @@ export async function GET() {
     ]);
 
     const stats = overallStats[0];
-    const totalKwhDecimal = stats.totalKwh / 100;
-    const totalCostDecimal = stats.totalCost / 100;
-    const avgPricePerKwh = totalKwhDecimal > 0 ? totalCostDecimal / totalKwhDecimal : 0;
+    const avgPricePerKwh = stats.totalKwh > 0 ? stats.totalCost / stats.totalKwh : 0;
 
     // Calculate avg price for each brand
     const brandData = brandStats.map((brand) => ({
@@ -94,8 +92,8 @@ export async function GET() {
       brandPhone: brand.brandPhone,
       brandWebsite: brand.brandWebsite,
       sessions: brand.sessions,
-      totalKwh: brand.totalKwh / 100,
-      totalCost: brand.totalCost / 100,
+      totalKwh: brand.totalKwh,
+      totalCost: brand.totalCost,
       avgPricePerKwh: brand.totalKwh > 0 ? (brand.totalCost / brand.totalKwh) : 0,
     }));
 
@@ -127,21 +125,21 @@ export async function GET() {
     let avgCostPerKm = 0;
 
     if (latestMileageKm > 0) {
-      avgCostPerKm = totalCostDecimal / latestMileageKm;
+      avgCostPerKm = stats.totalCost / latestMileageKm;
     }
 
     const monthlyData = monthlyTrend.map((month) => ({
       month: month.month,
-      totalKwh: month.totalKwh / 100,
-      totalCost: month.totalCost / 100,
+      totalKwh: month.totalKwh,
+      totalCost: month.totalCost,
       sessions: month.sessions,
     }));
 
     return NextResponse.json({
       stats: {
         totalSessions: stats.totalSessions,
-        totalKwh: totalKwhDecimal,
-        totalCost: totalCostDecimal,
+        totalKwh: stats.totalKwh,
+        totalCost: stats.totalCost,
         avgPricePerKwh: Math.round(avgPricePerKwh * 100) / 100,
         totalDistanceKm,
         avgCostPerKm: Math.round(avgCostPerKm * 100) / 100,
