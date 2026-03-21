@@ -23,7 +23,7 @@ function mockSession(overrides: {
   name?: string | null;
   email?: string;
   image?: string | null;
-  role?: string;
+  role?: 'user' | 'admin';
 }) {
   mockedUseSession.mockReturnValue({
     data: {
