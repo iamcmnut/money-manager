@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Zap, User } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
@@ -82,11 +82,8 @@ export function AdminChargingRecords() {
   }
 
   const totalPages = Math.ceil(records.length / ITEMS_PER_PAGE);
-  const paginatedRecords = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return records.slice(start, start + ITEMS_PER_PAGE);
-  }, [records, currentPage]);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedRecords = records.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
     <div className="space-y-3">
