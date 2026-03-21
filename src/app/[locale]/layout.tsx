@@ -44,20 +44,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: 'Manager.money',
       title: metadata.title,
       description: metadata.description,
-      images: [
-        {
-          url: '/og-image.png',
-          width: 1200,
-          height: 630,
-          alt: 'Manager.money',
-        },
-      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: metadata.title,
       description: metadata.description,
-      images: ['/og-image.png'],
     },
     robots: {
       index: true,
@@ -72,7 +63,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     icons: {
       icon: '/favicon.ico',
-      apple: '/apple-touch-icon.png',
     },
     alternates: {
       canonical: `${baseUrl}/${locale}`,

@@ -23,7 +23,7 @@ async function renderFeatureGate(props: {
 
 describe('FeatureGate', () => {
   it('renders children when feature flag is enabled', async () => {
-    mockGetFeatureFlag.mockReturnValue(true);
+    mockGetFeatureFlag.mockResolvedValue(true);
 
     await renderFeatureGate({
       flag: 'module_ev',
@@ -34,7 +34,7 @@ describe('FeatureGate', () => {
   });
 
   it('renders fallback when feature flag is disabled', async () => {
-    mockGetFeatureFlag.mockReturnValue(false);
+    mockGetFeatureFlag.mockResolvedValue(false);
 
     await renderFeatureGate({
       flag: 'module_ev',
@@ -47,7 +47,7 @@ describe('FeatureGate', () => {
   });
 
   it('renders nothing when flag is disabled and no fallback', async () => {
-    mockGetFeatureFlag.mockReturnValue(false);
+    mockGetFeatureFlag.mockResolvedValue(false);
 
     const { container } = render(<></>);
     const jsx = await FeatureGate({

@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { getFeatureFlag } from '@/lib/feature-flags';
 
 export async function GET() {
-  const googleEnabled = getFeatureFlag('auth_google');
-  const credentialsEnabled = getFeatureFlag('auth_credentials');
-  const registrationEnabled = getFeatureFlag('auth_registration');
+  const googleEnabled = await getFeatureFlag('auth_google');
+  const credentialsEnabled = await getFeatureFlag('auth_credentials');
+  const registrationEnabled = await getFeatureFlag('auth_registration');
 
   return NextResponse.json({
     providers: {

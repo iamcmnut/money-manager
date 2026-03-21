@@ -18,13 +18,8 @@ async function getAuthHandlers(request: NextRequest) {
 
   console.log('[Auth] Database available:', !!db);
 
-  const checkGoogleEnabled = async () => {
-    return getFeatureFlag('auth_google');
-  };
-
-  const checkCredentialsEnabled = async () => {
-    return getFeatureFlag('auth_credentials');
-  };
+  const checkGoogleEnabled = () => getFeatureFlag('auth_google');
+  const checkCredentialsEnabled = () => getFeatureFlag('auth_credentials');
 
   const getUserByEmail = db
     ? async (email: string) => {
