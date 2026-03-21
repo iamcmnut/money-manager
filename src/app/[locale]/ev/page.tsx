@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Car } from 'lucide-react';
 import { EVDashboard } from './_components/ev-dashboard';
 import { BreadcrumbJsonLd, WebApplicationJsonLd } from '@/components/seo/json-ld';
+import { FeatureGate } from '@/components/feature-gate';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -61,7 +62,11 @@ export default async function EVPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <EVPageContent locale={locale} />;
+  return (
+    <FeatureGate flag="module_ev">
+      <EVPageContent locale={locale} />
+    </FeatureGate>
+  );
 }
 
 function EVPageContent({ locale }: { locale: string }) {

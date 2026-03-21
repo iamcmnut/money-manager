@@ -1,3 +1,5 @@
+import { getKV } from './cloudflare';
+
 export type FeatureFlag =
   | 'module_ev'
   | 'module_living_cost'
@@ -15,7 +17,7 @@ const DEFAULT_FLAGS: Record<FeatureFlag, boolean> = {
   auth_registration: false,
 };
 
-// Map feature flags to environment variable names
+// Map feature flags to environment variable names (used for local dev fallback)
 const FLAG_ENV_MAP: Record<FeatureFlag, string> = {
   module_ev: 'FEATURE_MODULE_EV',
   module_living_cost: 'FEATURE_MODULE_LIVING_COST',
@@ -25,42 +27,38 @@ const FLAG_ENV_MAP: Record<FeatureFlag, string> = {
   auth_registration: 'FEATURE_AUTH_REGISTRATION',
 };
 
-function parseEnvBoolean(value: string | undefined, defaultValue: boolean): boolean {
-  if (value === undefined || value === '') {
+function parseBoolean(value: string | null | undefined, defaultValue: boolean): boolean {
+  if (value === undefined || value === null || value === '') {
     return defaultValue;
   }
   return value.toLowerCase() === 'true' || value === '1';
 }
 
-function getCloudflareEnvFromGlobal(): Record<string, unknown> | undefined {
-  const ctx = (globalThis as Record<symbol, unknown>)[Symbol.for('__cloudflare-context__')] as
-    | { env?: Record<string, unknown> }
-    | undefined;
-  return ctx?.env;
-}
-
-function getEnvValue(envVar: string): string | undefined {
-  // Try Cloudflare context first (works in Workers runtime)
-  try {
-    const cfEnv = getCloudflareEnvFromGlobal();
-    if (cfEnv?.[envVar] !== undefined) {
-      return String(cfEnv[envVar]);
-    }
-  } catch {
-    // Not in Cloudflare environment
+/**
+ * Get a single feature flag value.
+ * In production: reads from Cloudflare Workers KV.
+ * In local dev: falls back to process.env.
+ */
+export async function getFeatureFlag(flag: FeatureFlag): Promise<boolean> {
+  // Try KV first (Cloudflare Workers production)
+  const kv = getKV();
+  if (kv) {
+    const value = await kv.get(flag);
+    return parseBoolean(value, DEFAULT_FLAGS[flag]);
   }
 
-  // Fallback to process.env (works in Node.js / local dev)
-  return process.env[envVar];
-}
-
-export function getFeatureFlag(flag: FeatureFlag): boolean {
+  // Fallback to process.env (local development)
   const envVar = FLAG_ENV_MAP[flag];
-  const envValue = getEnvValue(envVar);
-  return parseEnvBoolean(envValue, DEFAULT_FLAGS[flag]);
+  const envValue = process.env[envVar];
+  return parseBoolean(envValue, DEFAULT_FLAGS[flag]);
 }
 
-export function getAllFeatureFlags(): Record<FeatureFlag, boolean> {
+/**
+ * Get all feature flags.
+ * In production: reads from Cloudflare Workers KV.
+ * In local dev: falls back to process.env.
+ */
+export async function getAllFeatureFlags(): Promise<Record<FeatureFlag, boolean>> {
   const flags: Record<FeatureFlag, boolean> = { ...DEFAULT_FLAGS };
 
   const flagKeys: FeatureFlag[] = [
@@ -72,9 +70,11 @@ export function getAllFeatureFlags(): Record<FeatureFlag, boolean> {
     'auth_registration',
   ];
 
-  for (const key of flagKeys) {
-    flags[key] = getFeatureFlag(key);
-  }
+  await Promise.all(
+    flagKeys.map(async (key) => {
+      flags[key] = await getFeatureFlag(key);
+    })
+  );
 
   return flags;
 }
