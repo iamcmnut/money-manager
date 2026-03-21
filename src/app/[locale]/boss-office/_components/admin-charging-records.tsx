@@ -27,23 +27,29 @@ interface RecordData {
 
 interface RecordsResponse {
   records?: RecordData[];
+  total?: number;
+  page?: number;
+  limit?: number;
   error?: string;
 }
 
 export function AdminChargingRecords() {
   const t = useTranslations('admin');
   const [records, setRecords] = useState<RecordData[]>([]);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const fetchRecords = useCallback(async () => {
+  const fetchRecords = useCallback(async (page = 1) => {
     try {
-      const response = await fetch('/api/admin/charging-records');
+      setLoading(true);
+      const response = await fetch(`/api/admin/charging-records?page=${page}&limit=${ITEMS_PER_PAGE}`);
       const data = (await response.json()) as RecordsResponse;
 
       if (response.ok && data.records) {
         setRecords(data.records);
+        setTotalRecords(data.total ?? data.records.length);
       } else {
         setError(data.error || t('chargingRecords.failedToLoad'));
       }
@@ -56,8 +62,8 @@ export function AdminChargingRecords() {
   }, [t]);
 
   useEffect(() => {
-    fetchRecords();
-  }, [fetchRecords]);
+    fetchRecords(currentPage);
+  }, [fetchRecords, currentPage]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(undefined, {
@@ -81,13 +87,12 @@ export function AdminChargingRecords() {
     return <div className="text-sm text-muted-foreground">{t('chargingRecords.noRecords')}</div>;
   }
 
-  const totalPages = Math.ceil(records.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(totalRecords / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedRecords = records.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
     <div className="space-y-3">
-      {paginatedRecords.map((record) => (
+      {records.map((record) => (
         <div
           key={record.id}
           className="rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
@@ -138,8 +143,8 @@ export function AdminChargingRecords() {
         onPageChange={setCurrentPage}
         showingLabel={t('pagination.showing', {
           from: startIndex + 1,
-          to: Math.min(startIndex + ITEMS_PER_PAGE, records.length),
-          total: records.length,
+          to: Math.min(startIndex + ITEMS_PER_PAGE, totalRecords),
+          total: totalRecords,
         })}
       />
     </div>

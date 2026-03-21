@@ -1,6 +1,8 @@
 // Edge Runtime compatible password hashing using Web Crypto API (PBKDF2)
 
-const ITERATIONS = 100000;
+// 50k iterations is secure for PBKDF2-SHA256 and stays within
+// Cloudflare Workers' CPU time budget (~10ms wall-clock on Workers).
+const ITERATIONS = 50000;
 const KEY_LENGTH = 64;
 const SALT_LENGTH = 16;
 
