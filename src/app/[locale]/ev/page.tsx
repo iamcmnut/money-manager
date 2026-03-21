@@ -47,6 +47,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url,
       type: 'website',
+      images: [
+        {
+          url: `${baseUrl}/ev/manager.money-ev-${locale}.png`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`${baseUrl}/ev/manager.money-ev-${locale}.png`],
     },
     alternates: {
       canonical: url,
