@@ -187,7 +187,7 @@
     "saving": "Saving...",
     "enabled": "Enabled",
     "disabled": "Disabled",
-    "flagsEnvNote": "Feature flags are configured via environment variables.",
+    "flagsEnvNote": "Changes take effect immediately in production.",
     "flags": {
       "module_ev": "EV Charging Price Module",
       "module_living_cost": "Living Cost Module",
