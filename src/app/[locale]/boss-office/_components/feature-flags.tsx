@@ -10,6 +10,7 @@ export function FeatureFlagsPanel() {
   const t = useTranslations('admin');
   const [flags, setFlags] = useState<FlagsState | null>(null);
   const [loading, setLoading] = useState(true);
+  const [toggling, setToggling] = useState<FeatureFlag | null>(null);
 
   useEffect(() => {
     fetchFlags();
@@ -29,6 +30,34 @@ export function FeatureFlagsPanel() {
     }
   };
 
+  const toggleFlag = async (flag: FeatureFlag) => {
+    if (!flags || toggling) return;
+
+    const newValue = !flags[flag];
+    setToggling(flag);
+
+    // Optimistic update
+    setFlags((prev) => (prev ? { ...prev, [flag]: newValue } : prev));
+
+    try {
+      const response = await fetch('/api/admin/flags', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ flag, enabled: newValue }),
+      });
+
+      if (!response.ok) {
+        // Revert on failure
+        setFlags((prev) => (prev ? { ...prev, [flag]: !newValue } : prev));
+      }
+    } catch {
+      // Revert on error
+      setFlags((prev) => (prev ? { ...prev, [flag]: !newValue } : prev));
+    } finally {
+      setToggling(null);
+    }
+  };
+
   if (loading) {
     return <div className="text-sm text-muted-foreground">{t('loadingFlags')}</div>;
   }
@@ -42,21 +71,24 @@ export function FeatureFlagsPanel() {
       {(Object.keys(flags) as FeatureFlag[]).map((flag) => (
         <div key={flag} className="flex items-center justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80">
           <span className="font-medium">{t(`flags.${flag}`)}</span>
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              flags[flag]
-                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-sm'
-                : 'bg-muted text-muted-foreground'
+          <button
+            type="button"
+            role="switch"
+            aria-checked={flags[flag]}
+            disabled={toggling === flag}
+            onClick={() => toggleFlag(flag)}
+            className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-wait disabled:opacity-60 ${
+              flags[flag] ? 'bg-green-500' : 'bg-muted'
             }`}
           >
-            {flags[flag] ? t('enabled') : t('disabled')}
-          </span>
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm ring-0 transition-transform duration-200 ${
+                flags[flag] ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
         </div>
       ))}
-
-      <p className="mt-4 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
-        {t('flagsEnvNote')}
-      </p>
     </div>
   );
 }

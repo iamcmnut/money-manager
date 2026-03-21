@@ -187,7 +187,7 @@
     "saving": "กำลังบันทึก...",
     "enabled": "เปิดใช้งาน",
     "disabled": "ปิดใช้งาน",
-    "flagsEnvNote": "Feature flags ถูกกำหนดค่าผ่าน environment variables",
+    "flagsEnvNote": "การเปลี่ยนแปลงจะมีผลทันทีในโปรดักชัน",
     "flags": {
       "module_ev": "โมดูลราคาชาร์จ EV",
       "module_living_cost": "โมดูลค่าครองชีพ",
