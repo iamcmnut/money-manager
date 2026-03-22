@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Trophy, TrendingUp, Zap, Wallet, ChevronDown, Phone, ExternalLink } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
 import { sanitizeUrl } from '@/lib/sanitize-url';
+import { NetworkDailyPriceChart } from './daily-price-chart';
 import type { BrandData } from './types';
 
 interface PriceComparisonChartProps {
@@ -277,6 +278,14 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
                           </a>
                         )}
                       </div>
+                    )}
+
+                    {/* Daily price trend chart */}
+                    {isExpanded && (
+                      <NetworkDailyPriceChart
+                        networkName={brand.brandName || brand.brandId}
+                        brandColor={brand.brandColor || '#6B7280'}
+                      />
                     )}
                   </div>
                 </div>

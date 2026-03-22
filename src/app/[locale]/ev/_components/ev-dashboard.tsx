@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChargingStats } from './charging-stats';
 import { PriceComparisonChart } from './price-comparison-chart';
-import { DailyPriceChart } from './daily-price-chart';
 import type { EVStatsResponse } from './types';
 
 export function EVDashboard() {
@@ -42,8 +41,6 @@ export function EVDashboard() {
         loading={loading}
         error={error}
       />
-
-      <DailyPriceChart />
 
       <ChargingStats
         stats={data?.stats}
