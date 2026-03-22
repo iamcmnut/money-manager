@@ -43,3 +43,19 @@ export interface EVStatsResponse {
   }[];
   error?: string;
 }
+
+export interface DailyPricePoint {
+  date: string;
+  [networkName: string]: string | number; // network name keys map to avg price values
+}
+
+export interface NetworkMeta {
+  name: string;
+  color: string;
+}
+
+export interface DailyPricesResponse {
+  dailyPrices: DailyPricePoint[];
+  networks: NetworkMeta[];
+  error?: string;
+}

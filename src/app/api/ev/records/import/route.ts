@@ -93,6 +93,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No data found in file' }, { status: 400 });
     }
 
+    // Limit rows to prevent CPU timeout on Workers
+    const MAX_ROWS = 200;
+    if (rows.length > MAX_ROWS) {
+      return NextResponse.json({ error: `Too many rows (${rows.length}). Maximum is ${MAX_ROWS} rows per import.` }, { status: 400 });
+    }
+
     // Fetch all networks for mapping
     const networks = await db.select().from(chargingNetworks);
 
@@ -223,19 +229,28 @@ export async function POST(request: Request) {
       }
     }
 
-    // Insert valid records one by one (D1 doesn't support batch inserts well)
+    // Insert records in batches to reduce CPU time
+    const BATCH_SIZE = 50;
     let insertedCount = 0;
     const insertErrors: { index: number; error: string }[] = [];
 
-    for (let i = 0; i < importedRecords.length; i++) {
+    for (let batchStart = 0; batchStart < importedRecords.length; batchStart += BATCH_SIZE) {
+      const batch = importedRecords.slice(batchStart, batchStart + BATCH_SIZE);
       try {
-        await db.insert(chargingRecords).values(importedRecords[i]);
-        insertedCount++;
+        await db.insert(chargingRecords).values(batch);
+        insertedCount += batch.length;
       } catch (e) {
-        const errorMsg = e instanceof Error ? e.message : 'Unknown';
-        console.error(`[Import] Failed to insert record ${i}:`, errorMsg);
-        insertErrors.push({ index: i, error: errorMsg });
-        // Continue with other records
+        // If batch fails, fall back to one-by-one for this batch
+        for (let i = 0; i < batch.length; i++) {
+          try {
+            await db.insert(chargingRecords).values(batch[i]);
+            insertedCount++;
+          } catch (innerErr) {
+            const errorMsg = innerErr instanceof Error ? innerErr.message : 'Unknown';
+            console.error(`[Import] Failed to insert record ${batchStart + i}:`, errorMsg);
+            insertErrors.push({ index: batchStart + i, error: errorMsg });
+          }
+        }
       }
     }
 
