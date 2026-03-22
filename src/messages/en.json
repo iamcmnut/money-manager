@@ -59,6 +59,17 @@
         "noData": "Your cost summary will appear here",
         "noDataHint": "Add your first charging session to see how much you're spending."
       },
+      "dailyChart": {
+        "title": "Daily Price Trend",
+        "description": "Average price per kWh over time by network",
+        "failedToLoad": "Failed to load price trend data",
+        "noData": "Not enough data for trends",
+        "noDataHint": "Add more charging sessions across different days to see price trends over time.",
+        "perKwh": "฿/kWh",
+        "range30": "30 days",
+        "range90": "90 days",
+        "rangeAll": "All time"
+      },
       "chart": {
         "title": "Price Comparison by Network",
         "description": "Average price per kWh across different charging networks",
