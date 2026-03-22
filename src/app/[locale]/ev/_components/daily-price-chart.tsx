@@ -143,7 +143,7 @@ export function NetworkDailyPriceChart({ networkName, brandColor }: NetworkDaily
                   boxShadow: '0 2px 4px rgba(0,0,0,.08)',
                 }}
                 labelFormatter={formatTooltipDate}
-                formatter={(value: number) => [`฿${value.toFixed(2)}/kWh`, t('title')]}
+                formatter={(value) => [`฿${Number(value).toFixed(2)}/kWh`, t('title')]}
               />
               <Line
                 type="monotone"
