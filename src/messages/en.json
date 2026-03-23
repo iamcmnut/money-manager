@@ -209,7 +209,16 @@
       "module_living_cost": "Living Cost Module",
       "module_savings": "Savings Module",
       "auth_google": "Google Sign-in",
-      "auth_credentials": "Email/Password Sign-in"
+      "auth_credentials": "Email/Password Sign-in",
+      "auth_registration": "User Registration",
+      "ev_daily_price_chart": "EV Daily Price Chart",
+      "ev_coupon": "EV Coupon / Referral Code"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "users": "Users",
+      "evNetworks": "EV Networks",
+      "evRecords": "EV Records"
     },
     "evNetworks": {
       "title": "EV Charging Networks",

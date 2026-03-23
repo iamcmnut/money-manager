@@ -209,7 +209,16 @@
       "module_living_cost": "โมดูลค่าครองชีพ",
       "module_savings": "โมดูลการออม",
       "auth_google": "เข้าสู่ระบบด้วย Google",
-      "auth_credentials": "เข้าสู่ระบบด้วยอีเมล/รหัสผ่าน"
+      "auth_credentials": "เข้าสู่ระบบด้วยอีเมล/รหัสผ่าน",
+      "auth_registration": "การลงทะเบียนผู้ใช้",
+      "ev_daily_price_chart": "กราฟราคาชาร์จ EV รายวัน",
+      "ev_coupon": "คูปอง / รหัสแนะนำ EV"
+    },
+    "tabs": {
+      "overview": "ภาพรวม",
+      "users": "ผู้ใช้",
+      "evNetworks": "เครือข่าย EV",
+      "evRecords": "รายการชาร์จ"
     },
     "evNetworks": {
       "title": "เครือข่ายชาร์จ EV",
