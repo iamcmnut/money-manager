@@ -56,6 +56,8 @@ GOOGLE_CLIENT_SECRET=
 FEATURE_MODULE_EV=true
 FEATURE_MODULE_LIVING_COST=true
 FEATURE_MODULE_SAVINGS=true
+FEATURE_EV_DAILY_PRICE_CHART=true
+FEATURE_EV_COUPON=true
 EOF
 
 # 4. Setup database (migrations + seed admin account)
@@ -109,19 +111,42 @@ FEATURE_MODULE_LIVING_COST=true
 FEATURE_MODULE_SAVINGS=true
 FEATURE_AUTH_GOOGLE=false
 FEATURE_AUTH_CREDENTIALS=true
+FEATURE_EV_DAILY_PRICE_CHART=true
+FEATURE_EV_COUPON=true
 ```
 
 ### Feature Flags
 
-Feature flags are configured via environment variables:
+Feature flags control which modules and features are available. In production, flags are stored in Cloudflare Workers KV and can be toggled at runtime via the admin panel (`/boss-office`). In local development, flags fall back to environment variables in `.env.local`.
+
+#### Module Flags
+
+Control visibility of entire app modules (pages and navigation links).
 
 | Environment Variable | Default | Description |
 |---------------------|---------|-------------|
-| `FEATURE_MODULE_EV` | `true` | Enable EV Calculator module |
-| `FEATURE_MODULE_LIVING_COST` | `true` | Enable Living Cost module |
-| `FEATURE_MODULE_SAVINGS` | `true` | Enable Savings module |
-| `FEATURE_AUTH_GOOGLE` | `false` | Enable Google OAuth sign-in |
+| `FEATURE_MODULE_EV` | `true` | Enable EV Calculator module — the EV charging price comparison page |
+| `FEATURE_MODULE_LIVING_COST` | `true` | Enable Living Cost module — regional living cost tracker |
+| `FEATURE_MODULE_SAVINGS` | `true` | Enable Savings module — savings goal planner |
+
+#### Authentication Flags
+
+Control which sign-in methods are available on the auth page.
+
+| Environment Variable | Default | Description |
+|---------------------|---------|-------------|
+| `FEATURE_AUTH_GOOGLE` | `false` | Enable Google OAuth sign-in (requires `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`) |
 | `FEATURE_AUTH_CREDENTIALS` | `false` | Enable Email/Password sign-in |
+| `FEATURE_AUTH_REGISTRATION` | `false` | Enable new user registration via Email/Password |
+
+#### EV Feature Flags
+
+Control sub-features within the EV Calculator module.
+
+| Environment Variable | Default | Description |
+|---------------------|---------|-------------|
+| `FEATURE_EV_DAILY_PRICE_CHART` | `true` | Show daily price trend sparkline chart inside expanded network cards |
+| `FEATURE_EV_COUPON` | `true` | Show referral/coupon codes inside expanded network cards |
 
 ### Troubleshooting
 

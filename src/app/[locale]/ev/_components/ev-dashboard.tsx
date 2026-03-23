@@ -5,7 +5,12 @@ import { ChargingStats } from './charging-stats';
 import { PriceComparisonChart } from './price-comparison-chart';
 import type { EVStatsResponse } from './types';
 
-export function EVDashboard() {
+interface EVDashboardProps {
+  showDailyPriceChart: boolean;
+  showCoupon: boolean;
+}
+
+export function EVDashboard({ showDailyPriceChart, showCoupon }: EVDashboardProps) {
   const [data, setData] = useState<EVStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +45,8 @@ export function EVDashboard() {
         brandComparison={data?.brandComparison}
         loading={loading}
         error={error}
+        showDailyPriceChart={showDailyPriceChart}
+        showCoupon={showCoupon}
       />
 
       <ChargingStats
