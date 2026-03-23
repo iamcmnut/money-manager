@@ -3,18 +3,38 @@ import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
 import { chargingRecords, chargingNetworks } from '@/lib/db/schema';
 import { and, eq, sql } from 'drizzle-orm';
+import { getKV } from '@/lib/cloudflare';
+
+const STATS_CACHE_TTL = 60; // seconds
 
 export async function GET() {
   const session = await auth();
   const userId = session?.user?.id;
 
-  const db = await getDatabase();
+  const db = getDatabase();
 
   if (!db) {
     return NextResponse.json({ error: 'Database not available' }, { status: 503 });
   }
 
   try {
+    // Check KV cache first
+    const kv = getKV();
+    const cacheKey = `cache:stats:${userId || 'public'}`;
+
+    if (kv) {
+      const cached = await kv.get(cacheKey);
+      if (cached) {
+        return NextResponse.json(JSON.parse(cached), {
+          headers: {
+            'Cache-Control': userId
+              ? 'private, max-age=60, stale-while-revalidate=300'
+              : 'public, s-maxage=60, stale-while-revalidate=300',
+          },
+        });
+      }
+    }
+
     // Run all queries in parallel
     // If logged in, scope to user's data; otherwise show all aggregated data
     const userFilter = userId ? eq(chargingRecords.userId, userId) : undefined;
@@ -42,6 +62,9 @@ export async function GET() {
           brandLogo: chargingNetworks.logo,
           brandPhone: chargingNetworks.phone,
           brandWebsite: chargingNetworks.website,
+          brandReferralCode: chargingNetworks.referralCode,
+          brandReferralCaptionEn: chargingNetworks.referralCaptionEn,
+          brandReferralCaptionTh: chargingNetworks.referralCaptionTh,
           sessions: sql<number>`COUNT(*)`,
           totalKwh: sql<number>`SUM(${chargingRecords.chargedKwh})`,
           totalCost: sql<number>`SUM(${chargingRecords.costThb})`,
@@ -55,7 +78,10 @@ export async function GET() {
           chargingNetworks.brandColor,
           chargingNetworks.logo,
           chargingNetworks.phone,
-          chargingNetworks.website
+          chargingNetworks.website,
+          chargingNetworks.referralCode,
+          chargingNetworks.referralCaptionEn,
+          chargingNetworks.referralCaptionTh
         ),
 
       // Latest mileage
@@ -91,6 +117,9 @@ export async function GET() {
       brandLogo: brand.brandLogo,
       brandPhone: brand.brandPhone,
       brandWebsite: brand.brandWebsite,
+      brandReferralCode: brand.brandReferralCode,
+      brandReferralCaptionEn: brand.brandReferralCaptionEn,
+      brandReferralCaptionTh: brand.brandReferralCaptionTh,
       sessions: brand.sessions,
       totalKwh: brand.totalKwh,
       totalCost: brand.totalCost,
@@ -135,7 +164,7 @@ export async function GET() {
       sessions: month.sessions,
     }));
 
-    return NextResponse.json({
+    const responseData = {
       stats: {
         totalSessions: stats.totalSessions,
         totalKwh: stats.totalKwh,
@@ -156,7 +185,14 @@ export async function GET() {
       },
       brandComparison,
       monthlyData,
-    }, {
+    };
+
+    // Cache in KV (fire-and-forget, don't block response)
+    if (kv) {
+      kv.put(cacheKey, JSON.stringify(responseData), { expirationTtl: STATS_CACHE_TTL }).catch(() => {});
+    }
+
+    return NextResponse.json(responseData, {
       headers: {
         'Cache-Control': userId
           ? 'private, max-age=60, stale-while-revalidate=300'

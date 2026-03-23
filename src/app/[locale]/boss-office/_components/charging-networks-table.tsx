@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Plus, Pencil, Trash2, ExternalLink, Phone } from 'lucide-react';
+import { Plus, Pencil, Trash2, ExternalLink, Phone, Tag } from 'lucide-react';
 import { ChargingNetworkForm } from './charging-network-form';
 import { sanitizeUrl } from '@/lib/sanitize-url';
 import { Pagination } from '@/components/ui/pagination';
@@ -19,6 +19,7 @@ interface NetworkData {
   website: string | null;
   phone: string | null;
   brandColor: string | null;
+  referralCode: string | null;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -175,6 +176,12 @@ export function ChargingNetworksTable() {
                       <span className="flex items-center gap-1">
                         <Phone className="h-3 w-3" />
                         {network.phone}
+                      </span>
+                    )}
+                    {network.referralCode && (
+                      <span className="flex items-center gap-1">
+                        <Tag className="h-3 w-3" />
+                        {network.referralCode}
                       </span>
                     )}
                   </div>

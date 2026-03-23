@@ -59,6 +59,17 @@
         "noData": "Your cost summary will appear here",
         "noDataHint": "Add your first charging session to see how much you're spending."
       },
+      "dailyChart": {
+        "title": "Daily Price Trend",
+        "description": "Average price per kWh over time by network",
+        "failedToLoad": "Failed to load price trend data",
+        "noData": "Not enough data for trends",
+        "noDataHint": "Add more charging sessions across different days to see price trends over time.",
+        "perKwh": "฿/kWh",
+        "range30": "30 days",
+        "range90": "90 days",
+        "rangeAll": "All time"
+      },
       "chart": {
         "title": "Price Comparison by Network",
         "description": "Average price per kWh across different charging networks",
@@ -73,7 +84,10 @@
         "moreExpensive": "more expensive",
         "perKwh": "/kWh",
         "tapToCompare": "Tap a network to see details",
-        "website": "Website"
+        "website": "Website",
+        "referralCode": "Referral Code",
+        "copy": "Copy",
+        "copied": "Copied!"
       },
       "history": {
         "title": "Charging History",
@@ -221,7 +235,32 @@
       "cancel": "Cancel",
       "save": "Save",
       "saving": "Saving...",
-      "uploading": "Uploading..."
+      "uploading": "Uploading...",
+      "referralCode": "Referral Code"
+    },
+    "referralCodes": {
+      "title": "Referral Codes",
+      "description": "Manage referral codes and promotions for charging networks",
+      "loading": "Loading referral codes...",
+      "failedToLoad": "Failed to load referral codes",
+      "failedToSave": "Failed to save referral code",
+      "confirmRemove": "Are you sure you want to remove this referral code?",
+      "noReferralCodes": "No referral codes found",
+      "add": "Add Referral Code",
+      "addReferralCode": "Add Referral Code",
+      "editReferralCode": "Edit Referral Code",
+      "network": "Charging Network",
+      "selectNetwork": "Select a network",
+      "code": "Referral Code",
+      "captionEn": "Caption (English)",
+      "captionTh": "Caption (Thai)",
+      "captionEnPlaceholder": "e.g. Apply to get free 300 THB",
+      "captionThPlaceholder": "เช่น สมัครรับฟรี 300 บาท",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "remove": "Remove",
+      "removing": "Removing..."
     },
     "evHistory": {
       "title": "My EV Charging History",

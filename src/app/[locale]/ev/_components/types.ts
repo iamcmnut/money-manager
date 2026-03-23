@@ -24,6 +24,9 @@ export interface BrandData {
   brandLogo: string | null;
   brandPhone: string | null;
   brandWebsite: string | null;
+  brandReferralCode: string | null;
+  brandReferralCaptionEn: string | null;
+  brandReferralCaptionTh: string | null;
   sessions: number;
   totalKwh: number;
   totalCost: number;
@@ -41,5 +44,21 @@ export interface EVStatsResponse {
     totalCost: number;
     sessions: number;
   }[];
+  error?: string;
+}
+
+export interface DailyPricePoint {
+  date: string;
+  [networkName: string]: string | number; // network name keys map to avg price values
+}
+
+export interface NetworkMeta {
+  name: string;
+  color: string;
+}
+
+export interface DailyPricesResponse {
+  dailyPrices: DailyPricePoint[];
+  networks: NetworkMeta[];
   error?: string;
 }
