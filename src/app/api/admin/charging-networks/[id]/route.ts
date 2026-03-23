@@ -52,6 +52,8 @@ interface UpdateNetworkBody {
   phone?: string | null;
   brandColor?: string | null;
   referralCode?: string | null;
+  referralCaptionEn?: string | null;
+  referralCaptionTh?: string | null;
 }
 
 export async function PATCH(request: Request, { params }: RouteParams) {
@@ -83,6 +85,8 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     if (body.phone !== undefined) updateData.phone = body.phone;
     if (body.brandColor !== undefined) updateData.brandColor = body.brandColor;
     if (body.referralCode !== undefined) updateData.referralCode = body.referralCode;
+    if (body.referralCaptionEn !== undefined) updateData.referralCaptionEn = body.referralCaptionEn;
+    if (body.referralCaptionTh !== undefined) updateData.referralCaptionTh = body.referralCaptionTh;
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });

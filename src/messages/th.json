@@ -238,6 +238,30 @@
       "uploading": "กำลังอัปโหลด...",
       "referralCode": "รหัสแนะนำ"
     },
+    "referralCodes": {
+      "title": "รหัสแนะนำ",
+      "description": "จัดการรหัสแนะนำและโปรโมชันสำหรับเครือข่ายชาร์จ",
+      "loading": "กำลังโหลดรหัสแนะนำ...",
+      "failedToLoad": "ไม่สามารถโหลดรหัสแนะนำได้",
+      "failedToSave": "ไม่สามารถบันทึกรหัสแนะนำได้",
+      "confirmRemove": "คุณแน่ใจหรือไม่ว่าต้องการลบรหัสแนะนำนี้?",
+      "noReferralCodes": "ไม่พบรหัสแนะนำ",
+      "add": "เพิ่มรหัสแนะนำ",
+      "addReferralCode": "เพิ่มรหัสแนะนำ",
+      "editReferralCode": "แก้ไขรหัสแนะนำ",
+      "network": "เครือข่ายชาร์จ",
+      "selectNetwork": "เลือกเครือข่าย",
+      "code": "รหัสแนะนำ",
+      "captionEn": "คำอธิบาย (อังกฤษ)",
+      "captionTh": "คำอธิบาย (ไทย)",
+      "captionEnPlaceholder": "e.g. Apply to get free 300 THB",
+      "captionThPlaceholder": "เช่น สมัครรับฟรี 300 บาท",
+      "cancel": "ยกเลิก",
+      "save": "บันทึก",
+      "saving": "กำลังบันทึก...",
+      "remove": "ลบ",
+      "removing": "กำลังลบ..."
+    },
     "evHistory": {
       "title": "ประวัติการชาร์จ EV",
       "description": "เพิ่ม แก้ไข และจัดการรายการชาร์จของคุณ"

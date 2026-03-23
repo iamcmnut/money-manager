@@ -79,6 +79,8 @@ describe('schema tables', () => {
     expect(columns).toContain('phone');
     expect(columns).toContain('brandColor');
     expect(columns).toContain('referralCode');
+    expect(columns).toContain('referralCaptionEn');
+    expect(columns).toContain('referralCaptionTh');
     expect(columns).toContain('createdAt');
     expect(columns).toContain('updatedAt');
   });

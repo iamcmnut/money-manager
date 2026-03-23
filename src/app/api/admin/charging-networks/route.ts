@@ -42,6 +42,8 @@ interface CreateNetworkBody {
   phone?: string;
   brandColor?: string;
   referralCode?: string;
+  referralCaptionEn?: string;
+  referralCaptionTh?: string;
 }
 
 export async function POST(request: Request) {
@@ -82,6 +84,8 @@ export async function POST(request: Request) {
         phone: body.phone || null,
         brandColor: body.brandColor || null,
         referralCode: body.referralCode || null,
+        referralCaptionEn: body.referralCaptionEn || null,
+        referralCaptionTh: body.referralCaptionTh || null,
         createdAt: now,
         updatedAt: now,
       })

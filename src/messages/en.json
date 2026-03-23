@@ -238,6 +238,30 @@
       "uploading": "Uploading...",
       "referralCode": "Referral Code"
     },
+    "referralCodes": {
+      "title": "Referral Codes",
+      "description": "Manage referral codes and promotions for charging networks",
+      "loading": "Loading referral codes...",
+      "failedToLoad": "Failed to load referral codes",
+      "failedToSave": "Failed to save referral code",
+      "confirmRemove": "Are you sure you want to remove this referral code?",
+      "noReferralCodes": "No referral codes found",
+      "add": "Add Referral Code",
+      "addReferralCode": "Add Referral Code",
+      "editReferralCode": "Edit Referral Code",
+      "network": "Charging Network",
+      "selectNetwork": "Select a network",
+      "code": "Referral Code",
+      "captionEn": "Caption (English)",
+      "captionTh": "Caption (Thai)",
+      "captionEnPlaceholder": "e.g. Apply to get free 300 THB",
+      "captionThPlaceholder": "เช่น สมัครรับฟรี 300 บาท",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "remove": "Remove",
+      "removing": "Removing..."
+    },
     "evHistory": {
       "title": "My EV Charging History",
       "description": "Add, edit, and manage your charging records"

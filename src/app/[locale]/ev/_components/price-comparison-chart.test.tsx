@@ -3,8 +3,10 @@ import { render, screen, act, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event';
 import type { BrandData } from './types';
 
+const mockLocale = vi.hoisted(() => ({ value: 'en' }));
 vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
+  useLocale: () => mockLocale.value,
 }));
 
 vi.mock('next/image', () => ({
@@ -38,6 +40,8 @@ function makeBrand(overrides: Partial<BrandData> = {}): BrandData {
     brandPhone: null,
     brandWebsite: null,
     brandReferralCode: null,
+    brandReferralCaptionEn: null,
+    brandReferralCaptionTh: null,
     sessions: 10,
     totalKwh: 100,
     totalCost: 500,
@@ -330,6 +334,91 @@ describe('PriceComparisonChart', () => {
 
       expect(screen.getByRole('button', { name: /rank/i })).toHaveAttribute('aria-expanded', 'true');
       expect(screen.getByText('REF-STOP')).toBeInTheDocument();
+    });
+  });
+
+  describe('referral code captions', () => {
+    it('shows EN caption when locale is en', async () => {
+      mockLocale.value = 'en';
+      const user = userEvent.setup();
+      const brands = [makeBrand({
+        brandReferralCode: 'REF-CAP',
+        brandReferralCaptionEn: 'Get 300 THB free',
+        brandReferralCaptionTh: 'รับ 300 บาทฟรี',
+      })];
+      render(
+        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
+      );
+
+      await user.click(screen.getByLabelText('Rank 1'));
+      expect(screen.getByText('Get 300 THB free')).toBeInTheDocument();
+    });
+
+    it('shows TH caption when locale is th', async () => {
+      mockLocale.value = 'th';
+      const user = userEvent.setup();
+      const brands = [makeBrand({
+        brandReferralCode: 'REF-CAP',
+        brandReferralCaptionEn: 'Get 300 THB free',
+        brandReferralCaptionTh: 'รับ 300 บาทฟรี',
+      })];
+      render(
+        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
+      );
+
+      await user.click(screen.getByLabelText('Rank 1'));
+      expect(screen.getByText('รับ 300 บาทฟรี')).toBeInTheDocument();
+    });
+
+    it('falls back to EN caption when TH is missing and locale is th', async () => {
+      mockLocale.value = 'th';
+      const user = userEvent.setup();
+      const brands = [makeBrand({
+        brandReferralCode: 'REF-FB',
+        brandReferralCaptionEn: 'English only caption',
+        brandReferralCaptionTh: null,
+      })];
+      render(
+        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
+      );
+
+      await user.click(screen.getByLabelText('Rank 1'));
+      expect(screen.getByText('English only caption')).toBeInTheDocument();
+    });
+
+    it('falls back to TH caption when EN is missing and locale is en', async () => {
+      mockLocale.value = 'en';
+      const user = userEvent.setup();
+      const brands = [makeBrand({
+        brandReferralCode: 'REF-FB2',
+        brandReferralCaptionEn: null,
+        brandReferralCaptionTh: 'คำอธิบายภาษาไทย',
+      })];
+      render(
+        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
+      );
+
+      await user.click(screen.getByLabelText('Rank 1'));
+      expect(screen.getByText('คำอธิบายภาษาไทย')).toBeInTheDocument();
+    });
+
+    it('does not show caption when both are null', async () => {
+      mockLocale.value = 'en';
+      const user = userEvent.setup();
+      const brands = [makeBrand({
+        brandReferralCode: 'REF-NOCAP',
+        brandReferralCaptionEn: null,
+        brandReferralCaptionTh: null,
+      })];
+      render(
+        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
+      );
+
+      await user.click(screen.getByLabelText('Rank 1'));
+      // Code should be visible but no caption paragraph
+      expect(screen.getByText('REF-NOCAP')).toBeInTheDocument();
+      const captionP = screen.queryByText(/Get|รับ|caption/i);
+      expect(captionP).not.toBeInTheDocument();
     });
   });
 });

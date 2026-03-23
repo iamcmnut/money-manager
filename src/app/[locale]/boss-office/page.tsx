@@ -3,11 +3,12 @@ import { auth } from '@/lib/auth';
 import { redirect } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Settings, Users, Flag, Shield, Mail, UserCircle, BadgeCheck, Zap, FileText, History } from 'lucide-react';
+import { Settings, Users, Flag, Shield, Mail, UserCircle, BadgeCheck, Zap, FileText, History, Tag } from 'lucide-react';
 import { FeatureFlagsPanel } from './_components/feature-flags';
 import { UsersTable } from './_components/users-table';
 import { ChargingNetworksTable } from './_components/charging-networks-table';
 import { AdminChargingRecords } from './_components/admin-charging-records';
+import { ReferralCodesTable } from './_components/referral-codes-table';
 import { ChargingRecordsList } from '@/app/[locale]/ev/_components/charging-records-list';
 
 type Props = {
@@ -122,6 +123,18 @@ function BossOfficePageContent({ session }: { session: Session }) {
                 </div>
               </div>
               <AdminChargingRecords />
+            </div>
+
+            {/* Referral Codes Card */}
+            <div className="rounded-xl border bg-card p-4 sm:p-6 md:col-span-2">
+              <div className="mb-4 flex items-center gap-3">
+                <Tag className="h-5 w-5 text-primary" />
+                <div>
+                  <h2 className="text-base font-semibold">{t('referralCodes.title')}</h2>
+                  <p className="text-xs text-muted-foreground">{t('referralCodes.description')}</p>
+                </div>
+              </div>
+              <ReferralCodesTable />
             </div>
           </div>
 

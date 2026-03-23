@@ -63,6 +63,8 @@ export async function GET() {
           brandPhone: chargingNetworks.phone,
           brandWebsite: chargingNetworks.website,
           brandReferralCode: chargingNetworks.referralCode,
+          brandReferralCaptionEn: chargingNetworks.referralCaptionEn,
+          brandReferralCaptionTh: chargingNetworks.referralCaptionTh,
           sessions: sql<number>`COUNT(*)`,
           totalKwh: sql<number>`SUM(${chargingRecords.chargedKwh})`,
           totalCost: sql<number>`SUM(${chargingRecords.costThb})`,
@@ -77,7 +79,9 @@ export async function GET() {
           chargingNetworks.logo,
           chargingNetworks.phone,
           chargingNetworks.website,
-          chargingNetworks.referralCode
+          chargingNetworks.referralCode,
+          chargingNetworks.referralCaptionEn,
+          chargingNetworks.referralCaptionTh
         ),
 
       // Latest mileage
@@ -114,6 +118,8 @@ export async function GET() {
       brandPhone: brand.brandPhone,
       brandWebsite: brand.brandWebsite,
       brandReferralCode: brand.brandReferralCode,
+      brandReferralCaptionEn: brand.brandReferralCaptionEn,
+      brandReferralCaptionTh: brand.brandReferralCaptionTh,
       sessions: brand.sessions,
       totalKwh: brand.totalKwh,
       totalCost: brand.totalCost,
