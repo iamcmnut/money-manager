@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Shield, Users, Zap, FileText, Flag, Tag, History, Mail, UserCircle, BadgeCheck } from 'lucide-react';
+import { Shield, Users, Zap, FileText, Flag, Tag, Mail, UserCircle, BadgeCheck } from 'lucide-react';
 import { FeatureFlagsPanel } from './feature-flags';
 import { UsersTable } from './users-table';
 import { ChargingNetworksTable } from './charging-networks-table';
 import { AdminChargingRecords } from './admin-charging-records';
 import { ReferralCodesTable } from './referral-codes-table';
-import { ChargingRecordsList } from '@/app/[locale]/ev/_components/charging-records-list';
 import { cn } from '@/lib/utils';
 
 type Session = {
@@ -154,30 +153,15 @@ function EVRecordsTab() {
   const t = useTranslations('admin');
 
   return (
-    <div className="space-y-6">
-      {/* All users' records */}
-      <div>
-        <div className="mb-4 flex items-center gap-3">
-          <FileText className="h-5 w-5 text-primary" />
-          <div>
-            <h2 className="text-base font-semibold">{t('chargingRecords.title')}</h2>
-            <p className="text-xs text-muted-foreground">{t('chargingRecords.description')}</p>
-          </div>
+    <div>
+      <div className="mb-4 flex items-center gap-3">
+        <FileText className="h-5 w-5 text-primary" />
+        <div>
+          <h2 className="text-base font-semibold">{t('chargingRecords.title')}</h2>
+          <p className="text-xs text-muted-foreground">{t('chargingRecords.description')}</p>
         </div>
-        <AdminChargingRecords />
       </div>
-
-      {/* Personal history */}
-      <div>
-        <div className="mb-4 flex items-center gap-3">
-          <History className="h-5 w-5 text-primary" />
-          <div>
-            <h2 className="text-base font-semibold">{t('evHistory.title')}</h2>
-            <p className="text-xs text-muted-foreground">{t('evHistory.description')}</p>
-          </div>
-        </div>
-        <ChargingRecordsList />
-      </div>
+      <AdminChargingRecords />
     </div>
   );
 }

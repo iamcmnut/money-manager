@@ -38,6 +38,7 @@ src/
 │   │   ├── page.tsx                 # Home — module cards grid
 │   │   ├── ev/                      # EV charging price comparison
 │   │   │   ├── page.tsx             # Server component: metadata, SEO, feature gates
+│   │   │   ├── history/page.tsx     # Auth-protected charging history page
 │   │   │   └── _components/         # Client components: dashboard, charts, forms
 │   │   ├── living-cost/             # Living cost tracker (placeholder)
 │   │   ├── savings/                 # Savings planner (placeholder)
@@ -50,7 +51,7 @@ src/
 │       ├── admin/                   # Flags, users, charging-networks, charging-records
 │       └── upload/                  # R2 file upload
 ├── components/
-│   ├── ui/                          # shadcn/ui: button, card, avatar, pagination, etc.
+│   ├── ui/                          # shadcn/ui: button, card, dialog, avatar, pagination, etc.
 │   ├── auth/                        # Login buttons, user menu
 │   ├── layout/                      # Header, footer, mobile nav, language switcher, theme toggle
 │   ├── seo/                         # JSON-LD structured data
@@ -100,6 +101,7 @@ Admin panel auto-discovers all flags via `getAllFeatureFlags()`.
 | `auth_registration` | `false` | New user registration |
 | `ev_daily_price_chart` | `true` | Daily price sparkline in expanded EV cards |
 | `ev_coupon` | `true` | Referral/coupon codes in expanded EV cards |
+| `ev_history` | `true` | Charging history page (/ev/history) and nav button |
 
 **Usage patterns:**
 - Server components: `await getFeatureFlag('flag_name')` or `<FeatureGate flag="flag_name">`
@@ -151,6 +153,7 @@ page.tsx (server) → fetches feature flags, generates metadata/SEO
 - Mock `next-intl` translations return the key as text
 
 ### Security
+- Protected routes (middleware): `/boss-office`, `/ev/history` — redirect to signin if no session token
 - Middleware adds: `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`
 - Password: PBKDF2-SHA256, 50k iterations, 16-byte salt
 - Rate limiting: 5 login attempts / 15 min, 3 registration attempts / 1 hr

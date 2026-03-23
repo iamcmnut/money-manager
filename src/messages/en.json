@@ -276,10 +276,6 @@
       "remove": "Remove",
       "removing": "Removing..."
     },
-    "evHistory": {
-      "title": "My EV Charging History",
-      "description": "Add, edit, and manage your charging records"
-    },
     "chargingRecords": {
       "title": "Charging Records",
       "description": "View all user charging sessions",
