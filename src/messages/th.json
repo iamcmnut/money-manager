@@ -112,6 +112,10 @@
           "showing": "{from}-{to} จาก {total}"
         }
       },
+      "historyPage": {
+        "title": "ประวัติการชาร์จของฉัน",
+        "description": "ติดตามและจัดการรายการชาร์จ EV ของคุณ"
+      },
       "networks": {
         "title": "เทียบราคาแต่ละค่าย",
         "failedToLoad": "ไม่สามารถโหลดข้อมูลเครือข่ายได้",
@@ -209,7 +213,17 @@
       "module_living_cost": "โมดูลค่าครองชีพ",
       "module_savings": "โมดูลการออม",
       "auth_google": "เข้าสู่ระบบด้วย Google",
-      "auth_credentials": "เข้าสู่ระบบด้วยอีเมล/รหัสผ่าน"
+      "auth_credentials": "เข้าสู่ระบบด้วยอีเมล/รหัสผ่าน",
+      "auth_registration": "การลงทะเบียนผู้ใช้",
+      "ev_daily_price_chart": "กราฟราคาชาร์จ EV รายวัน",
+      "ev_coupon": "คูปอง / รหัสแนะนำ EV",
+      "ev_history": "หน้าประวัติการชาร์จ EV"
+    },
+    "tabs": {
+      "overview": "ภาพรวม",
+      "users": "ผู้ใช้",
+      "evNetworks": "เครือข่าย EV",
+      "evRecords": "รายการชาร์จ"
     },
     "evNetworks": {
       "title": "เครือข่ายชาร์จ EV",
@@ -261,10 +275,6 @@
       "saving": "กำลังบันทึก...",
       "remove": "ลบ",
       "removing": "กำลังลบ..."
-    },
-    "evHistory": {
-      "title": "ประวัติการชาร์จ EV",
-      "description": "เพิ่ม แก้ไข และจัดการรายการชาร์จของคุณ"
     },
     "chargingRecords": {
       "title": "รายการชาร์จ",

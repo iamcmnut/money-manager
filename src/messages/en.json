@@ -112,6 +112,10 @@
           "showing": "{from}-{to} of {total}"
         }
       },
+      "historyPage": {
+        "title": "My Charging History",
+        "description": "Track and manage your EV charging sessions"
+      },
       "networks": {
         "title": "Network Comparison",
         "failedToLoad": "Failed to load network data",
@@ -209,7 +213,17 @@
       "module_living_cost": "Living Cost Module",
       "module_savings": "Savings Module",
       "auth_google": "Google Sign-in",
-      "auth_credentials": "Email/Password Sign-in"
+      "auth_credentials": "Email/Password Sign-in",
+      "auth_registration": "User Registration",
+      "ev_daily_price_chart": "EV Daily Price Chart",
+      "ev_coupon": "EV Coupon / Referral Code",
+      "ev_history": "EV Charging History Page"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "users": "Users",
+      "evNetworks": "EV Networks",
+      "evRecords": "EV Records"
     },
     "evNetworks": {
       "title": "EV Charging Networks",
@@ -261,10 +275,6 @@
       "saving": "Saving...",
       "remove": "Remove",
       "removing": "Removing..."
-    },
-    "evHistory": {
-      "title": "My EV Charging History",
-      "description": "Add, edit, and manage your charging records"
     },
     "chargingRecords": {
       "title": "Charging Records",

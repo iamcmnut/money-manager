@@ -61,7 +61,7 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingRecord, setEditingRecord] = useState<RecordData | null>(null);
-  const [showForm, setShowForm] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<ImportResponse | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -116,7 +116,7 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
   };
 
   const handleFormSuccess = () => {
-    setShowForm(false);
+    setFormOpen(false);
     setEditingRecord(null);
     fetchRecords(currentPage);
     onRecordChange?.();
@@ -211,9 +211,8 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
             size="sm"
             onClick={() => {
               setEditingRecord(null);
-              setShowForm(true);
+              setFormOpen(true);
             }}
-            className=""
           >
             <Plus className="mr-1 h-4 w-4" />
             {t('add')}
@@ -272,16 +271,15 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
         </div>
       )}
 
-      {showForm && (
-        <ChargingRecordForm
-          record={editingRecord}
-          onSuccess={handleFormSuccess}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingRecord(null);
-          }}
-        />
-      )}
+      <ChargingRecordForm
+        record={editingRecord}
+        open={formOpen}
+        onOpenChange={(open) => {
+          setFormOpen(open);
+          if (!open) setEditingRecord(null);
+        }}
+        onSuccess={handleFormSuccess}
+      />
 
       {records.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
@@ -353,7 +351,7 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
                       className="h-8 w-8"
                       onClick={() => {
                         setEditingRecord(record);
-                        setShowForm(true);
+                        setFormOpen(true);
                       }}
                     >
                       <Pencil className="h-4 w-4" />
