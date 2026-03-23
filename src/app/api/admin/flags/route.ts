@@ -1,16 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { getAllFeatureFlags, type FeatureFlag } from '@/lib/feature-flags';
+import { ALL_FLAGS, getAllFeatureFlags, type FeatureFlag } from '@/lib/feature-flags';
 import { getKV } from '@/lib/cloudflare';
-
-const VALID_FLAGS: FeatureFlag[] = [
-  'module_ev',
-  'module_living_cost',
-  'module_savings',
-  'auth_google',
-  'auth_credentials',
-  'auth_registration',
-];
 
 export async function GET() {
   const session = await auth();
@@ -42,7 +33,7 @@ export async function PUT(request: Request) {
   const body = (await request.json()) as { flag: string; enabled: boolean };
   const { flag, enabled } = body;
 
-  if (!VALID_FLAGS.includes(flag as FeatureFlag)) {
+  if (!ALL_FLAGS.includes(flag as FeatureFlag)) {
     return NextResponse.json({ error: 'Invalid flag' }, { status: 400 });
   }
 

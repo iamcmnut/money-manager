@@ -1,17 +1,6 @@
 import { getKV } from './cloudflare';
 
-export type FeatureFlag =
-  | 'module_ev'
-  | 'module_living_cost'
-  | 'module_savings'
-  | 'auth_google'
-  | 'auth_credentials'
-  | 'auth_registration'
-  | 'ev_daily_price_chart'
-  | 'ev_coupon'
-  | 'ev_history';
-
-const DEFAULT_FLAGS: Record<FeatureFlag, boolean> = {
+const DEFAULT_FLAGS = {
   module_ev: true,
   module_living_cost: true,
   module_savings: true,
@@ -21,7 +10,11 @@ const DEFAULT_FLAGS: Record<FeatureFlag, boolean> = {
   ev_daily_price_chart: true,
   ev_coupon: true,
   ev_history: true,
-};
+} as const satisfies Record<string, boolean>;
+
+export type FeatureFlag = keyof typeof DEFAULT_FLAGS;
+
+export const ALL_FLAGS = Object.keys(DEFAULT_FLAGS) as FeatureFlag[];
 
 // Map feature flags to environment variable names (used for local dev fallback)
 const FLAG_ENV_MAP: Record<FeatureFlag, string> = {
@@ -70,20 +63,8 @@ export async function getFeatureFlag(flag: FeatureFlag): Promise<boolean> {
 export async function getAllFeatureFlags(): Promise<Record<FeatureFlag, boolean>> {
   const flags: Record<FeatureFlag, boolean> = { ...DEFAULT_FLAGS };
 
-  const flagKeys: FeatureFlag[] = [
-    'module_ev',
-    'module_living_cost',
-    'module_savings',
-    'auth_google',
-    'auth_credentials',
-    'auth_registration',
-    'ev_daily_price_chart',
-    'ev_coupon',
-    'ev_history',
-  ];
-
   await Promise.all(
-    flagKeys.map(async (key) => {
+    ALL_FLAGS.map(async (key) => {
       flags[key] = await getFeatureFlag(key);
     })
   );
