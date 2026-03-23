@@ -6,7 +6,9 @@ export type FeatureFlag =
   | 'module_savings'
   | 'auth_google'
   | 'auth_credentials'
-  | 'auth_registration';
+  | 'auth_registration'
+  | 'ev_daily_price_chart'
+  | 'ev_coupon';
 
 const DEFAULT_FLAGS: Record<FeatureFlag, boolean> = {
   module_ev: true,
@@ -15,6 +17,8 @@ const DEFAULT_FLAGS: Record<FeatureFlag, boolean> = {
   auth_google: false,
   auth_credentials: false,
   auth_registration: false,
+  ev_daily_price_chart: true,
+  ev_coupon: true,
 };
 
 // Map feature flags to environment variable names (used for local dev fallback)
@@ -25,6 +29,8 @@ const FLAG_ENV_MAP: Record<FeatureFlag, string> = {
   auth_google: 'FEATURE_AUTH_GOOGLE',
   auth_credentials: 'FEATURE_AUTH_CREDENTIALS',
   auth_registration: 'FEATURE_AUTH_REGISTRATION',
+  ev_daily_price_chart: 'FEATURE_EV_DAILY_PRICE_CHART',
+  ev_coupon: 'FEATURE_EV_COUPON',
 };
 
 function parseBoolean(value: string | null | undefined, defaultValue: boolean): boolean {
@@ -68,6 +74,8 @@ export async function getAllFeatureFlags(): Promise<Record<FeatureFlag, boolean>
     'auth_google',
     'auth_credentials',
     'auth_registration',
+    'ev_daily_price_chart',
+    'ev_coupon',
   ];
 
   await Promise.all(

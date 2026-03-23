@@ -13,6 +13,8 @@ interface PriceComparisonChartProps {
   brandComparison?: BrandData[];
   loading: boolean;
   error: string | null;
+  showDailyPriceChart?: boolean;
+  showCoupon?: boolean;
 }
 
 const rankStyles = [
@@ -21,7 +23,7 @@ const rankStyles = [
   'border border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-400',
 ];
 
-export function PriceComparisonChart({ brandComparison, loading, error }: PriceComparisonChartProps) {
+export function PriceComparisonChart({ brandComparison, loading, error, showDailyPriceChart = true, showCoupon = true }: PriceComparisonChartProps) {
   const t = useTranslations('modules.ev.chart');
   const locale = useLocale();
   const [mounted, setMounted] = useState(false);
@@ -283,7 +285,7 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
                     )}
 
                     {/* Referral code */}
-                    {brand.brandReferralCode && (() => {
+                    {showCoupon && brand.brandReferralCode && (() => {
                       const caption = locale === 'th'
                         ? brand.brandReferralCaptionTh || brand.brandReferralCaptionEn
                         : brand.brandReferralCaptionEn || brand.brandReferralCaptionTh;
@@ -328,7 +330,7 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
                     })()}
 
                     {/* Daily price trend chart */}
-                    {isExpanded && (
+                    {showDailyPriceChart && isExpanded && (
                       <NetworkDailyPriceChart
                         networkName={brand.brandName || brand.brandId}
                         brandColor={brand.brandColor || '#6B7280'}

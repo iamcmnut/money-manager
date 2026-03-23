@@ -5,6 +5,7 @@ import { Car } from 'lucide-react';
 import { EVDashboard } from './_components/ev-dashboard';
 import { BreadcrumbJsonLd, WebApplicationJsonLd } from '@/components/seo/json-ld';
 import { FeatureGate } from '@/components/feature-gate';
+import { getFeatureFlag } from '@/lib/feature-flags';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -76,14 +77,19 @@ export default async function EVPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const [showDailyPriceChart, showCoupon] = await Promise.all([
+    getFeatureFlag('ev_daily_price_chart'),
+    getFeatureFlag('ev_coupon'),
+  ]);
+
   return (
     <FeatureGate flag="module_ev">
-      <EVPageContent locale={locale} />
+      <EVPageContent locale={locale} showDailyPriceChart={showDailyPriceChart} showCoupon={showCoupon} />
     </FeatureGate>
   );
 }
 
-function EVPageContent({ locale }: { locale: string }) {
+function EVPageContent({ locale, showDailyPriceChart, showCoupon }: { locale: string; showDailyPriceChart: boolean; showCoupon: boolean }) {
   const t = useTranslations('modules.ev');
   const navT = useTranslations('nav');
 
@@ -129,7 +135,7 @@ function EVPageContent({ locale }: { locale: string }) {
       {/* Dashboard Content */}
       <div className="container pb-16">
         <div className="mx-auto max-w-6xl">
-          <EVDashboard />
+          <EVDashboard showDailyPriceChart={showDailyPriceChart} showCoupon={showCoupon} />
         </div>
       </div>
     </div>
