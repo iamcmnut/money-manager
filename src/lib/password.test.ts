@@ -108,4 +108,38 @@ describe('hashPassword and verifyPassword', () => {
     const isValid = await verifyPassword('', hash);
     expect(isValid).toBe(false);
   });
+
+  it('should return false for legacy bcrypt hashes', async () => {
+    const bcryptHash = '$2b$10$somehashedvaluehere';
+    const isValid = await verifyPassword('password', bcryptHash);
+    expect(isValid).toBe(false);
+  });
+
+  it('should return false for bcrypt $2a$ hashes', async () => {
+    const bcryptHash = '$2a$10$somehashedvaluehere';
+    const isValid = await verifyPassword('password', bcryptHash);
+    expect(isValid).toBe(false);
+  });
+
+  it('should return false for malformed hash with wrong number of parts', async () => {
+    const isValid = await verifyPassword('password', 'invalid-hash');
+    expect(isValid).toBe(false);
+  });
+
+  it('should return false for hash with only two parts', async () => {
+    const isValid = await verifyPassword('password', 'part1$part2');
+    expect(isValid).toBe(false);
+  });
+
+  it('should handle hash format correctly (iterations$salt$hash)', async () => {
+    const password = 'TestPassword1';
+    const hash = await hashPassword(password);
+    const parts = hash.split('$');
+    expect(parts).toHaveLength(3);
+    expect(parseInt(parts[0])).toBe(50000);
+    // salt is 16 bytes = 32 hex chars
+    expect(parts[1]).toHaveLength(32);
+    // key is 64 bytes = 128 hex chars
+    expect(parts[2]).toHaveLength(128);
+  });
 });

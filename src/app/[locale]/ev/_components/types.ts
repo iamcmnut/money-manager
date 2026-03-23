@@ -24,6 +24,7 @@ export interface BrandData {
   brandLogo: string | null;
   brandPhone: string | null;
   brandWebsite: string | null;
+  brandReferralCode: string | null;
   sessions: number;
   totalKwh: number;
   totalCost: number;

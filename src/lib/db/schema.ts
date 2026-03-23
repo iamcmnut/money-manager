@@ -63,6 +63,7 @@ export const chargingNetworks = sqliteTable('charging_networks', {
   website: text('website'),
   phone: text('phone'),
   brandColor: text('brand_color'),
+  referralCode: text('referral_code'),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });

@@ -47,6 +47,16 @@ async function openMenu() {
 }
 
 describe('UserMenu', () => {
+  it('returns null when no session exists', () => {
+    mockedUseSession.mockReturnValue({
+      data: null,
+      status: 'unauthenticated',
+      update: vi.fn(),
+    });
+    const { container } = render(<UserMenu />);
+    expect(container.innerHTML).toBe('');
+  });
+
   it('renders user name and email', async () => {
     mockSession({ name: 'John Doe', email: 'john@example.com' });
     render(<UserMenu />);
@@ -86,5 +96,17 @@ describe('UserMenu', () => {
 
     expect(screen.getByText('noname@example.com')).toBeInTheDocument();
     expect(container).toBeTruthy();
+  });
+
+  it('calls signOut when sign out is clicked', async () => {
+    const { signOut } = await import('next-auth/react');
+    mockSession({ name: 'Test User' });
+    render(<UserMenu />);
+    await openMenu();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByText('auth.signOut'));
+
+    expect(signOut).toHaveBeenCalled();
   });
 });

@@ -150,6 +150,64 @@ describe('checkRateLimit', () => {
     // The function calls db.select().from().where() — we verify it was called
     expect(mockDb.select).toHaveBeenCalled();
   });
+
+  it('returns retryAfterSeconds when locked out with recent attempt', async () => {
+    const recentAttempt = new Date(Date.now() - 60 * 1000); // 1 minute ago
+    const whereResult = {
+      then: (resolve: (v: unknown) => void) => resolve([{ count: 5 }]),
+      orderBy: vi.fn().mockReturnValue({
+        limit: vi.fn().mockResolvedValue([{ attemptedAt: recentAttempt }]),
+      }),
+    };
+    const mockDb = {
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue(whereResult),
+        }),
+      }),
+      insert: vi.fn().mockReturnValue({
+        values: vi.fn().mockResolvedValue(undefined),
+      }),
+      delete: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue(undefined),
+      }),
+    };
+
+    const result = await checkRateLimit(mockDb as never, 'user@test.com', 'login');
+
+    expect(result.allowed).toBe(false);
+    expect(result.remaining).toBe(0);
+    expect(result.retryAfterSeconds).toBeGreaterThan(0);
+  });
+
+  it('returns retryAfterSeconds 0 when lockout has expired', async () => {
+    // Attempt was a long time ago — lockout has expired
+    const oldAttempt = new Date(Date.now() - 20 * 60 * 1000); // 20 minutes ago (lockout is 15min)
+    const whereResult = {
+      then: (resolve: (v: unknown) => void) => resolve([{ count: 5 }]),
+      orderBy: vi.fn().mockReturnValue({
+        limit: vi.fn().mockResolvedValue([{ attemptedAt: oldAttempt }]),
+      }),
+    };
+    const mockDb = {
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue(whereResult),
+        }),
+      }),
+      insert: vi.fn().mockReturnValue({
+        values: vi.fn().mockResolvedValue(undefined),
+      }),
+      delete: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue(undefined),
+      }),
+    };
+
+    const result = await checkRateLimit(mockDb as never, 'user@test.com', 'login');
+
+    expect(result.allowed).toBe(false);
+    expect(result.retryAfterSeconds).toBe(0);
+  });
 });
 
 describe('recordAttempt', () => {

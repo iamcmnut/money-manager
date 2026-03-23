@@ -13,6 +13,7 @@ interface NetworkData {
   website: string | null;
   phone: string | null;
   brandColor: string | null;
+  referralCode: string | null;
 }
 
 interface ChargingNetworkFormProps {
@@ -41,6 +42,7 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
     website: network?.website || '',
     phone: network?.phone || '',
     brandColor: network?.brandColor || '#6B7280',
+    referralCode: network?.referralCode || '',
   });
   const [logoPreview, setLogoPreview] = useState<string | null>(network?.logo || null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -106,6 +108,7 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
       website: formData.website || null,
       phone: formData.phone || null,
       brandColor: formData.brandColor || null,
+      referralCode: formData.referralCode || null,
     };
 
     try {
@@ -283,6 +286,17 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
                 placeholder="#00A651"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">{t('evNetworks.referralCode')}</label>
+            <input
+              type="text"
+              value={formData.referralCode}
+              onChange={(e) => setFormData({ ...formData, referralCode: e.target.value })}
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              placeholder="REF-ABC123"
+            />
           </div>
         </div>
 

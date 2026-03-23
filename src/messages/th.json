@@ -84,7 +84,10 @@
         "moreExpensive": "แพงกว่า",
         "perKwh": "/kWh",
         "tapToCompare": "แตะเครือข่ายเพื่อดูรายละเอียด",
-        "website": "เว็บไซต์"
+        "website": "เว็บไซต์",
+        "referralCode": "รหัสแนะนำ",
+        "copy": "คัดลอก",
+        "copied": "คัดลอกแล้ว!"
       },
       "history": {
         "title": "ประวัติการชาร์จ",
@@ -232,7 +235,8 @@
       "cancel": "ยกเลิก",
       "save": "บันทึก",
       "saving": "กำลังบันทึก...",
-      "uploading": "กำลังอัปโหลด..."
+      "uploading": "กำลังอัปโหลด...",
+      "referralCode": "รหัสแนะนำ"
     },
     "evHistory": {
       "title": "ประวัติการชาร์จ EV",

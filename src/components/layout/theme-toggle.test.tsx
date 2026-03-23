@@ -32,7 +32,7 @@ describe('ThemeToggle', () => {
     expect(screen.getByRole('menuitem', { name: 'System' })).toBeInTheDocument();
   });
 
-  it('calls setTheme when a theme option is clicked', async () => {
+  it('calls setTheme with dark when Dark is clicked', async () => {
     const user = userEvent.setup();
     render(<ThemeToggle />);
 
@@ -40,5 +40,25 @@ describe('ThemeToggle', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Dark' }));
 
     expect(mockSetTheme).toHaveBeenCalledWith('dark');
+  });
+
+  it('calls setTheme with light when Light is clicked', async () => {
+    const user = userEvent.setup();
+    render(<ThemeToggle />);
+
+    await user.click(screen.getByRole('button', { name: 'Toggle theme' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Light' }));
+
+    expect(mockSetTheme).toHaveBeenCalledWith('light');
+  });
+
+  it('calls setTheme with system when System is clicked', async () => {
+    const user = userEvent.setup();
+    render(<ThemeToggle />);
+
+    await user.click(screen.getByRole('button', { name: 'Toggle theme' }));
+    await user.click(screen.getByRole('menuitem', { name: 'System' }));
+
+    expect(mockSetTheme).toHaveBeenCalledWith('system');
   });
 });

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { Trophy, TrendingUp, Zap, Wallet, ChevronDown, Phone, ExternalLink } from 'lucide-react';
+import { Trophy, TrendingUp, Zap, Wallet, ChevronDown, Phone, ExternalLink, Tag, Copy, Check } from 'lucide-react';
 import { formatNumber, formatBaht } from '@/lib/format';
 import { sanitizeUrl } from '@/lib/sanitize-url';
 import { NetworkDailyPriceChart } from './daily-price-chart';
@@ -26,6 +26,7 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
   const [mounted, setMounted] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setMounted(true));
@@ -277,6 +278,39 @@ export function PriceComparisonChart({ brandComparison, loading, error }: PriceC
                             {t('website')}
                           </a>
                         )}
+                      </div>
+                    )}
+
+                    {/* Referral code */}
+                    {brand.brandReferralCode && (
+                      <div className="mt-3 flex items-center gap-2">
+                        <Tag className="h-3.5 w-3.5 text-primary/70" />
+                        <span className="text-xs text-muted-foreground">{t('referralCode')}:</span>
+                        <code className="rounded bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary tabular-nums">
+                          {brand.brandReferralCode}
+                        </code>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(brand.brandReferralCode!);
+                            setCopiedId(brand.brandId);
+                            setTimeout(() => setCopiedId(null), 2000);
+                          }}
+                          className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
+                        >
+                          {copiedId === brand.brandId ? (
+                            <>
+                              <Check className="h-3 w-3" />
+                              {t('copied')}
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3 w-3" />
+                              {t('copy')}
+                            </>
+                          )}
+                        </button>
                       </div>
                     )}
 
