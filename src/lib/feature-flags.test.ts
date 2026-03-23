@@ -27,6 +27,7 @@ describe('getDefaultFlags', () => {
       auth_registration: false,
       ev_daily_price_chart: true,
       ev_coupon: true,
+      ev_history: true,
     });
   });
 
@@ -150,6 +151,7 @@ describe('getAllFeatureFlags', () => {
     delete process.env.FEATURE_AUTH_REGISTRATION;
     delete process.env.FEATURE_EV_DAILY_PRICE_CHART;
     delete process.env.FEATURE_EV_COUPON;
+    delete process.env.FEATURE_EV_HISTORY;
 
     const flags = await getAllFeatureFlags();
 
@@ -162,6 +164,7 @@ describe('getAllFeatureFlags', () => {
       auth_registration: false,
       ev_daily_price_chart: true,
       ev_coupon: true,
+      ev_history: true,
     });
   });
 
@@ -195,7 +198,7 @@ describe('getAllFeatureFlags', () => {
     expect(flags.module_ev).toBe(true);
     expect(flags.auth_google).toBe(true);
     expect(flags.auth_credentials).toBe(false); // default
-    expect(mockKV.get).toHaveBeenCalledTimes(8);
+    expect(mockKV.get).toHaveBeenCalledTimes(9);
   });
 });
 
@@ -210,8 +213,9 @@ describe('FeatureFlag type', () => {
       'auth_registration',
       'ev_daily_price_chart',
       'ev_coupon',
+      'ev_history',
     ];
 
-    expect(validFlags).toHaveLength(8);
+    expect(validFlags).toHaveLength(9);
   });
 });

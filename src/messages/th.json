@@ -112,6 +112,10 @@
           "showing": "{from}-{to} จาก {total}"
         }
       },
+      "historyPage": {
+        "title": "ประวัติการชาร์จของฉัน",
+        "description": "ติดตามและจัดการรายการชาร์จ EV ของคุณ"
+      },
       "networks": {
         "title": "เทียบราคาแต่ละค่าย",
         "failedToLoad": "ไม่สามารถโหลดข้อมูลเครือข่ายได้",
@@ -212,7 +216,8 @@
       "auth_credentials": "เข้าสู่ระบบด้วยอีเมล/รหัสผ่าน",
       "auth_registration": "การลงทะเบียนผู้ใช้",
       "ev_daily_price_chart": "กราฟราคาชาร์จ EV รายวัน",
-      "ev_coupon": "คูปอง / รหัสแนะนำ EV"
+      "ev_coupon": "คูปอง / รหัสแนะนำ EV",
+      "ev_history": "หน้าประวัติการชาร์จ EV"
     },
     "tabs": {
       "overview": "ภาพรวม",

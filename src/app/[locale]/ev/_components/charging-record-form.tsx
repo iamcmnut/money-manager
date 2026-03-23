@@ -3,7 +3,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { formatNumber } from '@/lib/format';
 
 interface NetworkData {
@@ -35,11 +42,12 @@ interface RecordData {
 
 interface ChargingRecordFormProps {
   record: RecordData | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
-  onCancel: () => void;
 }
 
-export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingRecordFormProps) {
+export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: ChargingRecordFormProps) {
   const t = useTranslations('modules.ev.form');
   const isEditing = !!record;
 
@@ -61,7 +69,29 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Reset form when record changes (opening for a different record or new)
   useEffect(() => {
+    if (open) {
+      setFormData({
+        brandId: record?.brandId || '',
+        chargingDatetime: record?.chargingDatetime
+          ? new Date(record.chargingDatetime).toISOString().slice(0, 16)
+          : new Date().toISOString().slice(0, 16),
+        chargedKwh: record ? record.chargedKwh.toString() : '',
+        costThb: record ? record.costThb.toString() : '',
+        chargingPowerKw: record?.chargingPowerKw ? record.chargingPowerKw.toString() : '',
+        chargingFinishDatetime: record?.chargingFinishDatetime
+          ? new Date(record.chargingFinishDatetime).toISOString().slice(0, 16)
+          : '',
+        mileageKm: record?.mileageKm?.toString() || '',
+        notes: record?.notes || '',
+      });
+      setError(null);
+    }
+  }, [open, record]);
+
+  useEffect(() => {
+    if (!open) return;
     const fetchNetworks = async () => {
       try {
         const response = await fetch('/api/ev/networks');
@@ -79,7 +109,7 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
     };
     fetchNetworks();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [record]);
+  }, [open, record]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +135,7 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
       });
 
       if (response.ok) {
+        onOpenChange(false);
         onSuccess();
       } else {
         const data = (await response.json()) as ErrorResponse;
@@ -125,144 +156,145 @@ export function ChargingRecordForm({ record, onSuccess, onCancel }: ChargingReco
   }, [formData.chargedKwh, formData.costThb]);
 
   return (
-    <div className="rounded-xl border bg-background/80 p-4 backdrop-blur-sm">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-semibold">
-          {isEditing ? t('editRecord') : t('addRecord')}
-        </h3>
-        <Button variant="ghost" size="icon" onClick={onCancel}>
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl">
+        <DialogHeader>
+          <DialogTitle>
+            {isEditing ? t('editRecord') : t('addRecord')}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {isEditing ? t('editRecord') : t('addRecord')}
+          </DialogDescription>
+        </DialogHeader>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="text-sm text-destructive bg-destructive/5 border border-destructive/20 p-2 rounded-lg">{error}</div>
-        )}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="text-sm text-destructive bg-destructive/5 border border-destructive/20 p-2 rounded-lg">{error}</div>
+          )}
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('brand')}</label>
-            <select
-              required
-              value={formData.brandId}
-              onChange={(e) => setFormData({ ...formData, brandId: e.target.value })}
-              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-            >
-              {networks.map((network) => (
-                <option key={network.id} value={network.id}>
-                  {network.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium mb-1">{t('brand')}</label>
+              <select
+                required
+                value={formData.brandId}
+                onChange={(e) => setFormData({ ...formData, brandId: e.target.value })}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              >
+                {networks.map((network) => (
+                  <option key={network.id} value={network.id}>
+                    {network.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('datetime')}</label>
-            <input
-              type="datetime-local"
-              required
-              value={formData.chargingDatetime}
-              onChange={(e) => setFormData({ ...formData, chargingDatetime: e.target.value })}
-              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">{t('datetime')}</label>
+              <input
+                type="datetime-local"
+                required
+                value={formData.chargingDatetime}
+                onChange={(e) => setFormData({ ...formData, chargingDatetime: e.target.value })}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('chargedKwh')}</label>
-            <input
-              type="number"
-              required
-              min="0"
-              step="0.01"
-              value={formData.chargedKwh}
-              onChange={(e) => setFormData({ ...formData, chargedKwh: e.target.value })}
-              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-              placeholder="25.50"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">{t('chargedKwh')}</label>
+              <input
+                type="number"
+                required
+                min="0"
+                step="0.01"
+                value={formData.chargedKwh}
+                onChange={(e) => setFormData({ ...formData, chargedKwh: e.target.value })}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                placeholder="25.50"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('costThb')}</label>
-            <input
-              type="number"
-              required
-              min="0"
-              step="0.01"
-              value={formData.costThb}
-              onChange={(e) => setFormData({ ...formData, costThb: e.target.value })}
-              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-              placeholder="150.00"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">{t('costThb')}</label>
+              <input
+                type="number"
+                required
+                min="0"
+                step="0.01"
+                value={formData.costThb}
+                onChange={(e) => setFormData({ ...formData, costThb: e.target.value })}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                placeholder="150.00"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('avgUnitPrice')}</label>
-            <div className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2 text-sm">
-              <span>฿{avgUnitPrice}/kWh</span>
+            <div>
+              <label className="block text-sm font-medium mb-1">{t('avgUnitPrice')}</label>
+              <div className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2 text-sm">
+                <span>฿{avgUnitPrice}/kWh</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">{t('chargingPowerKw')}</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.chargingPowerKw}
+                onChange={(e) => setFormData({ ...formData, chargingPowerKw: e.target.value })}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                placeholder="150"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">{t('chargingFinishDatetime')}</label>
+              <input
+                type="datetime-local"
+                value={formData.chargingFinishDatetime}
+                onChange={(e) => setFormData({ ...formData, chargingFinishDatetime: e.target.value })}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">{t('mileageKm')}</label>
+              <input
+                type="number"
+                min="0"
+                value={formData.mileageKm}
+                onChange={(e) => setFormData({ ...formData, mileageKm: e.target.value })}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                placeholder="45000"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium mb-1">{t('notes')}</label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                rows={2}
+                placeholder={t('notesPlaceholder')}
+              />
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('chargingPowerKw')}</label>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              value={formData.chargingPowerKw}
-              onChange={(e) => setFormData({ ...formData, chargingPowerKw: e.target.value })}
-              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-              placeholder="150"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('chargingFinishDatetime')}</label>
-            <input
-              type="datetime-local"
-              value={formData.chargingFinishDatetime}
-              onChange={(e) => setFormData({ ...formData, chargingFinishDatetime: e.target.value })}
-              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('mileageKm')}</label>
-            <input
-              type="number"
-              min="0"
-              value={formData.mileageKm}
-              onChange={(e) => setFormData({ ...formData, mileageKm: e.target.value })}
-              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-              placeholder="45000"
-            />
-          </div>
-
-          <div className="sm:col-span-2">
-            <label className="block text-sm font-medium mb-1">{t('notes')}</label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-              rows={2}
-              placeholder={t('notesPlaceholder')}
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            {t('cancel')}
-          </Button>
-          <Button
-            type="submit"
-            disabled={saving}
-            className=""
-          >
-            {saving ? t('saving') : t('save')}
-          </Button>
-        </div>
-      </form>
-    </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              {t('cancel')}
+            </Button>
+            <Button
+              type="submit"
+              disabled={saving}
+            >
+              {saving ? t('saving') : t('save')}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

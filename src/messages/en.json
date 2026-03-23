@@ -112,6 +112,10 @@
           "showing": "{from}-{to} of {total}"
         }
       },
+      "historyPage": {
+        "title": "My Charging History",
+        "description": "Track and manage your EV charging sessions"
+      },
       "networks": {
         "title": "Network Comparison",
         "failedToLoad": "Failed to load network data",
@@ -212,7 +216,8 @@
       "auth_credentials": "Email/Password Sign-in",
       "auth_registration": "User Registration",
       "ev_daily_price_chart": "EV Daily Price Chart",
-      "ev_coupon": "EV Coupon / Referral Code"
+      "ev_coupon": "EV Coupon / Referral Code",
+      "ev_history": "EV Charging History Page"
     },
     "tabs": {
       "overview": "Overview",
