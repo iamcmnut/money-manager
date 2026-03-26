@@ -10,6 +10,8 @@ type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://manager.money';
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const t = await getTranslations({ locale, namespace: 'modules.ev.coupon' });
@@ -20,17 +22,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = t('pageTitle', { network: networkName });
   const description = t('pageDescription', { network: networkName });
 
+  const ogImage = locale === 'th' ? network?.couponOgImageTh : network?.couponOgImageEn;
+  const ogImageUrl = ogImage
+    ? (ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`)
+    : undefined;
+
   return {
     title,
     description,
     openGraph: {
       title,
       description,
+      ...(ogImageUrl && {
+        images: [{ url: ogImageUrl, width: 1200, height: 630, alt: title }],
+      }),
     },
     twitter: {
       card: 'summary_large_image' as const,
       title,
       description,
+      ...(ogImageUrl && { images: [ogImageUrl] }),
     },
   };
 }
