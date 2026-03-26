@@ -20,27 +20,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = t('pageTitle', { network: networkName });
   const description = t('pageDescription', { network: networkName });
 
-  const metadata: Metadata = {
+  return {
     title,
     description,
+    openGraph: {
+      title,
+      description,
+    },
+    twitter: {
+      card: 'summary_large_image' as const,
+      title,
+      description,
+    },
   };
-
-  const ogImage = locale === 'th' ? network?.couponOgImageTh : network?.couponOgImageEn;
-  if (ogImage) {
-    metadata.openGraph = {
-      title,
-      description,
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
-    };
-    metadata.twitter = {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [ogImage],
-    };
-  }
-
-  return metadata;
 }
 
 export default async function CouponPage({ params }: Props) {

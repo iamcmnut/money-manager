@@ -24,8 +24,14 @@ export async function GET(_request: Request, { params }: RouteParams) {
     const headers = new Headers();
     headers.set('Content-Type', object.httpMetadata?.contentType || 'application/octet-stream');
     headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    if (object.size) {
+      headers.set('Content-Length', String(object.size));
+    }
 
-    return new Response(object.body, { headers });
+    // Remove Next.js internal Vary headers that confuse social media crawlers
+    return new Response(object.body, {
+      headers,
+    });
   } catch (error) {
     console.error('Failed to get file:', error);
     return NextResponse.json({ error: 'Failed to get file' }, { status: 500 });
