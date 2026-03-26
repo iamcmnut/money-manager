@@ -60,10 +60,20 @@ export function isCloudflareEnv(): boolean {
 
 /**
  * Get R2 public URL for serving uploaded files directly from CDN.
- * Production: from Cloudflare env vars (wrangler.toml [vars])
- * Local dev: from process.env (`.env.local`)
+ * Production: from Cloudflare KV (changeable without redeploy)
+ * Fallback: from wrangler.toml [vars] or process.env (.env.local)
  */
-export function getR2PublicUrl(): string | null {
+export async function getR2PublicUrl(): Promise<string | null> {
+  const kv = getKV();
+  if (kv) {
+    try {
+      const kvValue = await kv.get('R2_PUBLIC_URL');
+      if (kvValue) return kvValue;
+    } catch {
+      // Fall through to env
+    }
+  }
+
   const env = getCloudflareEnv();
   if (env?.R2_PUBLIC_URL) {
     return env.R2_PUBLIC_URL;

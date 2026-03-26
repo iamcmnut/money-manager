@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       httpMetadata: { contentType: file.type },
     });
 
-    const r2PublicUrl = getR2PublicUrl();
+    const r2PublicUrl = await getR2PublicUrl();
     const url = r2PublicUrl ? `${r2PublicUrl}/${key}` : `/api/upload/${key}`;
 
     return NextResponse.json({ url, key });
