@@ -276,6 +276,8 @@
       "remove": "ลบ",
       "removing": "กำลังลบ..."
     },
+    "export": "ส่งออก CSV",
+    "exporting": "กำลังส่งออก...",
     "chargingRecords": {
       "title": "รายการชาร์จ",
       "description": "ดูรายการชาร์จของผู้ใช้ทั้งหมด",

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Plus, Pencil, Trash2, ExternalLink, Phone, Tag } from 'lucide-react';
+import { Plus, Pencil, Trash2, ExternalLink, Phone, Tag, Download } from 'lucide-react';
 import { ChargingNetworkForm } from './charging-network-form';
 import { sanitizeUrl } from '@/lib/sanitize-url';
 import { Pagination } from '@/components/ui/pagination';
@@ -95,6 +95,27 @@ export function ChargingNetworksTable() {
     fetchNetworks();
   };
 
+  const exportNetworks = () => {
+    const headers = ['Name', 'Slug', 'Website', 'Phone', 'Brand Color', 'Referral Code', 'Created At'];
+    const rows = networks.map((n) => [
+      n.name,
+      n.slug,
+      n.website || '',
+      n.phone || '',
+      n.brandColor || '',
+      n.referralCode || '',
+      n.createdAt || '',
+    ]);
+    const csv = [headers, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ev-networks-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (loading) {
     return <div className="text-sm text-muted-foreground">{t('evNetworks.loading')}</div>;
   }
@@ -105,7 +126,17 @@ export function ChargingNetworksTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        {networks.length > 0 && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={exportNetworks}
+          >
+            <Download className="mr-1 h-4 w-4" />
+            {t('export')}
+          </Button>
+        )}
         <Button
           size="sm"
           onClick={() => {
