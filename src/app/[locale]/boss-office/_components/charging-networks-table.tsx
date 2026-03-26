@@ -209,7 +209,7 @@ export function ChargingNetworksTable() {
             setEditingNetwork(null);
             setShowForm(true);
           }}
-          className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
         >
           <Plus className="mr-1 h-4 w-4" />
           {t('evNetworks.add')}
@@ -300,7 +300,7 @@ export function ChargingNetworksTable() {
                 ) : (
                   <div
                     className="flex h-10 w-10 items-center justify-center rounded-lg text-white font-bold text-sm"
-                    style={{ backgroundColor: network.brandColor || '#6B7280' }}
+                    style={{ backgroundColor: network.brandColor || 'hsl(var(--muted-foreground))' }}
                   >
                     {network.name.charAt(0)}
                   </div>
@@ -350,7 +350,7 @@ export function ChargingNetworksTable() {
                   size="icon"
                   disabled={deletingId === network.id}
                   onClick={() => deleteNetwork(network.id)}
-                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/5"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

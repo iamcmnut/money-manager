@@ -42,9 +42,12 @@ export function Header({ enabledModules }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none">
+        Skip to main content
+      </a>
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-8 flex items-center gap-2">
+          <Link href="/" aria-label="Manager.money home" className="mr-8 flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary transition-transform duration-200 hover:rotate-[-6deg]">
               <Wallet className="h-4 w-4 text-primary-foreground" />
             </div>
@@ -57,6 +60,7 @@ export function Header({ enabledModules }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={pathname === link.href ? 'page' : undefined}
                 className={cn(
                   'rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
                   pathname === link.href

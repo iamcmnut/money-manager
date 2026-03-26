@@ -160,7 +160,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                 ) : (
                   <div
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
-                    style={{ backgroundColor: brand.brandColor || '#6B7280' }}
+                    style={{ backgroundColor: brand.brandColor || 'hsl(var(--muted-foreground))' }}
                   >
                     {brand.brandName?.charAt(0) || '?'}
                   </div>
@@ -175,9 +175,10 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                   {/* Bar */}
                   <div className="relative h-6 w-full overflow-hidden rounded-md bg-muted/50">
                     <div
-                      className="absolute inset-y-0 left-0 rounded-md transition-[width] duration-700 motion-reduce:transition-none"
+                      className="h-full rounded-md origin-left transition-transform duration-700 motion-reduce:transition-none"
                       style={{
-                        width: mounted ? `${Math.max(barPercent, 8)}%` : '0%',
+                        transform: mounted ? `scaleX(${Math.max(barPercent, 8) / 100})` : 'scaleX(0)',
+                        width: '100%',
                         backgroundColor: brand.brandColor || 'hsl(var(--primary))',
                         opacity: 0.75,
                         transitionDelay: `${index * 60}ms`,
@@ -303,7 +304,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                     {showDailyPriceChart && isExpanded && (
                       <NetworkDailyPriceChart
                         networkName={brand.brandName || brand.brandId}
-                        brandColor={brand.brandColor || '#6B7280'}
+                        brandColor={brand.brandColor || 'hsl(var(--muted-foreground))'}
                       />
                     )}
                   </div>

@@ -130,7 +130,7 @@ export default async function LocaleLayout({ children, params }: Props) {
             <NextIntlClientProvider messages={messages}>
               <div className="relative flex min-h-screen flex-col">
                 <Header enabledModules={enabledModules} />
-                <main className="flex-1">{children}</main>
+                <main id="main-content" className="flex-1">{children}</main>
                 <Footer />
               </div>
               <CookieConsent />

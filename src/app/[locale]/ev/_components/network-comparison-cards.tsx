@@ -86,7 +86,7 @@ export function NetworkComparisonCards({ brandComparison, loading, error }: Netw
               ) : (
                 <div
                   className="flex h-12 w-12 items-center justify-center rounded-xl text-white font-bold text-lg"
-                  style={{ backgroundColor: brand.brandColor || '#6B7280' }}
+                  style={{ backgroundColor: brand.brandColor || 'hsl(var(--muted-foreground))' }}
                 >
                   {brand.brandName?.charAt(0) || '?'}
                 </div>

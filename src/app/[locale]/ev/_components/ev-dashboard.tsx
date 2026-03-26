@@ -50,11 +50,13 @@ export function EVDashboard({ showDailyPriceChart, showCoupon }: EVDashboardProp
   }, [showCoupon]);
 
   useEffect(() => {
+    const controller = new AbortController();
     fetchStats();
+    return () => controller.abort();
   }, [fetchStats]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" aria-busy={loading}>
       <PriceComparisonChart
         brandComparison={data?.brandComparison}
         loading={loading}
