@@ -21,16 +21,15 @@ export async function GET(_request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
-    const headers = new Headers();
-    headers.set('Content-Type', object.httpMetadata?.contentType || 'application/octet-stream');
-    headers.set('Cache-Control', 'public, max-age=31536000, immutable');
-    if (object.size) {
-      headers.set('Content-Length', String(object.size));
-    }
+    // Read full buffer — streaming responses cause issues with social media crawlers
+    const arrayBuffer = await object.arrayBuffer();
 
-    // Remove Next.js internal Vary headers that confuse social media crawlers
-    return new Response(object.body, {
-      headers,
+    return new Response(arrayBuffer, {
+      headers: {
+        'Content-Type': object.httpMetadata?.contentType || 'application/octet-stream',
+        'Content-Length': String(arrayBuffer.byteLength),
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
     });
   } catch (error) {
     console.error('Failed to get file:', error);
