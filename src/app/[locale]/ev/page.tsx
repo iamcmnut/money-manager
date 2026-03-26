@@ -50,6 +50,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url,
       type: 'website',
+      siteName: 'Manager.money',
+      locale: locale === 'th' ? 'th_TH' : 'en_US',
       images: [
         {
           url: `${baseUrl}/ev/manager.money-ev-${locale}.png`,
@@ -64,6 +66,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       images: [`${baseUrl}/ev/manager.money-ev-${locale}.png`],
+    },
+    other: {
+      'og:locale:alternate': locale === 'th' ? 'en_US' : 'th_TH',
     },
     alternates: {
       canonical: url,

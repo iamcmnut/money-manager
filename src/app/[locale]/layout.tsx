@@ -41,15 +41,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       type: 'website',
       locale: locale === 'th' ? 'th_TH' : 'en_US',
-      url: baseUrl,
+      url: `${baseUrl}/${locale}`,
       siteName: 'Manager.money',
       title: metadata.title,
       description: metadata.description,
+      images: [
+        {
+          url: `${baseUrl}/og/manager.money-${locale}.png`,
+          width: 1200,
+          height: 630,
+          alt: metadata.title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: metadata.title,
       description: metadata.description,
+      images: [`${baseUrl}/og/manager.money-${locale}.png`],
+    },
+    other: {
+      'og:locale:alternate': locale === 'th' ? 'en_US' : 'th_TH',
     },
     robots: {
       index: true,
