@@ -149,7 +149,7 @@ export function CouponsTable() {
   }
 
   if (error) {
-    return <div className="text-sm text-red-600">{error}</div>;
+    return <div className="text-sm text-destructive">{error}</div>;
   }
 
   const totalPages = Math.ceil(totalCoupons / ITEMS_PER_PAGE);
@@ -164,7 +164,7 @@ export function CouponsTable() {
             setEditingCoupon(null);
             setShowForm(true);
           }}
-          className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
         >
           <Plus className="mr-1 h-4 w-4" />
           {t('coupons.add')}
@@ -201,7 +201,7 @@ export function CouponsTable() {
           {couponsList.map((coupon) => (
             <div
               key={coupon.id}
-              className="flex items-center justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
+              className="flex items-center justify-between rounded-xl border bg-background/50 p-4 transition-all hover:bg-background/80 hover:shadow-md"
             >
               <div className="flex items-center gap-3 min-w-0">
                 {coupon.networkLogo ? (
@@ -215,7 +215,7 @@ export function CouponsTable() {
                 ) : (
                   <div
                     className="flex h-10 w-10 items-center justify-center rounded-lg text-white font-bold text-sm"
-                    style={{ backgroundColor: coupon.networkBrandColor || '#6B7280' }}
+                    style={{ backgroundColor: coupon.networkBrandColor || 'hsl(var(--muted-foreground))' }}
                   >
                     {(coupon.networkName || '?').charAt(0)}
                   </div>
@@ -228,16 +228,16 @@ export function CouponsTable() {
                     </code>
                     {coupon.isActive ? (
                       isExpired(coupon.endDate) ? (
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                        <span className="rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">
                           {t('coupons.expired')}
                         </span>
                       ) : (
-                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                        <span className="rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success">
                           {t('coupons.active')}
                         </span>
                       )
                     ) : (
-                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                         {t('coupons.inactive')}
                       </span>
                     )}
@@ -267,7 +267,7 @@ export function CouponsTable() {
                   size="icon"
                   disabled={deletingId === coupon.id}
                   onClick={() => deleteCoupon(coupon.id)}
-                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/5"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

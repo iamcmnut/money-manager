@@ -88,13 +88,14 @@
         "referralCode": "รหัสแนะนำ",
         "copy": "คัดลอก",
         "copied": "คัดลอกแล้ว!",
-        "hasCoupon": "มีคูปอง"
+        "coupon": "เก็บโค้ด",
+        "hasCoupon": "มีโค้ด"
       },
       "coupon": {
-        "pageTitle": "คูปองสำหรับ {network}",
-        "pageDescription": "ดูคูปองและรหัสแนะนำสำหรับการชาร์จ EV ของ {network}",
-        "noCoupons": "ไม่มีคูปองที่ใช้งานได้",
-        "noCouponsHint": "ยังไม่มีคูปองที่ใช้งานได้สำหรับเครือข่ายนี้ในขณะนี้",
+        "pageTitle": "โค้ดสำหรับ {network}",
+        "pageDescription": "เก็บโค้ดของ {network}",
+        "noCoupons": "ไม่มีโค้ดที่ใช้งานได้",
+        "noCouponsHint": "ยังไม่มีโค้ดที่ใช้งานได้สำหรับเครือข่ายนี้ในขณะนี้",
         "validFrom": "ใช้ได้ตั้งแต่",
         "validUntil": "ถึง",
         "code": "รหัส",

@@ -1,4 +1,5 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 import { Tag } from 'lucide-react';
 import { FeatureGate } from '@/components/feature-gate';
 import { Link } from '@/i18n/navigation';
@@ -77,12 +78,22 @@ async function CouponPageContent({ slug }: { slug: string }) {
         <div className="container">
           <div className="mx-auto max-w-6xl">
             <div className="flex items-center gap-3">
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-lg"
-                style={{ backgroundColor: network?.brandColor ? `${network.brandColor}20` : undefined }}
-              >
-                <Tag className="h-5 w-5" style={{ color: network?.brandColor || undefined }} />
-              </div>
+              {network?.logo ? (
+                <Image
+                  src={network.logo}
+                  alt={network.name || ''}
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 rounded-xl object-cover"
+                />
+              ) : (
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: network?.brandColor ? `${network.brandColor}20` : undefined }}
+                >
+                  <Tag className="h-6 w-6" style={{ color: network?.brandColor || undefined }} />
+                </div>
+              )}
               <div>
                 <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
                   {t('pageTitle', { network: network?.name || slug })}

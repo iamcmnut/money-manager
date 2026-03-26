@@ -84,7 +84,7 @@ function ResetPasswordForm({
       </div>
 
       {success ? (
-        <div className="flex items-center gap-2 text-sm text-green-600">
+        <div className="flex items-center gap-2 text-sm text-success">
           <Check className="h-4 w-4" />
           {t('resetPassword.success')}
         </div>
@@ -108,7 +108,7 @@ function ResetPasswordForm({
             minLength={8}
             className="w-full rounded-md border bg-background px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary/50"
           />
-          {error && <p className="text-xs text-red-600">{error}</p>}
+          {error && <p className="text-xs text-destructive">{error}</p>}
           <Button type="submit" size="sm" disabled={saving} className="w-full">
             {saving ? t('saving') : t('resetPassword.save')}
           </Button>
@@ -179,7 +179,7 @@ export function UsersTable() {
   }
 
   if (error) {
-    return <div className="text-sm text-red-600">{error}</div>;
+    return <div className="text-sm text-destructive">{error}</div>;
   }
 
   if (users.length === 0) {
@@ -194,7 +194,7 @@ export function UsersTable() {
     <div className="space-y-3">
       {paginatedUsers.map((user) => (
         <div key={user.id}>
-          <div className="flex items-center justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md">
+          <div className="flex items-center justify-between rounded-xl border bg-background/50 p-4 transition-all hover:bg-background/80 hover:shadow-md">
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10 ring-2 ring-primary/10">
                 <AvatarImage src={user.image ?? undefined} alt={user.name ?? ''} />
@@ -221,7 +221,7 @@ export function UsersTable() {
                 size="sm"
                 disabled={updatingId === user.id}
                 onClick={() => toggleRole(user.id, user.role)}
-                className={user.role === 'admin' ? 'bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : ''}
+                className={user.role === 'admin' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''}
               >
                 {updatingId === user.id ? '...' : user.role}
               </Button>

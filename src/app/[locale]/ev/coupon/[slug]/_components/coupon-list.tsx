@@ -72,7 +72,7 @@ export function CouponList({ coupons, brandColor }: CouponListProps) {
         return (
           <div
             key={coupon.id}
-            className="rounded-xl border bg-background/50 p-5 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
+            className="rounded-xl border bg-background/50 p-5 transition-all hover:bg-background/80 hover:shadow-md"
           >
             {/* Code + Copy */}
             <div className="flex items-center justify-between gap-3">
@@ -86,19 +86,22 @@ export function CouponList({ coupons, brandColor }: CouponListProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => copyCode(coupon.id, coupon.code)}
+                aria-label={`${t('copy')} ${coupon.code}`}
                 className="text-xs"
               >
-                {copiedId === coupon.id ? (
-                  <>
-                    <Check className="mr-1 h-3.5 w-3.5 text-success" />
-                    {t('copied')}
-                  </>
-                ) : (
-                  <>
-                    <Copy className="mr-1 h-3.5 w-3.5" />
-                    {t('copy')}
-                  </>
-                )}
+                <span aria-live="polite">
+                  {copiedId === coupon.id ? (
+                    <>
+                      <Check className="mr-1 inline h-3.5 w-3.5 text-success" />
+                      {t('copied')}
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="mr-1 inline h-3.5 w-3.5" />
+                      {t('copy')}
+                    </>
+                  )}
+                </span>
               </Button>
             </div>
 

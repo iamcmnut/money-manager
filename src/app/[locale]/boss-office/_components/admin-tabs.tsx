@@ -34,11 +34,15 @@ export function AdminTabs({ session }: { session: Session }) {
   return (
     <div>
       {/* Tab bar */}
-      <div className="mb-6 flex gap-1 rounded-xl bg-muted/50 p-1">
+      <div role="tablist" className="mb-6 flex gap-1 rounded-xl bg-muted/50 p-1">
         {tabs.map(({ id, icon: Icon }) => (
           <button
             key={id}
             type="button"
+            role="tab"
+            aria-selected={activeTab === id}
+            aria-controls={`tabpanel-${id}`}
+            id={`tab-${id}`}
             onClick={() => setActiveTab(id)}
             className={cn(
               'flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
@@ -47,14 +51,15 @@ export function AdminTabs({ session }: { session: Session }) {
                 : 'text-muted-foreground hover:text-foreground'
             )}
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="h-4 w-4" aria-hidden="true" />
             <span className="hidden sm:inline">{t(`tabs.${id}`)}</span>
+            <span className="sr-only sm:hidden">{t(`tabs.${id}`)}</span>
           </button>
         ))}
       </div>
 
       {/* Tab content */}
-      <div className="animate-slide-up-fade" key={activeTab}>
+      <div role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`} className="animate-slide-up-fade" key={activeTab}>
         {activeTab === 'overview' && <OverviewTab session={session} />}
         {activeTab === 'users' && <UsersTab />}
         {activeTab === 'evNetworks' && <EVNetworksTab />}
