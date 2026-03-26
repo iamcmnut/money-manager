@@ -129,7 +129,7 @@ export function AdminChargingRecords() {
   }
 
   if (error) {
-    return <div className="text-sm text-red-600">{error}</div>;
+    return <div className="text-sm text-destructive">{error}</div>;
   }
 
   if (records.length === 0) {
@@ -155,13 +155,13 @@ export function AdminChargingRecords() {
       {records.map((record) => (
         <div
           key={record.id}
-          className="rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
+          className="rounded-xl border bg-background/50 p-4 transition-all hover:bg-background/80 hover:shadow-md"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-3">
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-lg text-white"
-                style={{ backgroundColor: record.brandColor || '#6B7280' }}
+                style={{ backgroundColor: record.brandColor || 'hsl(var(--muted-foreground))' }}
               >
                 <Zap className="h-5 w-5" />
               </div>

@@ -223,7 +223,7 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</div>
+          <div className="text-sm text-destructive bg-destructive/5 p-2 rounded">{error}</div>
         )}
 
         <div>
@@ -265,7 +265,7 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
                   variant="outline"
                   size="sm"
                   onClick={handleRemoveLogo}
-                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/5"
                 >
                   <Trash2 className="mr-1 h-3 w-3" />
                   {t('evNetworks.removeLogo')}
@@ -296,7 +296,7 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
                     {ogImageEnPreview ? t('evNetworks.changeLogo') : t('evNetworks.uploadLogo')}
                   </Button>
                   {ogImageEnPreview && (
-                    <Button type="button" variant="outline" size="sm" onClick={handleRemoveOgImageEn} className="text-red-500 hover:text-red-600 hover:bg-red-50">
+                    <Button type="button" variant="outline" size="sm" onClick={handleRemoveOgImageEn} className="text-destructive hover:text-destructive hover:bg-destructive/5">
                       <Trash2 className="mr-1 h-3 w-3" />
                       {t('evNetworks.removeLogo')}
                     </Button>
@@ -321,7 +321,7 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
                     {ogImageThPreview ? t('evNetworks.changeLogo') : t('evNetworks.uploadLogo')}
                   </Button>
                   {ogImageThPreview && (
-                    <Button type="button" variant="outline" size="sm" onClick={handleRemoveOgImageTh} className="text-red-500 hover:text-red-600 hover:bg-red-50">
+                    <Button type="button" variant="outline" size="sm" onClick={handleRemoveOgImageTh} className="text-destructive hover:text-destructive hover:bg-destructive/5">
                       <Trash2 className="mr-1 h-3 w-3" />
                       {t('evNetworks.removeLogo')}
                     </Button>
@@ -424,7 +424,7 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
           <Button
             type="submit"
             disabled={isBusy}
-            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {isBusy && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
             {uploading ? t('evNetworks.uploading') : saving ? t('evNetworks.saving') : t('evNetworks.save')}

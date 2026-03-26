@@ -69,7 +69,7 @@ export function FeatureFlagsPanel() {
   return (
     <div className="space-y-3">
       {(Object.keys(flags) as FeatureFlag[]).map((flag) => (
-        <div key={flag} className="flex items-center justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80">
+        <div key={flag} className="flex items-center justify-between rounded-xl border bg-background/50 p-4 transition-all hover:bg-background/80">
           <span className="font-medium">{t(`flags.${flag}`)}</span>
           <button
             type="button"
@@ -78,7 +78,7 @@ export function FeatureFlagsPanel() {
             disabled={toggling === flag}
             onClick={() => toggleFlag(flag)}
             className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-wait disabled:opacity-60 ${
-              flags[flag] ? 'bg-green-500' : 'bg-muted'
+              flags[flag] ? 'bg-success' : 'bg-muted'
             }`}
           >
             <span

@@ -91,7 +91,7 @@ export function ReferralCodeForm({ referralCode, networks, onSuccess, onCancel }
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</div>
+          <div className="text-sm text-destructive bg-destructive/5 p-2 rounded">{error}</div>
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -155,7 +155,7 @@ export function ReferralCodeForm({ referralCode, networks, onSuccess, onCancel }
           <Button
             type="submit"
             disabled={saving}
-            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             {saving && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
             {saving ? t('saving') : t('save')}

@@ -72,7 +72,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
 
   if (error) {
     return (
-      <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+      <div role="alert" className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
         {error}
       </div>
     );
@@ -97,8 +97,6 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
     (a, b) => a.avgPricePerKwh - b.avgPricePerKwh
   );
 
-  const maxPrice = Math.max(...sorted.map((b) => b.avgPricePerKwh));
-
   const handleToggle = (brandId: string) => {
     setExpandedId((prev) => (prev === brandId ? null : brandId));
   };
@@ -110,9 +108,6 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
 
       <div className="space-y-3">
         {sorted.map((brand, index) => {
-          const barPercent = maxPrice > 0
-            ? (brand.avgPricePerKwh / maxPrice) * 100
-            : 0;
           const isExpanded = expandedId === brand.brandId;
           const price = Math.round(brand.avgPricePerKwh * 100) / 100;
           const rank = index + 1;
@@ -123,7 +118,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
               type="button"
               onClick={() => handleToggle(brand.brandId)}
               className={`
-                group w-full rounded-lg border p-3 text-left
+                group w-full overflow-hidden rounded-lg border p-3 text-left
                 transition-colors duration-200 ease-out
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                 ${brand.isCheapest
@@ -132,6 +127,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                 }
                 ${isExpanded ? 'ring-1 ring-border' : ''}
               `}
+              style={{ borderLeftWidth: '3px', borderLeftColor: brand.brandColor || 'hsl(var(--muted-foreground))' }}
               aria-expanded={isExpanded}
             >
               {/* Main row */}
@@ -160,31 +156,29 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                 ) : (
                   <div
                     className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
-                    style={{ backgroundColor: brand.brandColor || '#6B7280' }}
+                    style={{ backgroundColor: brand.brandColor || 'hsl(var(--muted-foreground))' }}
                   >
                     {brand.brandName?.charAt(0) || '?'}
                   </div>
                 )}
 
-                {/* Name + bar area */}
+                {/* Name + code badge */}
                 <div className="min-w-0 flex-1">
-                  <span className="mb-1.5 block truncate text-sm font-medium">
+                  <span className="block truncate text-sm font-medium">
                     {brand.brandName || brand.brandId}
                   </span>
 
-                  {/* Bar */}
-                  <div className="relative h-6 w-full overflow-hidden rounded-md bg-muted/50">
-                    <div
-                      className="absolute inset-y-0 left-0 rounded-md transition-[width] duration-700 motion-reduce:transition-none"
-                      style={{
-                        width: mounted ? `${Math.max(barPercent, 8)}%` : '0%',
-                        backgroundColor: brand.brandColor || 'hsl(var(--primary))',
-                        opacity: 0.75,
-                        transitionDelay: `${index * 60}ms`,
-                        transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-                      }}
-                    />
-                  </div>
+                  {/* Code badge */}
+                  {showCoupon && brand.brandSlug && couponNetworkSlugs.includes(brand.brandSlug) && (
+                    <Link
+                      href={`/ev/coupon/${brand.brandSlug}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="mt-1.5 inline-flex w-fit items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary/25 active:scale-[0.97]"
+                    >
+                      <Tag className="h-3.5 w-3.5" />
+                      {t('coupon')}
+                    </Link>
+                  )}
                 </div>
 
                 {/* Price + session count + chevron */}
@@ -264,9 +258,9 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                           <a
                             href={`tel:${brand.brandPhone.replace(/\s/g, '')}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
+                            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-muted px-3 py-2 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
                           >
-                            <Phone className="h-3 w-3" />
+                            <Phone className="h-3.5 w-3.5" />
                             {brand.brandPhone}
                           </a>
                         )}
@@ -276,7 +270,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
+                            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-muted px-3 py-2 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
                           >
                             <ExternalLink className="h-3 w-3" />
                             {t('website')}
@@ -303,7 +297,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                     {showDailyPriceChart && isExpanded && (
                       <NetworkDailyPriceChart
                         networkName={brand.brandName || brand.brandId}
-                        brandColor={brand.brandColor || '#6B7280'}
+                        brandColor={brand.brandColor || 'hsl(var(--muted-foreground))'}
                       />
                     )}
                   </div>

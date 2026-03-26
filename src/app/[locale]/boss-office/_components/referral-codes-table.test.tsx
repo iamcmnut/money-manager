@@ -189,7 +189,7 @@ describe('ReferralCodesTable', () => {
 
     // Click delete button for first network (find by class)
     const deleteButtons = screen.getAllByRole('button').filter(
-      (btn) => btn.className.includes('text-red-500')
+      (btn) => btn.className.includes('text-destructive')
     );
     await user.click(deleteButtons[0]);
 
