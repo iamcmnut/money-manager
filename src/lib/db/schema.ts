@@ -63,6 +63,8 @@ export const chargingNetworks = sqliteTable('charging_networks', {
   website: text('website'),
   phone: text('phone'),
   brandColor: text('brand_color'),
+  couponOgImageEn: text('coupon_og_image_en'),
+  couponOgImageTh: text('coupon_og_image_th'),
   referralCode: text('referral_code'), // @deprecated — use coupons table instead
   referralCaptionEn: text('referral_caption_en'), // @deprecated — use coupons table instead
   referralCaptionTh: text('referral_caption_th'), // @deprecated — use coupons table instead

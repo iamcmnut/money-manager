@@ -19,6 +19,8 @@ interface NetworkData {
   website: string | null;
   phone: string | null;
   brandColor: string | null;
+  couponOgImageEn: string | null;
+  couponOgImageTh: string | null;
   referralCode: string | null;
   createdAt: string | null;
   updatedAt: string | null;

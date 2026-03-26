@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
 import { coupons, chargingNetworks } from '@/lib/db/schema';
 import { desc, eq, sql } from 'drizzle-orm';
+import { invalidateCouponCache } from '@/lib/coupon-cache';
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -135,6 +136,9 @@ export async function POST(request: Request) {
         updatedAt: now,
       })
       .returning();
+
+    // Invalidate cache for this network
+    await invalidateCouponCache(body.networkId);
 
     return NextResponse.json({ coupon: coupon[0] }, { status: 201 });
   } catch (error) {

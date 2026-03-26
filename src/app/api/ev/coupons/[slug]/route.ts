@@ -41,6 +41,8 @@ export async function GET(
         logo: chargingNetworks.logo,
         brandColor: chargingNetworks.brandColor,
         website: chargingNetworks.website,
+        couponOgImageEn: chargingNetworks.couponOgImageEn,
+        couponOgImageTh: chargingNetworks.couponOgImageTh,
       })
       .from(chargingNetworks)
       .where(eq(chargingNetworks.slug, slug))

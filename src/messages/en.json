@@ -265,6 +265,10 @@
       "saving": "Saving...",
       "uploading": "Uploading...",
       "referralCode": "Referral Code",
+      "couponOgImage": "Coupon OG Image",
+      "couponOgImageHint": "Social sharing image for this network's coupon page (1200x630 recommended)",
+      "couponOgImageEn": "English (EN)",
+      "couponOgImageTh": "Thai (TH)",
       "import": {
         "button": "Import",
         "importing": "Importing...",

@@ -265,6 +265,10 @@
       "saving": "กำลังบันทึก...",
       "uploading": "กำลังอัปโหลด...",
       "referralCode": "รหัสแนะนำ",
+      "couponOgImage": "รูป OG สำหรับคูปอง",
+      "couponOgImageHint": "รูปภาพสำหรับแชร์บนโซเชียลของหน้าคูปองเครือข่ายนี้ (แนะนำ 1200x630)",
+      "couponOgImageEn": "อังกฤษ (EN)",
+      "couponOgImageTh": "ไทย (TH)",
       "import": {
         "button": "นำเข้า",
         "importing": "กำลังนำเข้า...",

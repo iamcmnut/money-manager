@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
 import { coupons } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { invalidateCouponCache } from '@/lib/coupon-cache';
 
 interface UpdateCouponBody {
   code?: string;
@@ -76,6 +77,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'Coupon not found' }, { status: 404 });
     }
 
+    // Invalidate cache for this coupon's network
+    await invalidateCouponCache(result[0].networkId);
+
     return NextResponse.json({ coupon: result[0] });
   } catch (error) {
     console.error('Failed to update coupon:', error);
@@ -111,6 +115,9 @@ export async function DELETE(
     if (result.length === 0) {
       return NextResponse.json({ error: 'Coupon not found' }, { status: 404 });
     }
+
+    // Invalidate cache for this coupon's network
+    await invalidateCouponCache(result[0].networkId);
 
     return NextResponse.json({ success: true });
   } catch (error) {

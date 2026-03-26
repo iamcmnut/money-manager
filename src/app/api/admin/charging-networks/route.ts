@@ -41,6 +41,8 @@ interface CreateNetworkBody {
   website?: string;
   phone?: string;
   brandColor?: string;
+  couponOgImageEn?: string;
+  couponOgImageTh?: string;
   referralCode?: string;
   referralCaptionEn?: string;
   referralCaptionTh?: string;
@@ -83,6 +85,8 @@ export async function POST(request: Request) {
         website: body.website || null,
         phone: body.phone || null,
         brandColor: body.brandColor || null,
+        couponOgImageEn: body.couponOgImageEn || null,
+        couponOgImageTh: body.couponOgImageTh || null,
         referralCode: body.referralCode || null,
         referralCaptionEn: body.referralCaptionEn || null,
         referralCaptionTh: body.referralCaptionTh || null,
