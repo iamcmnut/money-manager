@@ -9,18 +9,19 @@ interface ImportRow {
   slug?: string;
   website?: string;
   phone?: string;
-  brandColor?: string;
+  brandcolor?: string;
   brand_color?: string;
   color?: string;
   logo?: string;
-  referralCode?: string;
+  referralcode?: string;
   referral_code?: string;
-  referralCaptionEn?: string;
+  referralcaptionen?: string;
   referral_caption_en?: string;
-  captionEn?: string;
-  referralCaptionTh?: string;
+  captionen?: string;
+  referralcaptionth?: string;
   referral_caption_th?: string;
-  captionTh?: string;
+  captionth?: string;
+  createdat?: string;
 }
 
 function slugify(text: string): string {
@@ -74,7 +75,16 @@ export async function POST(request: Request) {
 
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json<ImportRow>(worksheet);
+    // Normalize headers: lowercase, strip spaces to camelCase
+    // e.g. "Brand Color" -> "brandcolor", "Referral Code" -> "referralcode"
+    const rawRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet);
+    const rows: ImportRow[] = rawRows.map((raw) => {
+      const normalized: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(raw)) {
+        normalized[key.toLowerCase().replace(/\s+/g, '').trim()] = value;
+      }
+      return normalized as unknown as ImportRow;
+    });
 
     if (rows.length === 0) {
       return NextResponse.json({ error: 'No data found in file' }, { status: 400 });
@@ -108,10 +118,10 @@ export async function POST(request: Request) {
           continue;
         }
 
-        const brandColor = row.brandColor || row.brand_color || row.color || null;
-        const referralCode = row.referralCode || row.referral_code || null;
-        const referralCaptionEn = row.referralCaptionEn || row.referral_caption_en || row.captionEn || null;
-        const referralCaptionTh = row.referralCaptionTh || row.referral_caption_th || row.captionTh || null;
+        const brandColor = row.brandcolor || row.brand_color || row.color || null;
+        const referralCode = row.referralcode || row.referral_code || null;
+        const referralCaptionEn = row.referralcaptionen || row.referral_caption_en || row.captionen || null;
+        const referralCaptionTh = row.referralcaptionth || row.referral_caption_th || row.captionth || null;
 
         const now = new Date();
 

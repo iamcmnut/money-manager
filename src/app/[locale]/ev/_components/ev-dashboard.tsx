@@ -10,22 +10,36 @@ interface EVDashboardProps {
   showCoupon: boolean;
 }
 
+interface ActiveNetworksResponse {
+  slugs?: string[];
+}
+
 export function EVDashboard({ showDailyPriceChart, showCoupon }: EVDashboardProps) {
   const [data, setData] = useState<EVStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [couponNetworkSlugs, setCouponNetworkSlugs] = useState<string[]>([]);
 
   const fetchStats = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/ev/stats');
-      const result = (await response.json()) as EVStatsResponse;
+      const [statsResponse, couponResponse] = await Promise.all([
+        fetch('/api/ev/stats'),
+        showCoupon ? fetch('/api/ev/coupons/active-networks') : Promise.resolve(null),
+      ]);
 
-      if (response.ok) {
+      const result = (await statsResponse.json()) as EVStatsResponse;
+
+      if (statsResponse.ok) {
         setData(result);
       } else {
         setError(result.error || 'Failed to load stats');
+      }
+
+      if (couponResponse?.ok) {
+        const couponData = (await couponResponse.json()) as ActiveNetworksResponse;
+        setCouponNetworkSlugs(couponData.slugs || []);
       }
     } catch (err) {
       console.error('Failed to fetch EV stats:', err);
@@ -33,7 +47,7 @@ export function EVDashboard({ showDailyPriceChart, showCoupon }: EVDashboardProp
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showCoupon]);
 
   useEffect(() => {
     fetchStats();
@@ -47,6 +61,7 @@ export function EVDashboard({ showDailyPriceChart, showCoupon }: EVDashboardProp
         error={error}
         showDailyPriceChart={showDailyPriceChart}
         showCoupon={showCoupon}
+        couponNetworkSlugs={couponNetworkSlugs}
       />
 
       <ChargingStats

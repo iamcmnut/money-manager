@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { BrandData } from './types';
 
@@ -23,6 +23,12 @@ vi.mock('@/lib/sanitize-url', () => ({
   sanitizeUrl: (url: string) => (url.startsWith('http') ? url : null),
 }));
 
+vi.mock('@/i18n/navigation', () => ({
+  Link: ({ href, children, ...props }: { href: string; children: React.ReactNode;[key: string]: unknown }) => (
+    <a href={href} {...props}>{children}</a>
+  ),
+}));
+
 vi.mock('./daily-price-chart', () => ({
   NetworkDailyPriceChart: ({ networkName }: { networkName: string }) => (
     <div data-testid={`daily-chart-${networkName}`} />
@@ -35,13 +41,11 @@ function makeBrand(overrides: Partial<BrandData> = {}): BrandData {
   return {
     brandId: 'test-brand',
     brandName: 'Test Brand',
+    brandSlug: 'test-brand',
     brandColor: '#00A651',
     brandLogo: null,
     brandPhone: null,
     brandWebsite: null,
-    brandReferralCode: null,
-    brandReferralCaptionEn: null,
-    brandReferralCaptionTh: null,
     sessions: 10,
     totalKwh: 100,
     totalCost: 500,
@@ -52,15 +56,7 @@ function makeBrand(overrides: Partial<BrandData> = {}): BrandData {
   };
 }
 
-const writeTextMock = vi.fn().mockResolvedValue(undefined);
-Object.defineProperty(navigator, 'clipboard', {
-  value: { writeText: writeTextMock },
-  writable: true,
-  configurable: true,
-});
-
 beforeEach(() => {
-  writeTextMock.mockClear();
   // Mock requestAnimationFrame so mounted becomes true synchronously
   vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
     cb(0);
@@ -201,224 +197,63 @@ describe('PriceComparisonChart', () => {
     });
   });
 
-  describe('referral code', () => {
-    it('does not show referral code when null', async () => {
+  describe('coupon badge', () => {
+    it('does not show coupon badge when network has no active coupons', async () => {
       const user = userEvent.setup();
-      const brands = [makeBrand({ brandReferralCode: null })];
+      const brands = [makeBrand({ brandSlug: 'test-brand' })];
       render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
+        <PriceComparisonChart loading={false} error={null} brandComparison={brands} couponNetworkSlugs={[]} />
       );
 
-      await user.click(screen.getByRole('button'));
-      expect(screen.queryByText('referralCode')).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: /rank/i }));
+      expect(screen.queryByText('hasCoupon')).not.toBeInTheDocument();
     });
 
-    it('displays referral code when available', async () => {
+    it('shows "Has Coupon" badge when network has active coupons', async () => {
       const user = userEvent.setup();
-      const brands = [makeBrand({ brandReferralCode: 'REF-ABC123' })];
+      const brands = [makeBrand({ brandSlug: 'test-brand' })];
       render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
+        <PriceComparisonChart loading={false} error={null} brandComparison={brands} couponNetworkSlugs={['test-brand']} />
       );
 
       await user.click(screen.getByLabelText('Rank 1'));
-      expect(screen.getByText('REF-ABC123')).toBeInTheDocument();
-      expect(screen.getByText(/referralCode/)).toBeInTheDocument();
+      expect(screen.getByText('hasCoupon')).toBeInTheDocument();
     });
 
-    it('shows copy button next to referral code', async () => {
+    it('coupon badge links to coupon page', async () => {
       const user = userEvent.setup();
-      const brands = [makeBrand({ brandReferralCode: 'REF-XYZ' })];
+      const brands = [makeBrand({ brandSlug: 'test-brand' })];
       render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
+        <PriceComparisonChart loading={false} error={null} brandComparison={brands} couponNetworkSlugs={['test-brand']} />
       );
 
-      await user.click(screen.getByRole('button', { name: /rank/i }));
-      expect(screen.getByText('copy')).toBeInTheDocument();
-    });
-
-    it('copies referral code to clipboard on click', async () => {
-      // The "copied" feedback test proves the click handler runs (state changes to "copied").
-      // Here we verify the clipboard.writeText call is made by checking the state transition
-      // which only happens when the handler runs successfully.
-      const user = userEvent.setup();
-      const brands = [makeBrand({ brandReferralCode: 'REF-COPY' })];
-      render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
-      );
-
-      // Expand the card
       await user.click(screen.getByLabelText('Rank 1'));
-      expect(screen.getByText('REF-COPY')).toBeInTheDocument();
-
-      // Click the copy button — the handler calls navigator.clipboard.writeText and setCopiedId
-      const copyButton = screen.getByText('copy').closest('button')!;
-      await user.click(copyButton);
-
-      // If the handler ran, the state changes to show "copied" and the code is still visible
-      expect(screen.getByText('copied')).toBeInTheDocument();
-      expect(screen.getByText('REF-COPY')).toBeInTheDocument();
+      const link = screen.getByText('hasCoupon').closest('a');
+      expect(link).toHaveAttribute('href', '/ev/coupon/test-brand');
     });
 
-    it('shows "copied" feedback after copying', async () => {
+    it('does not show coupon badge when showCoupon is false', async () => {
       const user = userEvent.setup();
-      const brands = [makeBrand({ brandReferralCode: 'REF-FEEDBACK' })];
+      const brands = [makeBrand({ brandSlug: 'test-brand' })];
       render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
+        <PriceComparisonChart loading={false} error={null} brandComparison={brands} showCoupon={false} couponNetworkSlugs={['test-brand']} />
       );
 
       await user.click(screen.getByRole('button', { name: /rank/i }));
-      const copyButton = screen.getByText('copy').closest('button')!;
-      await user.click(copyButton);
-
-      expect(screen.getByText('copied')).toBeInTheDocument();
-      expect(screen.queryByText('copy')).not.toBeInTheDocument();
+      expect(screen.queryByText('hasCoupon')).not.toBeInTheDocument();
     });
 
-    it('reverts back to "copy" after timeout', async () => {
-      vi.useFakeTimers({ shouldAdvanceTime: true });
-      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-      const brands = [makeBrand({ brandReferralCode: 'REF-TIMEOUT' })];
-      render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
-      );
-
-      await user.click(screen.getByRole('button', { name: /rank/i }));
-      const copyButton = screen.getByText('copy').closest('button')!;
-      await user.click(copyButton);
-
-      expect(screen.getByText('copied')).toBeInTheDocument();
-
-      act(() => {
-        vi.advanceTimersByTime(2000);
-      });
-
-      expect(screen.getByText('copy')).toBeInTheDocument();
-      vi.useRealTimers();
-    });
-
-    it('shows referral code for multiple brands independently', async () => {
+    it('does not show coupon badge for network not in couponNetworkSlugs', async () => {
       const user = userEvent.setup();
       const brands = [
-        makeBrand({ brandId: 'brand-a', brandName: 'Brand A', avgPricePerKwh: 5, brandReferralCode: 'REF-A' }),
-        makeBrand({ brandId: 'brand-b', brandName: 'Brand B', avgPricePerKwh: 6, brandReferralCode: 'REF-B', isCheapest: false }),
+        makeBrand({ brandId: 'brand-b', brandName: 'Brand B', brandSlug: 'brand-b', avgPricePerKwh: 6, isCheapest: true }),
       ];
       render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
+        <PriceComparisonChart loading={false} error={null} brandComparison={brands} couponNetworkSlugs={['brand-a']} />
       );
 
-      // Expand Brand A
-      const buttons = screen.getAllByRole('button', { name: /rank/i });
-      await user.click(buttons[0]);
-      expect(screen.getByText('REF-A')).toBeInTheDocument();
-
-      // Collapse Brand A and expand Brand B
-      await user.click(buttons[0]);
-      await user.click(buttons[1]);
-      expect(screen.getByText('REF-B')).toBeInTheDocument();
-    });
-
-    it('copy does not trigger card collapse (stopPropagation)', async () => {
-      const user = userEvent.setup();
-      const brands = [makeBrand({ brandReferralCode: 'REF-STOP' })];
-      render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
-      );
-
-      // Expand
       await user.click(screen.getByRole('button', { name: /rank/i }));
-      expect(screen.getByRole('button', { name: /rank/i })).toHaveAttribute('aria-expanded', 'true');
-
-      // Click copy — should NOT collapse the card
-      const copyButton = screen.getByText('copy').closest('button')!;
-      await user.click(copyButton);
-
-      expect(screen.getByRole('button', { name: /rank/i })).toHaveAttribute('aria-expanded', 'true');
-      expect(screen.getByText('REF-STOP')).toBeInTheDocument();
-    });
-  });
-
-  describe('referral code captions', () => {
-    it('shows EN caption when locale is en', async () => {
-      mockLocale.value = 'en';
-      const user = userEvent.setup();
-      const brands = [makeBrand({
-        brandReferralCode: 'REF-CAP',
-        brandReferralCaptionEn: 'Get 300 THB free',
-        brandReferralCaptionTh: 'รับ 300 บาทฟรี',
-      })];
-      render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
-      );
-
-      await user.click(screen.getByLabelText('Rank 1'));
-      expect(screen.getByText('Get 300 THB free')).toBeInTheDocument();
-    });
-
-    it('shows TH caption when locale is th', async () => {
-      mockLocale.value = 'th';
-      const user = userEvent.setup();
-      const brands = [makeBrand({
-        brandReferralCode: 'REF-CAP',
-        brandReferralCaptionEn: 'Get 300 THB free',
-        brandReferralCaptionTh: 'รับ 300 บาทฟรี',
-      })];
-      render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
-      );
-
-      await user.click(screen.getByLabelText('Rank 1'));
-      expect(screen.getByText('รับ 300 บาทฟรี')).toBeInTheDocument();
-    });
-
-    it('falls back to EN caption when TH is missing and locale is th', async () => {
-      mockLocale.value = 'th';
-      const user = userEvent.setup();
-      const brands = [makeBrand({
-        brandReferralCode: 'REF-FB',
-        brandReferralCaptionEn: 'English only caption',
-        brandReferralCaptionTh: null,
-      })];
-      render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
-      );
-
-      await user.click(screen.getByLabelText('Rank 1'));
-      expect(screen.getByText('English only caption')).toBeInTheDocument();
-    });
-
-    it('falls back to TH caption when EN is missing and locale is en', async () => {
-      mockLocale.value = 'en';
-      const user = userEvent.setup();
-      const brands = [makeBrand({
-        brandReferralCode: 'REF-FB2',
-        brandReferralCaptionEn: null,
-        brandReferralCaptionTh: 'คำอธิบายภาษาไทย',
-      })];
-      render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
-      );
-
-      await user.click(screen.getByLabelText('Rank 1'));
-      expect(screen.getByText('คำอธิบายภาษาไทย')).toBeInTheDocument();
-    });
-
-    it('does not show caption when both are null', async () => {
-      mockLocale.value = 'en';
-      const user = userEvent.setup();
-      const brands = [makeBrand({
-        brandReferralCode: 'REF-NOCAP',
-        brandReferralCaptionEn: null,
-        brandReferralCaptionTh: null,
-      })];
-      render(
-        <PriceComparisonChart loading={false} error={null} brandComparison={brands} />
-      );
-
-      await user.click(screen.getByLabelText('Rank 1'));
-      // Code should be visible but no caption paragraph
-      expect(screen.getByText('REF-NOCAP')).toBeInTheDocument();
-      const captionP = screen.queryByText(/Get|รับ|caption/i);
-      expect(captionP).not.toBeInTheDocument();
+      expect(screen.queryByText('hasCoupon')).not.toBeInTheDocument();
     });
   });
 });

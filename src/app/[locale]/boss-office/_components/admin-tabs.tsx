@@ -7,7 +7,7 @@ import { FeatureFlagsPanel } from './feature-flags';
 import { UsersTable } from './users-table';
 import { ChargingNetworksTable } from './charging-networks-table';
 import { AdminChargingRecords } from './admin-charging-records';
-import { ReferralCodesTable } from './referral-codes-table';
+import { CouponsTable } from './coupons-table';
 import { cn } from '@/lib/utils';
 
 type Session = {
@@ -134,16 +134,16 @@ function EVNetworksTab() {
         <ChargingNetworksTable />
       </div>
 
-      {/* Referral codes */}
+      {/* Coupons */}
       <div>
         <div className="mb-4 flex items-center gap-3">
           <Tag className="h-5 w-5 text-primary" />
           <div>
-            <h2 className="text-base font-semibold">{t('referralCodes.title')}</h2>
-            <p className="text-xs text-muted-foreground">{t('referralCodes.description')}</p>
+            <h2 className="text-base font-semibold">{t('coupons.title')}</h2>
+            <p className="text-xs text-muted-foreground">{t('coupons.description')}</p>
           </div>
         </div>
-        <ReferralCodesTable />
+        <CouponsTable />
       </div>
     </div>
   );

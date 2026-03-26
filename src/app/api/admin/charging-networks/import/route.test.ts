@@ -337,6 +337,66 @@ describe('POST /api/admin/charging-networks/import', () => {
     });
   });
 
+  describe('Header normalization', () => {
+    it('should handle uppercase column headers', async () => {
+      mockAuth.mockResolvedValue(adminSession);
+      const db = createMockDb();
+      mockGetDatabase.mockResolvedValue(db);
+
+      const file = createMockFile([
+        { Name: 'EA Anywhere', Website: 'https://ea.co.th', Phone: '1234' },
+      ]);
+
+      const response = await POST(createRequest(file));
+      expect(response.status).toBe(200);
+
+      const insertCall = db.insert.mock.results[0].value.values;
+      const valuesArg = insertCall.mock.calls[0][0];
+      expect(valuesArg.name).toBe('EA Anywhere');
+      expect(valuesArg.website).toBe('https://ea.co.th');
+      expect(valuesArg.phone).toBe('1234');
+    });
+
+    it('should handle mixed case column headers', async () => {
+      mockAuth.mockResolvedValue(adminSession);
+      const db = createMockDb();
+      mockGetDatabase.mockResolvedValue(db);
+
+      const file = createMockFile([
+        { NAME: 'Test', BrandColor: '#FF0000', ReferralCode: 'ABC' },
+      ]);
+
+      const response = await POST(createRequest(file));
+      expect(response.status).toBe(200);
+
+      const insertCall = db.insert.mock.results[0].value.values;
+      const valuesArg = insertCall.mock.calls[0][0];
+      expect(valuesArg.name).toBe('Test');
+      expect(valuesArg.brandColor).toBe('#FF0000');
+      expect(valuesArg.referralCode).toBe('ABC');
+    });
+
+    it('should handle spaced column headers like exported CSV', async () => {
+      mockAuth.mockResolvedValue(adminSession);
+      const db = createMockDb();
+      mockGetDatabase.mockResolvedValue(db);
+
+      const file = createMockFile([
+        { Name: 'Spark', Slug: 'spark', Website: 'https://spark.co', Phone: '123', 'Brand Color': '#fc4c02', 'Referral Code': 'SMILES' },
+      ]);
+
+      const response = await POST(createRequest(file));
+      expect(response.status).toBe(200);
+
+      const insertCall = db.insert.mock.results[0].value.values;
+      const valuesArg = insertCall.mock.calls[0][0];
+      expect(valuesArg.name).toBe('Spark');
+      expect(valuesArg.slug).toBe('spark');
+      expect(valuesArg.brandColor).toBe('#fc4c02');
+      expect(valuesArg.referralCode).toBe('SMILES');
+    });
+  });
+
   describe('Slug generation', () => {
     it('should auto-generate slug from name', async () => {
       mockAuth.mockResolvedValue(adminSession);
