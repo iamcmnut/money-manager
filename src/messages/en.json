@@ -93,7 +93,7 @@
       },
       "coupon": {
         "pageTitle": "Codes for {network}",
-        "pageDescription": "View active codes and referral codes for {network} EV charging",
+        "pageDescription": "Claim your credit or discount codes",
         "noCoupons": "No active codes",
         "noCouponsHint": "There are no active codes for this network at the moment.",
         "validFrom": "Valid from",
