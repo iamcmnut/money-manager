@@ -118,7 +118,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
               type="button"
               onClick={() => handleToggle(brand.brandId)}
               className={`
-                group w-full rounded-lg border p-3 text-left
+                group w-full overflow-hidden rounded-lg border p-3 text-left
                 transition-colors duration-200 ease-out
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                 ${brand.isCheapest
@@ -127,6 +127,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                 }
                 ${isExpanded ? 'ring-1 ring-border' : ''}
               `}
+              style={{ borderLeftWidth: '3px', borderLeftColor: brand.brandColor || 'hsl(var(--muted-foreground))' }}
               aria-expanded={isExpanded}
             >
               {/* Main row */}
