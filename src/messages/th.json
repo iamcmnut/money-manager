@@ -250,7 +250,16 @@
       "save": "บันทึก",
       "saving": "กำลังบันทึก...",
       "uploading": "กำลังอัปโหลด...",
-      "referralCode": "รหัสแนะนำ"
+      "referralCode": "รหัสแนะนำ",
+      "import": {
+        "button": "นำเข้า",
+        "importing": "กำลังนำเข้า...",
+        "failed": "ไม่สามารถนำเข้าเครือข่ายได้",
+        "success": "นำเข้า {count} จาก {total} เครือข่าย",
+        "warnings": "คำเตือน",
+        "rowError": "แถว {row}",
+        "moreErrors": "...และข้อผิดพลาดอื่นๆ"
+      }
     },
     "referralCodes": {
       "title": "รหัสแนะนำ",

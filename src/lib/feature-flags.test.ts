@@ -110,10 +110,23 @@ describe('getFeatureFlag (production — KV)', () => {
     expect(mockKV.get).toHaveBeenCalledWith('auth_google');
   });
 
-  it('should return default when KV returns null', async () => {
+  it('should fall back to process.env when KV returns null', async () => {
     mockKV.get.mockResolvedValue(null);
     const result = await getFeatureFlag('module_ev');
-    expect(result).toBe(true); // default for module_ev
+    // KV returned null → falls through to process.env → not set → default true
+    expect(result).toBe(true);
+  });
+
+  it('should use env var when KV returns null and env var is set', async () => {
+    const originalEnv = process.env;
+    process.env = { ...originalEnv, FEATURE_AUTH_GOOGLE: 'true' };
+
+    mockKV.get.mockResolvedValue(null);
+    const result = await getFeatureFlag('auth_google');
+    // KV returned null → falls through to process.env → 'true'
+    expect(result).toBe(true);
+
+    process.env = originalEnv;
   });
 
   it('should parse "false" from KV', async () => {

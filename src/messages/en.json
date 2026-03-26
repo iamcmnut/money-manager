@@ -250,7 +250,16 @@
       "save": "Save",
       "saving": "Saving...",
       "uploading": "Uploading...",
-      "referralCode": "Referral Code"
+      "referralCode": "Referral Code",
+      "import": {
+        "button": "Import",
+        "importing": "Importing...",
+        "failed": "Failed to import networks",
+        "success": "Imported {count} of {total} networks",
+        "warnings": "Warnings",
+        "rowError": "Row {row}",
+        "moreErrors": "...and more errors"
+      }
     },
     "referralCodes": {
       "title": "Referral Codes",

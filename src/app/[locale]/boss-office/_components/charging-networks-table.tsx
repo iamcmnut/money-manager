@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Plus, Pencil, Trash2, ExternalLink, Phone, Tag, Download } from 'lucide-react';
+import { Plus, Pencil, Trash2, ExternalLink, Phone, Tag, Download, Upload, X, FileSpreadsheet } from 'lucide-react';
 import { ChargingNetworkForm } from './charging-network-form';
 import { sanitizeUrl } from '@/lib/sanitize-url';
 import { Pagination } from '@/components/ui/pagination';
@@ -33,6 +33,15 @@ interface ErrorResponse {
   error?: string;
 }
 
+interface ImportResponse {
+  success?: boolean;
+  imported?: number;
+  total?: number;
+  errors?: { row: number; error: string }[];
+  hasMoreErrors?: boolean;
+  error?: string;
+}
+
 export function ChargingNetworksTable() {
   const t = useTranslations('admin');
   const [networks, setNetworks] = useState<NetworkData[]>([]);
@@ -42,6 +51,9 @@ export function ChargingNetworksTable() {
   const [editingNetwork, setEditingNetwork] = useState<NetworkData | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResponse | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchNetworks = useCallback(async () => {
     try {
@@ -95,6 +107,41 @@ export function ChargingNetworksTable() {
     fetchNetworks();
   };
 
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    setImportResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/admin/charging-networks/import', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = (await response.json()) as ImportResponse;
+
+      if (response.ok && result.success) {
+        setImportResult(result);
+        fetchNetworks();
+      } else {
+        setImportResult({ error: result.error || t('evNetworks.import.failed') });
+      }
+    } catch (err) {
+      console.error('Failed to import:', err);
+      setImportResult({ error: t('evNetworks.import.failed') });
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   const exportNetworks = () => {
     const headers = ['Name', 'Slug', 'Website', 'Phone', 'Brand Color', 'Referral Code', 'Created At'];
     const rows = networks.map((n) => [
@@ -127,6 +174,14 @@ export function ChargingNetworksTable() {
   return (
     <div className="space-y-4">
       <div className="flex justify-end gap-2">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          onChange={handleImport}
+          className="hidden"
+          disabled={importing}
+        />
         {networks.length > 0 && (
           <Button
             size="sm"
@@ -139,6 +194,15 @@ export function ChargingNetworksTable() {
         )}
         <Button
           size="sm"
+          variant="outline"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={importing}
+        >
+          <Upload className="mr-1 h-4 w-4" />
+          {importing ? t('evNetworks.import.importing') : t('evNetworks.import.button')}
+        </Button>
+        <Button
+          size="sm"
           onClick={() => {
             setEditingNetwork(null);
             setShowForm(true);
@@ -149,6 +213,56 @@ export function ChargingNetworksTable() {
           {t('evNetworks.add')}
         </Button>
       </div>
+
+      {importResult && (
+        <div
+          className={`rounded-xl border p-4 ${
+            importResult.error
+              ? 'bg-destructive/5 border-destructive/20 text-destructive'
+              : 'bg-success-muted border-success/20 text-success'
+          }`}
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3">
+              <FileSpreadsheet className="h-5 w-5 mt-0.5" />
+              <div>
+                {importResult.error ? (
+                  <p className="font-medium">{importResult.error}</p>
+                ) : (
+                  <>
+                    <p className="font-medium">
+                      {t('evNetworks.import.success', { count: importResult.imported ?? 0, total: importResult.total ?? 0 })}
+                    </p>
+                    {importResult.errors && importResult.errors.length > 0 && (
+                      <div className="mt-2 text-sm">
+                        <p className="font-medium text-warning">{t('evNetworks.import.warnings')}:</p>
+                        <ul className="mt-1 list-disc list-inside">
+                          {importResult.errors.map((err, i) => (
+                            <li key={i}>
+                              {err.row > 0 ? `${t('evNetworks.import.rowError', { row: err.row })}: ` : ''}{err.error}
+                            </li>
+                          ))}
+                        </ul>
+                        {importResult.hasMoreErrors && (
+                          <p className="mt-1 text-muted-foreground">{t('evNetworks.import.moreErrors')}</p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => setImportResult(null)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <ChargingNetworkForm

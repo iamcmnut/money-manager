@@ -58,6 +58,7 @@ FEATURE_MODULE_LIVING_COST=true
 FEATURE_MODULE_SAVINGS=true
 FEATURE_EV_DAILY_PRICE_CHART=true
 FEATURE_EV_COUPON=true
+FEATURE_AUTH_REGISTRATION=true
 EOF
 
 # 4. Setup database (migrations + seed admin account)
