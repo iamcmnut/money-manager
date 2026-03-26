@@ -22,10 +22,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = t('pageTitle', { network: networkName });
   const description = t('pageDescription', { network: networkName });
 
-  const ogImage = locale === 'th' ? network?.couponOgImageTh : network?.couponOgImageEn;
-  const ogImageUrl = ogImage
-    ? (ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`)
-    : undefined;
+  const customOgImage = locale === 'th' ? network?.couponOgImageTh : network?.couponOgImageEn;
+  const ogImageUrl = customOgImage
+    ? (customOgImage.startsWith('http') ? customOgImage : `${baseUrl}${customOgImage}`)
+    : `${baseUrl}/ev/manager.money-ev-${locale}.png`;
+
+  const url = `${baseUrl}/${locale}/ev/coupon/${slug}`;
 
   return {
     title,
@@ -33,15 +35,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      ...(ogImageUrl && {
-        images: [{ url: ogImageUrl, width: 1200, height: 630, alt: title }],
-      }),
+      url,
+      type: 'website',
+      siteName: 'Manager.money',
+      locale: locale === 'th' ? 'th_TH' : 'en_US',
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: 'summary_large_image' as const,
       title,
       description,
-      ...(ogImageUrl && { images: [ogImageUrl] }),
+      images: [ogImageUrl],
+    },
+    other: {
+      'og:locale:alternate': locale === 'th' ? 'en_US' : 'th_TH',
     },
   };
 }
