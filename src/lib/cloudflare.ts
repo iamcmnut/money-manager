@@ -6,6 +6,7 @@ export interface CloudflareEnv {
   DB: D1Database;
   FEATURE_FLAGS: KVNamespace;
   R2: R2Bucket;
+  R2_PUBLIC_URL?: string;
 }
 
 function getCloudflareContextFromGlobal(): { env?: Record<string, unknown> } | undefined {
@@ -55,4 +56,17 @@ export function getKV(): KVNamespace | null {
  */
 export function isCloudflareEnv(): boolean {
   return getCloudflareEnv() !== null;
+}
+
+/**
+ * Get R2 public URL for serving uploaded files directly from CDN.
+ * Production: from Cloudflare env vars (wrangler.toml [vars])
+ * Local dev: from process.env (`.env.local`)
+ */
+export function getR2PublicUrl(): string | null {
+  const env = getCloudflareEnv();
+  if (env?.R2_PUBLIC_URL) {
+    return env.R2_PUBLIC_URL;
+  }
+  return process.env.R2_PUBLIC_URL || null;
 }

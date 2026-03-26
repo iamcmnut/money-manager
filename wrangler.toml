@@ -26,6 +26,7 @@ bucket_name = "manager-money"
 
 [vars]
 ENVIRONMENT = "production"
+R2_PUBLIC_URL = "https://cdn.manager.money"
 
 [observability]
 enabled = false

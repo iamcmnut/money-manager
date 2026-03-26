@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getR2 } from '@/lib/server/r2';
+import { getR2PublicUrl } from '@/lib/cloudflare';
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -57,7 +58,8 @@ export async function POST(request: Request) {
       httpMetadata: { contentType: file.type },
     });
 
-    const url = `/api/upload/${key}`;
+    const r2PublicUrl = getR2PublicUrl();
+    const url = r2PublicUrl ? `${r2PublicUrl}/${key}` : `/api/upload/${key}`;
 
     return NextResponse.json({ url, key });
   } catch (error) {
