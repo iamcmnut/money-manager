@@ -3,42 +3,69 @@ import { Tag } from 'lucide-react';
 import { FeatureGate } from '@/components/feature-gate';
 import { Link } from '@/i18n/navigation';
 import { CouponList } from './_components/coupon-list';
+import { getDatabase } from '@/lib/server';
+import { coupons, chargingNetworks } from '@/lib/db/schema';
+import { and, eq, sql } from 'drizzle-orm';
 import type { Metadata } from 'next';
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
-interface CouponApiResponse {
-  network?: { id: string; name: string; slug: string; logo: string | null; brandColor: string | null; website: string | null };
-  coupons?: Array<{
-    id: string;
-    code: string;
-    descriptionEn: string | null;
-    descriptionTh: string | null;
-    conditionEn: string | null;
-    conditionTh: string | null;
-    startDate: string;
-    endDate: string;
-  }>;
+async function getNetworkWithCoupons(slug: string) {
+  const db = getDatabase();
+  if (!db) return { network: null, coupons: [] };
+
+  const networkResult = await db
+    .select({
+      id: chargingNetworks.id,
+      name: chargingNetworks.name,
+      slug: chargingNetworks.slug,
+      logo: chargingNetworks.logo,
+      brandColor: chargingNetworks.brandColor,
+      website: chargingNetworks.website,
+    })
+    .from(chargingNetworks)
+    .where(eq(chargingNetworks.slug, slug))
+    .limit(1);
+
+  if (networkResult.length === 0) {
+    return { network: null, coupons: [] };
+  }
+
+  const network = networkResult[0];
+  const now = Math.floor(Date.now() / 1000);
+
+  const validCoupons = await db
+    .select({
+      id: coupons.id,
+      code: coupons.code,
+      descriptionEn: coupons.descriptionEn,
+      descriptionTh: coupons.descriptionTh,
+      conditionEn: coupons.conditionEn,
+      conditionTh: coupons.conditionTh,
+      startDate: coupons.startDate,
+      endDate: coupons.endDate,
+    })
+    .from(coupons)
+    .where(
+      and(
+        eq(coupons.networkId, network.id),
+        eq(coupons.isActive, true),
+        sql`${coupons.startDate} <= ${now}`,
+        sql`${coupons.endDate} >= ${now}`
+      )
+    );
+
+  return { network, coupons: validCoupons };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const t = await getTranslations({ locale, namespace: 'modules.ev.coupon' });
 
-  // Fetch network name for SEO
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  let networkName = slug;
-  try {
-    const res = await fetch(`${baseUrl}/api/ev/coupons/${slug}`, { next: { revalidate: 60 } });
-    if (res.ok) {
-      const data = (await res.json()) as CouponApiResponse;
-      networkName = data.network?.name || slug;
-    }
-  } catch {
-    // Fall back to slug
-  }
+  const { network } = await getNetworkWithCoupons(slug);
+  const networkName = network?.name || slug;
 
   return {
     title: t('pageTitle', { network: networkName }),
@@ -59,31 +86,13 @@ export default async function CouponPage({ params }: Props) {
 
 async function CouponPageContent({ slug }: { slug: string }) {
   const t = await getTranslations('modules.ev.coupon');
-
-  // Fetch coupon data server-side
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  let network = null;
-  let couponsList: Array<{
-    id: string;
-    code: string;
-    descriptionEn: string | null;
-    descriptionTh: string | null;
-    conditionEn: string | null;
-    conditionTh: string | null;
-    startDate: string;
-    endDate: string;
-  }> = [];
-
-  try {
-    const res = await fetch(`${baseUrl}/api/ev/coupons/${slug}`, { next: { revalidate: 60 } });
-    if (res.ok) {
-      const data = (await res.json()) as CouponApiResponse;
-      network = data.network || null;
-      couponsList = data.coupons || [];
-    }
-  } catch {
-    // Will show empty state
-  }
+  const data = await getNetworkWithCoupons(slug);
+  const network = data.network;
+  const couponsList = data.coupons.map((c) => ({
+    ...c,
+    startDate: c.startDate instanceof Date ? c.startDate.toISOString() : String(c.startDate),
+    endDate: c.endDate instanceof Date ? c.endDate.toISOString() : String(c.endDate),
+  }));
 
   return (
     <div>
