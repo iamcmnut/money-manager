@@ -9,6 +9,20 @@ type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
+interface CouponApiResponse {
+  network?: { id: string; name: string; slug: string; logo: string | null; brandColor: string | null; website: string | null };
+  coupons?: Array<{
+    id: string;
+    code: string;
+    descriptionEn: string | null;
+    descriptionTh: string | null;
+    conditionEn: string | null;
+    conditionTh: string | null;
+    startDate: string;
+    endDate: string;
+  }>;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const t = await getTranslations({ locale, namespace: 'modules.ev.coupon' });
@@ -19,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const res = await fetch(`${baseUrl}/api/ev/coupons/${slug}`, { next: { revalidate: 60 } });
     if (res.ok) {
-      const data = await res.json();
+      const data = (await res.json()) as CouponApiResponse;
       networkName = data.network?.name || slug;
     }
   } catch {
@@ -63,8 +77,8 @@ async function CouponPageContent({ slug }: { slug: string }) {
   try {
     const res = await fetch(`${baseUrl}/api/ev/coupons/${slug}`, { next: { revalidate: 60 } });
     if (res.ok) {
-      const data = await res.json();
-      network = data.network;
+      const data = (await res.json()) as CouponApiResponse;
+      network = data.network || null;
       couponsList = data.coupons || [];
     }
   } catch {

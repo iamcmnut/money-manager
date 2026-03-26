@@ -90,7 +90,7 @@ export async function POST(request: Request) {
     const worksheet = workbook.Sheets[sheetName];
 
     // Convert to JSON with normalized headers (lowercase, no spaces)
-    const rawRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, { cellDates: true });
+    const rawRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet);
     const rows: ImportRow[] = rawRows.map((raw) => {
       const normalized: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(raw)) {
