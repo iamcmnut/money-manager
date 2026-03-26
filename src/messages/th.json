@@ -93,7 +93,7 @@
       },
       "coupon": {
         "pageTitle": "โค้ดสำหรับ {network}",
-        "pageDescription": "ดูโค้ดและรหัสแนะนำสำหรับการชาร์จ EV ของ {network}",
+        "pageDescription": "เก็บโค้ดของ {network}",
         "noCoupons": "ไม่มีโค้ดที่ใช้งานได้",
         "noCouponsHint": "ยังไม่มีโค้ดที่ใช้งานได้สำหรับเครือข่ายนี้ในขณะนี้",
         "validFrom": "ใช้ได้ตั้งแต่",
