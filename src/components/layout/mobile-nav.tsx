@@ -69,6 +69,7 @@ export function MobileNav({ enabledModules }: MobileNavProps) {
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
+                aria-current={pathname === link.href ? 'page' : undefined}
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors',
                   pathname === link.href

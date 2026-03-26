@@ -26,34 +26,38 @@ export function NetworkDailyPriceChart({ networkName, brandColor }: NetworkDaily
   const [error, setError] = useState(false);
   const [range, setRange] = useState<Range>('90');
 
-  const fetchData = useCallback(async (r: Range) => {
-    setLoading(true);
-    setError(false);
-    try {
-      const response = await fetch(`/api/ev/stats/daily-prices?range=${r}`);
-      if (!response.ok) {
-        setError(true);
-        return;
-      }
-      const result = (await response.json()) as DailyPricesResponse;
-      // Filter to only this network's data points
-      const filtered = result.dailyPrices
-        .filter((point) => point[networkName] !== undefined)
-        .map((point) => ({
-          date: point.date as string,
-          price: point[networkName] as number,
-        }));
-      setData(filtered);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }, [networkName]);
-
   useEffect(() => {
-    fetchData(range);
-  }, [range, fetchData]);
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    async function fetchData() {
+      setLoading(true);
+      setError(false);
+      try {
+        const response = await fetch(`/api/ev/stats/daily-prices?range=${range}`, { signal });
+        if (signal.aborted) return;
+        if (!response.ok) {
+          setError(true);
+          return;
+        }
+        const result = (await response.json()) as DailyPricesResponse;
+        const filtered = result.dailyPrices
+          .filter((point) => point[networkName] !== undefined)
+          .map((point) => ({
+            date: point.date as string,
+            price: point[networkName] as number,
+          }));
+        setData(filtered);
+      } catch {
+        if (!signal.aborted) setError(true);
+      } finally {
+        if (!signal.aborted) setLoading(false);
+      }
+    }
+
+    fetchData();
+    return () => controller.abort();
+  }, [range, networkName]);
 
   const ranges: { value: Range; label: string }[] = [
     { value: '30', label: t('range30') },

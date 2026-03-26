@@ -88,13 +88,14 @@
         "referralCode": "Referral Code",
         "copy": "Copy",
         "copied": "Copied!",
-        "hasCoupon": "Has Coupon"
+        "coupon": "Code",
+        "hasCoupon": "Has Code"
       },
       "coupon": {
-        "pageTitle": "Coupons for {network}",
-        "pageDescription": "View active coupons and referral codes for {network} EV charging",
-        "noCoupons": "No active coupons",
-        "noCouponsHint": "There are no active coupons for this network at the moment.",
+        "pageTitle": "Codes for {network}",
+        "pageDescription": "View active codes and referral codes for {network} EV charging",
+        "noCoupons": "No active codes",
+        "noCouponsHint": "There are no active codes for this network at the moment.",
         "validFrom": "Valid from",
         "validUntil": "until",
         "code": "Code",

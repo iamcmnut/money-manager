@@ -194,7 +194,7 @@ export function UsersTable() {
     <div className="space-y-3">
       {paginatedUsers.map((user) => (
         <div key={user.id}>
-          <div className="flex items-center justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md">
+          <div className="flex items-center justify-between rounded-xl border bg-background/50 p-4 transition-all hover:bg-background/80 hover:shadow-md">
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10 ring-2 ring-primary/10">
                 <AvatarImage src={user.image ?? undefined} alt={user.name ?? ''} />

@@ -148,7 +148,7 @@ export function ReferralCodesTable() {
           {networksWithCodes.map((network) => (
             <div
               key={network.id}
-              className="flex items-start justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
+              className="flex items-start justify-between rounded-xl border bg-background/50 p-4 transition-all hover:bg-background/80 hover:shadow-md"
             >
               <div className="flex items-start gap-3 min-w-0">
                 {network.logo ? (

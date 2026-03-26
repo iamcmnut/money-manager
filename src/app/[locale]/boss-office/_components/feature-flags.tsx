@@ -69,7 +69,7 @@ export function FeatureFlagsPanel() {
   return (
     <div className="space-y-3">
       {(Object.keys(flags) as FeatureFlag[]).map((flag) => (
-        <div key={flag} className="flex items-center justify-between rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80">
+        <div key={flag} className="flex items-center justify-between rounded-xl border bg-background/50 p-4 transition-all hover:bg-background/80">
           <span className="font-medium">{t(`flags.${flag}`)}</span>
           <button
             type="button"

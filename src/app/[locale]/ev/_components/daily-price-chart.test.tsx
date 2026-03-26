@@ -303,7 +303,7 @@ describe('NetworkDailyPriceChart', () => {
       render(<NetworkDailyPriceChart {...defaultProps} />);
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/ev/stats/daily-prices?range=90');
+        expect(global.fetch).toHaveBeenCalledWith('/api/ev/stats/daily-prices?range=90', expect.objectContaining({ signal: expect.any(AbortSignal) }));
       });
     });
 
@@ -320,7 +320,7 @@ describe('NetworkDailyPriceChart', () => {
       await user.click(screen.getByText('range30'));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/ev/stats/daily-prices?range=30');
+        expect(global.fetch).toHaveBeenCalledWith('/api/ev/stats/daily-prices?range=30', expect.objectContaining({ signal: expect.any(AbortSignal) }));
       });
     });
 
@@ -337,7 +337,7 @@ describe('NetworkDailyPriceChart', () => {
       await user.click(screen.getByText('rangeAll'));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/ev/stats/daily-prices?range=all');
+        expect(global.fetch).toHaveBeenCalledWith('/api/ev/stats/daily-prices?range=all', expect.objectContaining({ signal: expect.any(AbortSignal) }));
       });
     });
 
@@ -459,7 +459,7 @@ describe('NetworkDailyPriceChart', () => {
       render(<NetworkDailyPriceChart {...defaultProps} />);
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/ev/stats/daily-prices?range=90');
+        expect(global.fetch).toHaveBeenCalledWith('/api/ev/stats/daily-prices?range=90', expect.objectContaining({ signal: expect.any(AbortSignal) }));
       });
     });
 

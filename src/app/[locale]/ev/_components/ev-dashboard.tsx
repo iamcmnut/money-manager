@@ -20,40 +20,45 @@ export function EVDashboard({ showDailyPriceChart, showCoupon }: EVDashboardProp
   const [error, setError] = useState<string | null>(null);
   const [couponNetworkSlugs, setCouponNetworkSlugs] = useState<string[]>([]);
 
-  const fetchStats = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [statsResponse, couponResponse] = await Promise.all([
-        fetch('/api/ev/stats'),
-        showCoupon ? fetch('/api/ev/coupons/active-networks') : Promise.resolve(null),
-      ]);
-
-      const result = (await statsResponse.json()) as EVStatsResponse;
-
-      if (statsResponse.ok) {
-        setData(result);
-      } else {
-        setError(result.error || 'Failed to load stats');
-      }
-
-      if (couponResponse?.ok) {
-        const couponData = (await couponResponse.json()) as ActiveNetworksResponse;
-        setCouponNetworkSlugs(couponData.slugs || []);
-      }
-    } catch (err) {
-      console.error('Failed to fetch EV stats:', err);
-      setError('Failed to load stats');
-    } finally {
-      setLoading(false);
-    }
-  }, [showCoupon]);
-
   useEffect(() => {
     const controller = new AbortController();
+    const signal = controller.signal;
+
+    async function fetchStats() {
+      setLoading(true);
+      setError(null);
+      try {
+        const [statsResponse, couponResponse] = await Promise.all([
+          fetch('/api/ev/stats', { signal }),
+          showCoupon ? fetch('/api/ev/coupons/active-networks', { signal }) : Promise.resolve(null),
+        ]);
+
+        if (signal.aborted) return;
+
+        const result = (await statsResponse.json()) as EVStatsResponse;
+
+        if (statsResponse.ok) {
+          setData(result);
+        } else {
+          setError(result.error || 'Failed to load stats');
+        }
+
+        if (couponResponse?.ok) {
+          const couponData = (await couponResponse.json()) as ActiveNetworksResponse;
+          setCouponNetworkSlugs(couponData.slugs || []);
+        }
+      } catch (err) {
+        if (signal.aborted) return;
+        console.error('Failed to fetch EV stats:', err);
+        setError('Failed to load stats');
+      } finally {
+        if (!signal.aborted) setLoading(false);
+      }
+    }
+
     fetchStats();
     return () => controller.abort();
-  }, [fetchStats]);
+  }, [showCoupon]);
 
   return (
     <div className="space-y-6" aria-busy={loading}>

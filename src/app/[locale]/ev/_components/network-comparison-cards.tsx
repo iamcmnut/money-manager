@@ -28,7 +28,7 @@ export function NetworkComparisonCards({ brandComparison, loading, error }: Netw
 
   if (error) {
     return (
-      <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+      <div role="alert" className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
         {error}
       </div>
     );

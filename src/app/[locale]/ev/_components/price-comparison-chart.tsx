@@ -72,7 +72,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
 
   if (error) {
     return (
-      <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
+      <div role="alert" className="rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive">
         {error}
       </div>
     );
@@ -188,7 +188,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                   </div>
                 </div>
 
-                {/* Price + session count + chevron */}
+                {/* Price + coupon badge + session count + chevron */}
                 <div className="flex shrink-0 items-center gap-2">
                   <div className="text-right">
                     <span className="text-sm font-semibold tabular-nums">
@@ -198,6 +198,16 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                       {formatNumber(brand.sessions)} {t('sessions')}
                     </p>
                   </div>
+                  {showCoupon && brand.brandSlug && couponNetworkSlugs.includes(brand.brandSlug) && (
+                    <Link
+                      href={`/ev/coupon/${brand.brandSlug}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-[10px] font-medium text-primary transition-colors hover:bg-primary/20"
+                    >
+                      <Tag className="h-3 w-3" />
+                      {t('coupon')}
+                    </Link>
+                  )}
                   <ChevronDown
                     className={`h-4 w-4 text-muted-foreground/50 transition-transform duration-200 motion-reduce:transition-none ${
                       isExpanded ? 'rotate-180' : ''
@@ -265,9 +275,9 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                           <a
                             href={`tel:${brand.brandPhone.replace(/\s/g, '')}`}
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
+                            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-muted px-3 py-2 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
                           >
-                            <Phone className="h-3 w-3" />
+                            <Phone className="h-3.5 w-3.5" />
                             {brand.brandPhone}
                           </a>
                         )}
@@ -277,7 +287,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
+                            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-muted px-3 py-2 text-xs transition-colors hover:bg-primary/10 hover:text-primary"
                           >
                             <ExternalLink className="h-3 w-3" />
                             {t('website')}

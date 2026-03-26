@@ -72,7 +72,7 @@ export function CouponList({ coupons, brandColor }: CouponListProps) {
         return (
           <div
             key={coupon.id}
-            className="rounded-xl border bg-background/50 p-5 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
+            className="rounded-xl border bg-background/50 p-5 transition-all hover:bg-background/80 hover:shadow-md"
           >
             {/* Code + Copy */}
             <div className="flex items-center justify-between gap-3">

@@ -155,7 +155,7 @@ export function AdminChargingRecords() {
       {records.map((record) => (
         <div
           key={record.id}
-          className="rounded-xl border bg-background/50 p-4 backdrop-blur-sm transition-all hover:bg-background/80 hover:shadow-md"
+          className="rounded-xl border bg-background/50 p-4 transition-all hover:bg-background/80 hover:shadow-md"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-3">
