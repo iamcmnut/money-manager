@@ -122,6 +122,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <link rel="alternate" hrefLang="en" href={`${baseUrl}/en`} />
         <link rel="alternate" hrefLang="th" href={`${baseUrl}/th`} />
         <link rel="alternate" hrefLang="x-default" href={`${baseUrl}/en`} />
+        <script defer src="https://cloud.umami.is/script.js" data-website-id="51823652-77d5-4a54-a7f7-715a79c5626a" />
       </head>
       <body className={`${plexSans.variable} ${plexSansThai.variable} ${plexMono.variable} antialiased`}>
         <SessionProvider>
