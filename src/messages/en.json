@@ -276,6 +276,8 @@
       "remove": "Remove",
       "removing": "Removing..."
     },
+    "export": "Export CSV",
+    "exporting": "Exporting...",
     "chargingRecords": {
       "title": "Charging Records",
       "description": "View all user charging sessions",

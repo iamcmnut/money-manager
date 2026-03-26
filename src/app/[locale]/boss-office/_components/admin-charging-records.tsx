@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Zap, User } from 'lucide-react';
+import { Zap, User, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { formatNumber, formatBaht } from '@/lib/format';
 import { Pagination } from '@/components/ui/pagination';
 
@@ -40,6 +41,7 @@ export function AdminChargingRecords() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [exporting, setExporting] = useState(false);
 
   const fetchRecords = useCallback(async (page = 1) => {
     try {
@@ -75,6 +77,53 @@ export function AdminChargingRecords() {
     });
   };
 
+  const exportRecords = async () => {
+    setExporting(true);
+    try {
+      const allRecords: RecordData[] = [];
+      let page = 1;
+      const batchLimit = 100;
+      let hasMore = true;
+
+      while (hasMore) {
+        const response = await fetch(`/api/admin/charging-records?page=${page}&limit=${batchLimit}`);
+        const data = (await response.json()) as RecordsResponse;
+        if (data.records) {
+          allRecords.push(...data.records);
+          hasMore = allRecords.length < (data.total ?? 0);
+          page++;
+        } else {
+          hasMore = false;
+        }
+      }
+
+      const headers = ['Date', 'User', 'Email', 'Network', 'kWh', 'Cost (THB)', 'Avg Price (THB/kWh)', 'Mileage (km)', 'Notes'];
+      const rows = allRecords.map((r) => [
+        r.chargingDatetime,
+        r.userName || '',
+        r.userEmail || '',
+        r.brandName || r.brandId,
+        r.chargedKwh,
+        r.costThb,
+        r.avgUnitPrice ?? '',
+        r.mileageKm ?? '',
+        r.notes || '',
+      ]);
+      const csv = [headers, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ev-charging-records-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to export records:', err);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) {
     return <div className="text-sm text-muted-foreground">{t('chargingRecords.loading')}</div>;
   }
@@ -92,6 +141,17 @@ export function AdminChargingRecords() {
 
   return (
     <div className="space-y-3">
+      <div className="flex justify-end">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={exportRecords}
+          disabled={exporting}
+        >
+          <Download className="mr-1 h-4 w-4" />
+          {exporting ? t('exporting') : t('export')}
+        </Button>
+      </div>
       {records.map((record) => (
         <div
           key={record.id}
