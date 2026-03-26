@@ -6,26 +6,29 @@ import * as XLSX from 'xlsx';
 
 interface ImportRow {
   brand?: string;
-  brandId?: string;
+  brandid?: string;
   network?: string;
   date?: string | number | Date;
   datetime?: string | number | Date;
-  chargingDatetime?: string | number | Date;
+  chargingdatetime?: string | number | Date;
   kwh?: number | string;
-  chargedKwh?: number | string;
+  chargedkwh?: number | string;
   energy?: number | string;
   cost?: number | string;
-  costThb?: number | string;
+  'cost(thb)'?: number | string;
+  costthb?: number | string;
   price?: number | string;
   power?: number | string;
-  chargingPowerKw?: number | string;
-  chargingPower?: number | string;
-  finishTime?: string | number | Date;
-  chargingFinishDatetime?: string | number | Date;
-  endTime?: string | number | Date;
+  chargingpowerkw?: number | string;
+  chargingpower?: number | string;
+  finishtime?: string | number | Date;
+  chargingfinishdatetime?: string | number | Date;
+  endtime?: string | number | Date;
   mileage?: number | string;
-  mileageKm?: number | string;
+  'mileage(km)'?: number | string;
+  mileagekm?: number | string;
   km?: number | string;
+  'avgprice(thb/kwh)'?: number | string;
   notes?: string;
   note?: string;
 }
@@ -86,8 +89,15 @@ export async function POST(request: Request) {
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
 
-    // Convert to JSON
-    const rows = XLSX.utils.sheet_to_json<ImportRow>(worksheet);
+    // Convert to JSON with normalized headers (lowercase, no spaces)
+    const rawRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet);
+    const rows: ImportRow[] = rawRows.map((raw) => {
+      const normalized: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(raw)) {
+        normalized[key.toLowerCase().replace(/\s+/g, '').trim()] = value;
+      }
+      return normalized as unknown as ImportRow;
+    });
 
     if (rows.length === 0) {
       return NextResponse.json({ error: 'No data found in file' }, { status: 400 });
@@ -124,7 +134,7 @@ export async function POST(request: Request) {
 
       try {
         // Find brand/network
-        const brandValue = row.brand || row.brandId || row.network || '';
+        const brandValue = row.brand || row.brandid || row.network || '';
         const brandId = networkMap.get(String(brandValue).toLowerCase());
 
         if (!brandId) {
@@ -133,7 +143,7 @@ export async function POST(request: Request) {
         }
 
         // Parse date
-        const dateValue = row.datetime || row.chargingDatetime || row.date;
+        const dateValue = row.datetime || row.chargingdatetime || row.date;
         let chargingDatetime: Date;
 
         if (dateValue instanceof Date) {
@@ -154,7 +164,7 @@ export async function POST(request: Request) {
         }
 
         // Parse kWh
-        const kwhValue = row.kwh || row.chargedKwh || row.energy;
+        const kwhValue = row.kwh || row.chargedkwh || row.energy;
         const chargedKwh = parseFloat(String(kwhValue));
 
         if (isNaN(chargedKwh) || chargedKwh <= 0) {
@@ -163,7 +173,7 @@ export async function POST(request: Request) {
         }
 
         // Parse cost
-        const costValue = row.cost || row.costThb || row.price;
+        const costValue = row.cost || row['cost(thb)'] || row.costthb || row.price;
         const costThb = parseFloat(String(costValue));
 
         if (isNaN(costThb) || costThb < 0) {
@@ -172,7 +182,7 @@ export async function POST(request: Request) {
         }
 
         // Parse mileage (optional)
-        const mileageValue = row.mileage || row.mileageKm || row.km;
+        const mileageValue = row.mileage || row['mileage(km)'] || row.mileagekm || row.km;
         let mileageKm: number | null = null;
         if (mileageValue !== undefined && mileageValue !== null && mileageValue !== '') {
           mileageKm = parseInt(String(mileageValue));
@@ -180,7 +190,7 @@ export async function POST(request: Request) {
         }
 
         // Parse charging power (optional)
-        const powerValue = row.power || row.chargingPowerKw || row.chargingPower;
+        const powerValue = row.power || row.chargingpowerkw || row.chargingpower;
         let chargingPowerKw: number | null = null;
         if (powerValue !== undefined && powerValue !== null && powerValue !== '') {
           chargingPowerKw = parseFloat(String(powerValue));
@@ -188,7 +198,7 @@ export async function POST(request: Request) {
         }
 
         // Parse charging finish time (optional)
-        const finishValue = row.finishTime || row.chargingFinishDatetime || row.endTime;
+        const finishValue = row.finishtime || row.chargingfinishdatetime || row.endtime;
         let chargingFinishDatetime: Date | null = null;
         if (finishValue !== undefined && finishValue !== null && finishValue !== '') {
           if (finishValue instanceof Date) {

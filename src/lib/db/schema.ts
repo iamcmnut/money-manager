@@ -63,9 +63,11 @@ export const chargingNetworks = sqliteTable('charging_networks', {
   website: text('website'),
   phone: text('phone'),
   brandColor: text('brand_color'),
-  referralCode: text('referral_code'),
-  referralCaptionEn: text('referral_caption_en'),
-  referralCaptionTh: text('referral_caption_th'),
+  couponOgImageEn: text('coupon_og_image_en'),
+  couponOgImageTh: text('coupon_og_image_th'),
+  referralCode: text('referral_code'), // @deprecated — use coupons table instead
+  referralCaptionEn: text('referral_caption_en'), // @deprecated — use coupons table instead
+  referralCaptionTh: text('referral_caption_th'), // @deprecated — use coupons table instead
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
@@ -91,6 +93,24 @@ export const chargingRecords = sqliteTable('charging_records', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
+// Coupons (multiple per network, with date-based validity)
+export const coupons = sqliteTable('coupons', {
+  id: text('id').primaryKey(),
+  networkId: text('network_id')
+    .notNull()
+    .references(() => chargingNetworks.id, { onDelete: 'cascade' }),
+  code: text('code').notNull(),
+  descriptionEn: text('description_en'),
+  descriptionTh: text('description_th'),
+  conditionEn: text('condition_en'),
+  conditionTh: text('condition_th'),
+  startDate: integer('start_date', { mode: 'timestamp' }).notNull(),
+  endDate: integer('end_date', { mode: 'timestamp' }).notNull(),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+});
+
 // Login attempts tracking for brute force protection
 export const loginAttempts = sqliteTable('login_attempts', {
   id: text('id').primaryKey(),
@@ -110,5 +130,7 @@ export type ChargingNetwork = typeof chargingNetworks.$inferSelect;
 export type NewChargingNetwork = typeof chargingNetworks.$inferInsert;
 export type ChargingRecord = typeof chargingRecords.$inferSelect;
 export type NewChargingRecord = typeof chargingRecords.$inferInsert;
+export type Coupon = typeof coupons.$inferSelect;
+export type NewCoupon = typeof coupons.$inferInsert;
 export type LoginAttempt = typeof loginAttempts.$inferSelect;
 export type NewLoginAttempt = typeof loginAttempts.$inferInsert;

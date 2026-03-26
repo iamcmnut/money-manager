@@ -89,6 +89,8 @@ describe('ChargingNetworkForm', () => {
       website: 'https://example.com',
       phone: '02-123-4567',
       brandColor: '#FF0000',
+      couponOgImageEn: null,
+      couponOgImageTh: null,
       referralCode: 'EXISTING-REF',
     };
 

@@ -46,10 +46,12 @@ export async function getFeatureFlag(flag: FeatureFlag): Promise<boolean> {
   const kv = getKV();
   if (kv) {
     const value = await kv.get(flag);
-    return parseBoolean(value, DEFAULT_FLAGS[flag]);
+    if (value !== null) {
+      return parseBoolean(value, DEFAULT_FLAGS[flag]);
+    }
   }
 
-  // Fallback to process.env (local development)
+  // Fallback to process.env (local development, or KV key not set)
   const envVar = FLAG_ENV_MAP[flag];
   const envValue = process.env[envVar];
   return parseBoolean(envValue, DEFAULT_FLAGS[flag]);

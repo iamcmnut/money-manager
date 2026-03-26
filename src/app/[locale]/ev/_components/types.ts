@@ -20,13 +20,11 @@ export interface StatsData {
 export interface BrandData {
   brandId: string;
   brandName: string | null;
+  brandSlug: string | null;
   brandColor: string | null;
   brandLogo: string | null;
   brandPhone: string | null;
   brandWebsite: string | null;
-  brandReferralCode: string | null;
-  brandReferralCaptionEn: string | null;
-  brandReferralCaptionTh: string | null;
   sessions: number;
   totalKwh: number;
   totalCost: number;

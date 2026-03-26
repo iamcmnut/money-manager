@@ -22,7 +22,8 @@ A modular personal finance web application built with Next.js, TypeScript, and d
 - **EV Calculator** - Calculate and compare electric vehicle charging costs
 - **Living Cost Tracker** - Track and manage monthly living expenses
 - **Savings Planner** - Plan and track savings goals
-- **Admin Panel** - Manage users and view feature flags
+- **Admin Panel** - Manage users, charging networks, charging records, and feature flags
+- **Data Import/Export** - Import charging networks from Excel/CSV, export networks and records to CSV
 - **Authentication** - Google OAuth and Email/Password sign-in
 - **Cookie Consent** - GDPR-compliant cookie consent banner
 - **Dark Mode** - System-aware theme switching
@@ -58,6 +59,7 @@ FEATURE_MODULE_LIVING_COST=true
 FEATURE_MODULE_SAVINGS=true
 FEATURE_EV_DAILY_PRICE_CHART=true
 FEATURE_EV_COUPON=true
+FEATURE_AUTH_REGISTRATION=true
 EOF
 
 # 4. Setup database (migrations + seed admin account)
@@ -117,7 +119,7 @@ FEATURE_EV_COUPON=true
 
 ### Feature Flags
 
-Feature flags control which modules and features are available. In production, flags are stored in Cloudflare Workers KV and can be toggled at runtime via the admin panel (`/boss-office`). In local development, flags fall back to environment variables in `.env.local`.
+Feature flags control which modules and features are available. In production, flags are stored in Cloudflare Workers KV and can be toggled at runtime via the admin panel (`/boss-office`). In local development, or when a flag is not set in KV, the system falls back to environment variables in `.env.local`, then to built-in defaults.
 
 #### Module Flags
 
@@ -147,6 +149,7 @@ Control sub-features within the EV Calculator module.
 |---------------------|---------|-------------|
 | `FEATURE_EV_DAILY_PRICE_CHART` | `true` | Show daily price trend sparkline chart inside expanded network cards |
 | `FEATURE_EV_COUPON` | `true` | Show referral/coupon codes inside expanded network cards |
+| `FEATURE_EV_HISTORY` | `true` | Show charging history page and navigation button |
 
 ### Troubleshooting
 
@@ -221,8 +224,10 @@ manager.money/
 │   │   │   │   └── error/
 │   │   │   └── boss-office/       # Admin panel (protected)
 │   │   ├── api/                   # API routes (no locale)
-│   │   │   ├── auth/
-│   │   │   └── admin/
+│   │   │   ├── auth/              # Auth, registration, status
+│   │   │   ├── ev/                # Stats, records, networks, import
+│   │   │   ├── admin/             # Users, flags, networks, records
+│   │   │   └── upload/            # R2 file upload
 │   │   ├── layout.tsx             # Root layout
 │   │   └── sitemap.ts             # Multi-locale sitemap
 │   ├── components/
@@ -283,6 +288,9 @@ The application uses Cloudflare D1 with Drizzle ORM.
 | `accounts` | OAuth provider accounts |
 | `sessions` | User sessions |
 | `verification_tokens` | Email verification tokens |
+| `charging_networks` | EV charging network brands (name, logo, website, phone, brandColor, referralCode) |
+| `charging_records` | User charging sessions (userId, brandId, kWh, cost, mileage, timestamps) |
+| `login_attempts` | Brute force protection (identifier, type, success, IP) |
 
 ### Migrations
 
@@ -349,9 +357,10 @@ npm run db:seed:prod
 ```
 
 **Features:**
-- View registered users
-- Change user roles (user/admin)
-- View feature flag status (read-only, configured via env vars)
+- View and manage registered users (role toggling, password reset)
+- Toggle feature flags at runtime (production: KV, local: env fallback)
+- Manage EV charging networks (add, edit, delete, import from Excel/CSV, export to CSV)
+- View all user charging records (with export to CSV)
 - View current session info
 
 ## Testing

@@ -51,6 +51,8 @@ interface UpdateNetworkBody {
   website?: string | null;
   phone?: string | null;
   brandColor?: string | null;
+  couponOgImageEn?: string | null;
+  couponOgImageTh?: string | null;
   referralCode?: string | null;
   referralCaptionEn?: string | null;
   referralCaptionTh?: string | null;
@@ -84,6 +86,8 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     if (body.website !== undefined) updateData.website = body.website;
     if (body.phone !== undefined) updateData.phone = body.phone;
     if (body.brandColor !== undefined) updateData.brandColor = body.brandColor;
+    if (body.couponOgImageEn !== undefined) updateData.couponOgImageEn = body.couponOgImageEn;
+    if (body.couponOgImageTh !== undefined) updateData.couponOgImageTh = body.couponOgImageTh;
     if (body.referralCode !== undefined) updateData.referralCode = body.referralCode;
     if (body.referralCaptionEn !== undefined) updateData.referralCaptionEn = body.referralCaptionEn;
     if (body.referralCaptionTh !== undefined) updateData.referralCaptionTh = body.referralCaptionTh;

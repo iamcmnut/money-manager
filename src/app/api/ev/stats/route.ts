@@ -58,13 +58,11 @@ export async function GET() {
         .select({
           brandId: chargingRecords.brandId,
           brandName: chargingNetworks.name,
+          brandSlug: chargingNetworks.slug,
           brandColor: chargingNetworks.brandColor,
           brandLogo: chargingNetworks.logo,
           brandPhone: chargingNetworks.phone,
           brandWebsite: chargingNetworks.website,
-          brandReferralCode: chargingNetworks.referralCode,
-          brandReferralCaptionEn: chargingNetworks.referralCaptionEn,
-          brandReferralCaptionTh: chargingNetworks.referralCaptionTh,
           sessions: sql<number>`COUNT(*)`,
           totalKwh: sql<number>`SUM(${chargingRecords.chargedKwh})`,
           totalCost: sql<number>`SUM(${chargingRecords.costThb})`,
@@ -75,13 +73,11 @@ export async function GET() {
         .groupBy(
           chargingRecords.brandId,
           chargingNetworks.name,
+          chargingNetworks.slug,
           chargingNetworks.brandColor,
           chargingNetworks.logo,
           chargingNetworks.phone,
-          chargingNetworks.website,
-          chargingNetworks.referralCode,
-          chargingNetworks.referralCaptionEn,
-          chargingNetworks.referralCaptionTh
+          chargingNetworks.website
         ),
 
       // Latest mileage
@@ -113,13 +109,11 @@ export async function GET() {
     const brandData = brandStats.map((brand) => ({
       brandId: brand.brandId,
       brandName: brand.brandName,
+      brandSlug: brand.brandSlug,
       brandColor: brand.brandColor,
       brandLogo: brand.brandLogo,
       brandPhone: brand.brandPhone,
       brandWebsite: brand.brandWebsite,
-      brandReferralCode: brand.brandReferralCode,
-      brandReferralCaptionEn: brand.brandReferralCaptionEn,
-      brandReferralCaptionTh: brand.brandReferralCaptionTh,
       sessions: brand.sessions,
       totalKwh: brand.totalKwh,
       totalCost: brand.totalCost,

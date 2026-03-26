@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { X, Upload, Trash2, Loader2 } from 'lucide-react';
+import { X, Upload, Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
 
 interface NetworkData {
   id: string;
@@ -13,6 +13,8 @@ interface NetworkData {
   website: string | null;
   phone: string | null;
   brandColor: string | null;
+  couponOgImageEn: string | null;
+  couponOgImageTh: string | null;
   referralCode: string | null;
 }
 
@@ -35,6 +37,8 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
   const t = useTranslations('admin');
   const isEditing = !!network;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const ogImageEnInputRef = useRef<HTMLInputElement>(null);
+  const ogImageThInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     name: network?.name || '',
@@ -47,6 +51,12 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
   const [logoPreview, setLogoPreview] = useState<string | null>(network?.logo || null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoRemoved, setLogoRemoved] = useState(false);
+  const [ogImageEnPreview, setOgImageEnPreview] = useState<string | null>(network?.couponOgImageEn || null);
+  const [ogImageEnFile, setOgImageEnFile] = useState<File | null>(null);
+  const [ogImageEnRemoved, setOgImageEnRemoved] = useState(false);
+  const [ogImageThPreview, setOgImageThPreview] = useState<string | null>(network?.couponOgImageTh || null);
+  const [ogImageThFile, setOgImageThFile] = useState<File | null>(null);
+  const [ogImageThRemoved, setOgImageThRemoved] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,10 +84,44 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
     }
   };
 
-  const uploadLogo = async (file: File): Promise<string | null> => {
+  const handleOgImageEnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setOgImageEnFile(file);
+    setOgImageEnRemoved(false);
+    const reader = new FileReader();
+    reader.onload = () => setOgImageEnPreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveOgImageEn = () => {
+    setOgImageEnPreview(null);
+    setOgImageEnFile(null);
+    setOgImageEnRemoved(true);
+    if (ogImageEnInputRef.current) ogImageEnInputRef.current.value = '';
+  };
+
+  const handleOgImageThChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setOgImageThFile(file);
+    setOgImageThRemoved(false);
+    const reader = new FileReader();
+    reader.onload = () => setOgImageThPreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveOgImageTh = () => {
+    setOgImageThPreview(null);
+    setOgImageThFile(null);
+    setOgImageThRemoved(true);
+    if (ogImageThInputRef.current) ogImageThInputRef.current.value = '';
+  };
+
+  const uploadImage = async (file: File, folder: string): Promise<string | null> => {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('folder', 'logos');
+    formData.append('folder', folder);
 
     const response = await fetch('/api/upload', {
       method: 'POST',
@@ -112,12 +156,28 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
     };
 
     try {
-      if (logoFile) {
+      const filesToUpload = [logoFile, ogImageEnFile, ogImageThFile].filter(Boolean);
+      if (filesToUpload.length > 0) {
         setUploading(true);
-        payload.logo = await uploadLogo(logoFile);
+        if (logoFile) {
+          payload.logo = await uploadImage(logoFile, 'logos');
+        }
+        if (ogImageEnFile) {
+          payload.couponOgImageEn = await uploadImage(ogImageEnFile, 'og-images');
+        }
+        if (ogImageThFile) {
+          payload.couponOgImageTh = await uploadImage(ogImageThFile, 'og-images');
+        }
         setUploading(false);
-      } else if (logoRemoved) {
+      }
+      if (!logoFile && logoRemoved) {
         payload.logo = null;
+      }
+      if (!ogImageEnFile && ogImageEnRemoved) {
+        payload.couponOgImageEn = null;
+      }
+      if (!ogImageThFile && ogImageThRemoved) {
+        payload.couponOgImageTh = null;
       }
 
       const response = await fetch(url, {
@@ -211,6 +271,63 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
                   {t('evNetworks.removeLogo')}
                 </Button>
               )}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">{t('evNetworks.couponOgImage')}</label>
+          <p className="text-xs text-muted-foreground mb-3">{t('evNetworks.couponOgImageHint')}</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-2">{t('evNetworks.couponOgImageEn')}</label>
+              <div className="flex items-start gap-3">
+                {ogImageEnPreview ? (
+                  <img src={ogImageEnPreview} alt="OG EN preview" className="h-[63px] w-[120px] rounded-lg object-cover border" />
+                ) : (
+                  <div className="flex h-[63px] w-[120px] items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground">
+                    <ImageIcon className="h-5 w-5" />
+                  </div>
+                )}
+                <div className="flex flex-col gap-1">
+                  <input ref={ogImageEnInputRef} type="file" accept="image/*" onChange={handleOgImageEnChange} className="hidden" />
+                  <Button type="button" variant="outline" size="sm" onClick={() => ogImageEnInputRef.current?.click()}>
+                    <Upload className="mr-1 h-3 w-3" />
+                    {ogImageEnPreview ? t('evNetworks.changeLogo') : t('evNetworks.uploadLogo')}
+                  </Button>
+                  {ogImageEnPreview && (
+                    <Button type="button" variant="outline" size="sm" onClick={handleRemoveOgImageEn} className="text-red-500 hover:text-red-600 hover:bg-red-50">
+                      <Trash2 className="mr-1 h-3 w-3" />
+                      {t('evNetworks.removeLogo')}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-2">{t('evNetworks.couponOgImageTh')}</label>
+              <div className="flex items-start gap-3">
+                {ogImageThPreview ? (
+                  <img src={ogImageThPreview} alt="OG TH preview" className="h-[63px] w-[120px] rounded-lg object-cover border" />
+                ) : (
+                  <div className="flex h-[63px] w-[120px] items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground">
+                    <ImageIcon className="h-5 w-5" />
+                  </div>
+                )}
+                <div className="flex flex-col gap-1">
+                  <input ref={ogImageThInputRef} type="file" accept="image/*" onChange={handleOgImageThChange} className="hidden" />
+                  <Button type="button" variant="outline" size="sm" onClick={() => ogImageThInputRef.current?.click()}>
+                    <Upload className="mr-1 h-3 w-3" />
+                    {ogImageThPreview ? t('evNetworks.changeLogo') : t('evNetworks.uploadLogo')}
+                  </Button>
+                  {ogImageThPreview && (
+                    <Button type="button" variant="outline" size="sm" onClick={handleRemoveOgImageTh} className="text-red-500 hover:text-red-600 hover:bg-red-50">
+                      <Trash2 className="mr-1 h-3 w-3" />
+                      {t('evNetworks.removeLogo')}
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
