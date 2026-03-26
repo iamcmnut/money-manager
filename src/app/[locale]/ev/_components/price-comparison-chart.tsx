@@ -97,8 +97,6 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
     (a, b) => a.avgPricePerKwh - b.avgPricePerKwh
   );
 
-  const maxPrice = Math.max(...sorted.map((b) => b.avgPricePerKwh));
-
   const handleToggle = (brandId: string) => {
     setExpandedId((prev) => (prev === brandId ? null : brandId));
   };
@@ -110,9 +108,6 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
 
       <div className="space-y-3">
         {sorted.map((brand, index) => {
-          const barPercent = maxPrice > 0
-            ? (brand.avgPricePerKwh / maxPrice) * 100
-            : 0;
           const isExpanded = expandedId === brand.brandId;
           const price = Math.round(brand.avgPricePerKwh * 100) / 100;
           const rank = index + 1;
@@ -166,29 +161,26 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                   </div>
                 )}
 
-                {/* Name + bar area */}
+                {/* Name + code badge */}
                 <div className="min-w-0 flex-1">
-                  <span className="mb-1.5 block truncate text-sm font-medium">
+                  <span className="block truncate text-sm font-medium">
                     {brand.brandName || brand.brandId}
                   </span>
 
-                  {/* Bar */}
-                  <div className="relative h-6 w-full overflow-hidden rounded-md bg-muted/50">
-                    <div
-                      className="h-full rounded-md origin-left transition-transform duration-700 motion-reduce:transition-none"
-                      style={{
-                        transform: mounted ? `scaleX(${Math.max(barPercent, 8) / 100})` : 'scaleX(0)',
-                        width: '100%',
-                        backgroundColor: brand.brandColor || 'hsl(var(--primary))',
-                        opacity: 0.75,
-                        transitionDelay: `${index * 60}ms`,
-                        transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-                      }}
-                    />
-                  </div>
+                  {/* Code badge */}
+                  {showCoupon && brand.brandSlug && couponNetworkSlugs.includes(brand.brandSlug) && (
+                    <Link
+                      href={`/ev/coupon/${brand.brandSlug}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="mt-1 inline-flex w-fit items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary transition-colors hover:bg-primary/20"
+                    >
+                      <Tag className="h-2.5 w-2.5" />
+                      {t('coupon')}
+                    </Link>
+                  )}
                 </div>
 
-                {/* Price + coupon badge + session count + chevron */}
+                {/* Price + session count + chevron */}
                 <div className="flex shrink-0 items-center gap-2">
                   <div className="text-right">
                     <span className="text-sm font-semibold tabular-nums">
@@ -198,16 +190,6 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                       {formatNumber(brand.sessions)} {t('sessions')}
                     </p>
                   </div>
-                  {showCoupon && brand.brandSlug && couponNetworkSlugs.includes(brand.brandSlug) && (
-                    <Link
-                      href={`/ev/coupon/${brand.brandSlug}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-[10px] font-medium text-primary transition-colors hover:bg-primary/20"
-                    >
-                      <Tag className="h-3 w-3" />
-                      {t('coupon')}
-                    </Link>
-                  )}
                   <ChevronDown
                     className={`h-4 w-4 text-muted-foreground/50 transition-transform duration-200 motion-reduce:transition-none ${
                       isExpanded ? 'rotate-180' : ''
