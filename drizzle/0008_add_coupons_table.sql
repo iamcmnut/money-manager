@@ -1,4 +1,4 @@
-CREATE TABLE `coupons` (
+CREATE TABLE IF NOT EXISTS `coupons` (
 	`id` text PRIMARY KEY NOT NULL,
 	`network_id` text NOT NULL REFERENCES `charging_networks`(`id`) ON DELETE CASCADE,
 	`code` text NOT NULL,

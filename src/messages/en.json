@@ -131,6 +131,10 @@
         "title": "My Charging History",
         "description": "Track and manage your EV charging sessions"
       },
+      "filter": {
+        "allTime": "All time",
+        "filterByMonth": "Filter by month"
+      },
       "networks": {
         "title": "Network Comparison",
         "failedToLoad": "Failed to load network data",
