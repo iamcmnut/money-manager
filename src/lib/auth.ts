@@ -30,6 +30,8 @@ declare module '@auth/core/jwt' {
 
 interface AuthConfigOptions {
   adapter?: Adapter;
+  googleClientId?: string;
+  googleClientSecret?: string;
   checkGoogleEnabled?: () => Promise<boolean>;
   checkCredentialsEnabled?: () => Promise<boolean>;
   getUserByEmail?: (email: string) => Promise<{
@@ -52,8 +54,8 @@ function createBaseConfig(options?: AuthConfigOptions): NextAuthConfig {
   // Google provider (always added, but sign-in can be blocked)
   providers.push(
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+      clientId: options?.googleClientId || process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: options?.googleClientSecret || process.env.GOOGLE_CLIENT_SECRET || '',
     })
   );
 

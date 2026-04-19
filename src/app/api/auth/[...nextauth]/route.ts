@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import { createAuthConfig, createDrizzleAdapter } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
 import { getFeatureFlag } from '@/lib/feature-flags';
+import { getCloudflareEnv } from '@/lib/cloudflare';
 import { users } from '@/lib/db/schema';
 import {
   checkRateLimit,
@@ -15,6 +16,7 @@ import {
 
 async function getAuthHandlers(request: NextRequest) {
   const db = await getDatabase();
+  const cfEnv = getCloudflareEnv() as Record<string, unknown> | null;
 
   console.log('[Auth] Database available:', !!db);
 
@@ -66,6 +68,8 @@ async function getAuthHandlers(request: NextRequest) {
 
   const config = createAuthConfig({
     adapter: db ? createDrizzleAdapter(db) : undefined,
+    googleClientId: (cfEnv?.GOOGLE_CLIENT_ID as string) || undefined,
+    googleClientSecret: (cfEnv?.GOOGLE_CLIENT_SECRET as string) || undefined,
     checkGoogleEnabled,
     checkCredentialsEnabled,
     getUserByEmail,
