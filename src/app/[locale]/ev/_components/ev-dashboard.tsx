@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { ChargingStats } from './charging-stats';
 import { PriceComparisonChart } from './price-comparison-chart';
+import { MonthFilter } from './month-filter';
 import type { EVStatsResponse } from './types';
 
 interface EVDashboardProps {
@@ -19,6 +20,12 @@ export function EVDashboard({ showDailyPriceChart, showCoupon }: EVDashboardProp
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [couponNetworkSlugs, setCouponNetworkSlugs] = useState<string[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
+
+  const availableMonths = useMemo(
+    () => data?.monthlyData?.map((m) => m.month) ?? [],
+    [data?.monthlyData]
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -28,8 +35,12 @@ export function EVDashboard({ showDailyPriceChart, showCoupon }: EVDashboardProp
       setLoading(true);
       setError(null);
       try {
+        const statsUrl = selectedMonth
+          ? `/api/ev/stats?month=${selectedMonth}`
+          : '/api/ev/stats';
+
         const [statsResponse, couponResponse] = await Promise.all([
-          fetch('/api/ev/stats', { signal }),
+          fetch(statsUrl, { signal }),
           showCoupon ? fetch('/api/ev/coupons/active-networks', { signal }) : Promise.resolve(null),
         ]);
 
@@ -58,10 +69,20 @@ export function EVDashboard({ showDailyPriceChart, showCoupon }: EVDashboardProp
 
     fetchStats();
     return () => controller.abort();
-  }, [showCoupon]);
+  }, [showCoupon, selectedMonth]);
 
   return (
     <div className="space-y-6" aria-busy={loading}>
+      {availableMonths.length > 0 && (
+        <div className="flex justify-end">
+          <MonthFilter
+            months={availableMonths}
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+          />
+        </div>
+      )}
+
       <PriceComparisonChart
         brandComparison={data?.brandComparison}
         loading={loading}

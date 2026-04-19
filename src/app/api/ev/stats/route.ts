@@ -1,13 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
 import { chargingRecords, chargingNetworks } from '@/lib/db/schema';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, gte, lt, sql } from 'drizzle-orm';
 import { getKV } from '@/lib/cloudflare';
 
 const STATS_CACHE_TTL = 60; // seconds
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -18,9 +18,13 @@ export async function GET() {
   }
 
   try {
+    // Parse month filter from query params (format: YYYY-MM)
+    const { searchParams } = request.nextUrl;
+    const month = searchParams.get('month');
+
     // Check KV cache first
     const kv = getKV();
-    const cacheKey = `cache:stats:${userId || 'public'}`;
+    const cacheKey = `cache:stats:${userId || 'public'}:${month || 'all'}`;
 
     if (kv) {
       const cached = await kv.get(cacheKey);
@@ -38,9 +42,27 @@ export async function GET() {
     // Run all queries in parallel
     // If logged in, scope to user's data; otherwise show all aggregated data
     const userFilter = userId ? eq(chargingRecords.userId, userId) : undefined;
-    const mileageFilter = userId
-      ? and(eq(chargingRecords.userId, userId), sql`${chargingRecords.mileageKm} IS NOT NULL`)
-      : sql`${chargingRecords.mileageKm} IS NOT NULL`;
+
+    // Build month date range filter
+    let monthFilter: ReturnType<typeof and> | undefined;
+    if (month && /^\d{4}-\d{2}$/.test(month)) {
+      const [yearStr, monthStr] = month.split('-');
+      const year = parseInt(yearStr, 10);
+      const monthIndex = parseInt(monthStr, 10) - 1;
+      const startDate = new Date(year, monthIndex, 1);
+      const endDate = new Date(year, monthIndex + 1, 1);
+      monthFilter = and(
+        gte(chargingRecords.chargingDatetime, startDate),
+        lt(chargingRecords.chargingDatetime, endDate)
+      );
+    }
+
+    // Combined filter for main queries (user + month)
+    const mainFilter = and(userFilter, monthFilter);
+    const mileageFilter = and(
+      mainFilter,
+      sql`${chargingRecords.mileageKm} IS NOT NULL`
+    );
 
     const [overallStats, brandStats, latestMileageResult, monthlyTrend] = await Promise.all([
       // Overall stats
@@ -51,7 +73,7 @@ export async function GET() {
           totalCost: sql<number>`COALESCE(SUM(${chargingRecords.costThb}), 0)`,
         })
         .from(chargingRecords)
-        .where(userFilter),
+        .where(mainFilter),
 
       // Stats per brand
       db
@@ -68,7 +90,7 @@ export async function GET() {
           totalCost: sql<number>`SUM(${chargingRecords.costThb})`,
         })
         .from(chargingRecords)
-        .where(userFilter)
+        .where(mainFilter)
         .leftJoin(chargingNetworks, eq(chargingRecords.brandId, chargingNetworks.id))
         .groupBy(
           chargingRecords.brandId,
@@ -88,7 +110,7 @@ export async function GET() {
         .orderBy(sql`${chargingRecords.chargingDatetime} DESC`)
         .limit(1),
 
-      // Monthly trend
+      // Monthly trend (always unfiltered by month so dropdown can show all available months)
       db
         .select({
           month: sql<string>`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`,
