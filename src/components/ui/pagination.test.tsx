@@ -99,7 +99,6 @@ describe('Pagination', () => {
   });
 
   it('clamps previous to 1 when on first page', async () => {
-    const user = userEvent.setup();
     const onPageChange = vi.fn();
     render(<Pagination currentPage={1} totalPages={5} onPageChange={onPageChange} />);
 

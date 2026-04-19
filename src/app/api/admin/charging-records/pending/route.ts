@@ -49,17 +49,21 @@ export async function GET(request: Request) {
         .from(chargingRecords)
         .leftJoin(users, eq(chargingRecords.userId, users.id))
         .leftJoin(chargingNetworks, eq(chargingRecords.brandId, chargingNetworks.id))
+        .where(eq(chargingRecords.approvalStatus, 'pending'))
         .orderBy(desc(chargingRecords.chargingDatetime))
         .limit(limit)
         .offset(offset),
-      db.select({ count: sql<number>`COUNT(*)` }).from(chargingRecords),
+      db
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(chargingRecords)
+        .where(eq(chargingRecords.approvalStatus, 'pending')),
     ]);
 
     const total = countResult[0].count;
 
     return NextResponse.json({ records, total, page, limit });
   } catch (error) {
-    console.error('Failed to fetch charging records:', error);
-    return NextResponse.json({ error: 'Failed to fetch charging records' }, { status: 500 });
+    console.error('Failed to fetch pending charging records:', error);
+    return NextResponse.json({ error: 'Failed to fetch pending charging records' }, { status: 500 });
   }
 }

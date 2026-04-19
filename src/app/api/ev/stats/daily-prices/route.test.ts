@@ -94,7 +94,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetDatabase.mockReturnValue(null);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       expect(response.status).toBe(503);
       expect(body.error).toBe('Database not available');
@@ -225,7 +225,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetDatabase.mockReturnValue(db);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       expect(body).toHaveProperty('dailyPrices');
       expect(body).toHaveProperty('networks');
@@ -239,7 +239,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetDatabase.mockReturnValue(db);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       // 3 unique dates in sampleRows
       expect(body.dailyPrices).toHaveLength(3);
@@ -269,7 +269,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetDatabase.mockReturnValue(db);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       expect(body.networks).toHaveLength(2);
       expect(body.networks).toContainEqual({ name: 'PEA Volta', color: '#00A651' });
@@ -282,7 +282,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetDatabase.mockReturnValue(db);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       expect(body.dailyPrices).toEqual([]);
       expect(body.networks).toEqual([]);
@@ -297,7 +297,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetDatabase.mockReturnValue(db);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       expect(body.dailyPrices[0]['unknown-brand']).toBe(7.0);
       expect(body.networks[0].name).toBe('unknown-brand');
@@ -312,7 +312,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetDatabase.mockReturnValue(db);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       expect(body.networks[0].color).toBe('#6B7280');
     });
@@ -326,7 +326,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetDatabase.mockReturnValue(db);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       expect(body.dailyPrices).toHaveLength(1);
       expect(body.networks).toHaveLength(1);
@@ -346,7 +346,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetDatabase.mockReturnValue(db);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       expect(body.dailyPrices).toHaveLength(1);
       expect(body.networks).toHaveLength(5);
@@ -364,7 +364,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetDatabase.mockReturnValue(db);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       expect(body.networks).toHaveLength(1);
       expect(body.dailyPrices).toHaveLength(3);
@@ -385,7 +385,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetKV.mockReturnValue(mockKV);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       expect(body).toEqual(cachedData);
       // DB should NOT have been queried
@@ -489,7 +489,7 @@ describe('GET /api/ev/stats/daily-prices', () => {
       mockGetDatabase.mockReturnValue(db);
 
       const response = await GET(createRequest());
-      const body = await response.json();
+      const body: any = await response.json();
 
       expect(response.status).toBe(500);
       expect(body.error).toBe('Failed to fetch daily prices');

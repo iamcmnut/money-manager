@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Shield, Users, Zap, FileText, Flag, Tag, Mail, UserCircle, BadgeCheck } from 'lucide-react';
+import { Shield, Users, Zap, FileText, Flag, Tag, Mail, UserCircle, BadgeCheck, ClipboardCheck } from 'lucide-react';
 import { FeatureFlagsPanel } from './feature-flags';
 import { UsersTable } from './users-table';
 import { ChargingNetworksTable } from './charging-networks-table';
 import { AdminChargingRecords } from './admin-charging-records';
+import { PendingApprovals } from './pending-approvals';
 import { CouponsTable } from './coupons-table';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +24,7 @@ const tabs = [
   { id: 'users', icon: Users },
   { id: 'evNetworks', icon: Zap },
   { id: 'evRecords', icon: FileText },
+  { id: 'pendingApprovals', icon: ClipboardCheck },
 ] as const;
 
 type TabId = (typeof tabs)[number]['id'];
@@ -64,6 +66,7 @@ export function AdminTabs({ session }: { session: Session }) {
         {activeTab === 'users' && <UsersTab />}
         {activeTab === 'evNetworks' && <EVNetworksTab />}
         {activeTab === 'evRecords' && <EVRecordsTab />}
+        {activeTab === 'pendingApprovals' && <PendingApprovals />}
       </div>
     </div>
   );

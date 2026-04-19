@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
-import { chargingRecords, chargingNetworks } from '@/lib/db/schema';
+import { chargingRecords, chargingNetworks, users } from '@/lib/db/schema';
 import { desc, eq, sql } from 'drizzle-orm';
 
 export async function GET(request: Request) {
@@ -39,6 +39,7 @@ export async function GET(request: Request) {
           chargingFinishDatetime: chargingRecords.chargingFinishDatetime,
           mileageKm: chargingRecords.mileageKm,
           notes: chargingRecords.notes,
+          approvalStatus: chargingRecords.approvalStatus,
           createdAt: chargingRecords.createdAt,
         })
         .from(chargingRecords)
@@ -98,6 +99,17 @@ export async function POST(request: Request) {
 
     const avgUnitPrice = body.chargedKwh > 0 ? body.costThb / body.chargedKwh : null;
 
+    // Determine approval status based on user role or pre-approval
+    let approvalStatus: 'pending' | 'approved' = 'pending';
+    if (session.user.role === 'admin') {
+      approvalStatus = 'approved';
+    } else {
+      const userRecord = await db.select({ isPreApproved: users.isPreApproved }).from(users).where(eq(users.id, session.user.id)).limit(1);
+      if (userRecord[0]?.isPreApproved) {
+        approvalStatus = 'approved';
+      }
+    }
+
     const id = `rec-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const now = new Date();
 
@@ -115,6 +127,7 @@ export async function POST(request: Request) {
         chargingFinishDatetime: body.chargingFinishDatetime ? new Date(body.chargingFinishDatetime) : null,
         mileageKm: body.mileageKm ?? null,
         notes: body.notes || null,
+        approvalStatus,
         createdAt: now,
         updatedAt: now,
       })

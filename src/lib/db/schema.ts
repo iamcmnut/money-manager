@@ -8,6 +8,7 @@ export const users = sqliteTable('users', {
   name: text('name'),
   image: text('image'),
   role: text('role', { enum: ['user', 'admin'] }).default('user').notNull(),
+  isPreApproved: integer('is_pre_approved', { mode: 'boolean' }).default(false).notNull(),
   emailVerified: integer('email_verified', { mode: 'timestamp' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
@@ -89,6 +90,7 @@ export const chargingRecords = sqliteTable('charging_records', {
   chargingFinishDatetime: integer('charging_finish_datetime', { mode: 'timestamp' }),
   mileageKm: real('mileage_km'),
   notes: text('notes'),
+  approvalStatus: text('approval_status', { enum: ['pending', 'approved', 'rejected'] }).default('approved').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });

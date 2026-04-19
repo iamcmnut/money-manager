@@ -34,6 +34,7 @@ export async function GET(request: Request, { params }: RouteParams) {
         name: users.name,
         image: users.image,
         role: users.role,
+        isPreApproved: users.isPreApproved,
         createdAt: users.createdAt,
       })
       .from(users)
@@ -55,6 +56,7 @@ interface UpdateUserBody {
   role?: 'user' | 'admin';
   name?: string;
   password?: string;
+  isPreApproved?: boolean;
 }
 
 export async function PATCH(request: Request, { params }: RouteParams) {
@@ -87,6 +89,10 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       updateData.name = body.name;
     }
 
+    if (body.isPreApproved !== undefined) {
+      updateData.isPreApproved = body.isPreApproved;
+    }
+
     if (body.password !== undefined) {
       const { validatePassword, hashPassword } = await import('@/lib/password');
       const validation = validatePassword(body.password);
@@ -111,6 +117,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         email: users.email,
         name: users.name,
         role: users.role,
+        isPreApproved: users.isPreApproved,
       });
 
     if (updated.length === 0) {

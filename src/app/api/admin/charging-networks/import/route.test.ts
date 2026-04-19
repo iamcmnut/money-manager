@@ -139,7 +139,7 @@ describe('POST /api/admin/charging-networks/import', () => {
 
       const response = await POST(createRequest(null));
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('No file provided');
     });
 
@@ -149,7 +149,7 @@ describe('POST /api/admin/charging-networks/import', () => {
 
       const response = await POST(createFailingFormDataRequest());
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Failed to parse form data');
     });
 
@@ -160,7 +160,7 @@ describe('POST /api/admin/charging-networks/import', () => {
       const file = createMockFile([]);
       const response = await POST(createRequest(file));
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('No data found in file');
     });
   });
@@ -178,7 +178,7 @@ describe('POST /api/admin/charging-networks/import', () => {
 
       const response = await POST(createRequest(file));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.success).toBe(true);
       expect(body.imported).toBe(2);
       expect(body.total).toBe(2);
@@ -276,7 +276,7 @@ describe('POST /api/admin/charging-networks/import', () => {
 
       const response = await POST(createRequest(file));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.imported).toBe(1);
       expect(body.total).toBe(2);
       expect(body.errors).toBeDefined();
@@ -300,7 +300,7 @@ describe('POST /api/admin/charging-networks/import', () => {
 
       const response = await POST(createRequest(file));
       expect(response.status).toBe(500);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Failed to insert any networks');
       expect(body.errors).toBeDefined();
       expect(body.errors[0].error).toContain('Duplicate slug');
@@ -329,7 +329,7 @@ describe('POST /api/admin/charging-networks/import', () => {
 
       const response = await POST(createRequest(file));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.success).toBe(true);
       expect(body.imported).toBe(1);
       expect(body.total).toBe(2);

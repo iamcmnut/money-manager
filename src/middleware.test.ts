@@ -45,17 +45,17 @@ describe('Middleware', () => {
     });
 
     it('should skip _next routes', async () => {
-      const response = await middleware(createRequest('/_next/static/chunk.js'));
+      await middleware(createRequest('/_next/static/chunk.js'));
       expect(mockIntlMiddleware).not.toHaveBeenCalled();
     });
 
     it('should skip favicon', async () => {
-      const response = await middleware(createRequest('/favicon.ico'));
+      await middleware(createRequest('/favicon.ico'));
       expect(mockIntlMiddleware).not.toHaveBeenCalled();
     });
 
     it('should skip files with extensions', async () => {
-      const response = await middleware(createRequest('/images/logo.png'));
+      await middleware(createRequest('/images/logo.png'));
       expect(mockIntlMiddleware).not.toHaveBeenCalled();
     });
   });

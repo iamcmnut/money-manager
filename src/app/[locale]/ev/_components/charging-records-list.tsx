@@ -22,6 +22,7 @@ interface RecordData {
   chargingPowerKw: number | null;
   chargingFinishDatetime: string | null;
   mileageKm: number | null;
+  approvalStatus?: string;
   notes: string | null;
   createdAt: string | null;
 }
@@ -321,6 +322,16 @@ export function ChargingRecordsList({ onRecordChange }: ChargingRecordsListProps
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="font-medium">{record.brandName || record.brandId}</p>
+                      {record.approvalStatus === 'pending' && (
+                        <span className="inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+                          {t('status.pending')}
+                        </span>
+                      )}
+                      {record.approvalStatus === 'rejected' && (
+                        <span className="inline-flex items-center rounded-full border border-destructive/20 bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
+                          {t('status.rejected')}
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {formatDate(record.chargingDatetime)}

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { UserMenu } from './user-menu';
@@ -28,6 +28,7 @@ function mockSession(overrides: {
   mockedUseSession.mockReturnValue({
     data: {
       user: {
+        id: 'user-1',
         name: overrides.name ?? 'John Doe',
         email: overrides.email ?? 'john@example.com',
         image: overrides.image ?? null,

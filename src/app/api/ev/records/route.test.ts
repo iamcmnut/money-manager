@@ -25,6 +25,7 @@ vi.mock('@/lib/db/schema', () => ({
     chargingFinishDatetime: 'charging_finish_datetime',
     mileageKm: 'mileage_km',
     notes: 'notes',
+    approvalStatus: 'approval_status',
     createdAt: 'created_at',
   },
   chargingNetworks: {
@@ -32,6 +33,10 @@ vi.mock('@/lib/db/schema', () => ({
     name: 'name',
     brandColor: 'brand_color',
     logo: 'logo',
+  },
+  users: {
+    id: 'id',
+    isPreApproved: 'is_pre_approved',
   },
 }));
 
@@ -61,19 +66,31 @@ function createMockDb(records: Record<string, unknown>[] = [], total = 0) {
   const mockOrderBy = vi.fn().mockReturnValue({
     limit: mockLimit,
   });
-  const mockWhere = vi.fn().mockReturnValue({
+  const mockRecordsWhere = vi.fn().mockReturnValue({
     orderBy: mockOrderBy,
   });
 
-  return {
-    select: vi.fn().mockReturnValue({
-      from: vi.fn().mockReturnValue({
-        leftJoin: vi.fn().mockReturnValue({
-          where: mockWhere,
-        }),
-        where: vi.fn().mockResolvedValue([{ count: total }]),
-      }),
+  // Each select().from() result supports both GET patterns and user query pattern
+  // GET records: select().from().leftJoin().where().orderBy().limit().offset()
+  // GET count: select().from().where() -> resolves to [{ count: total }]
+  // POST user query: select().from(users).where().limit() -> resolves to [{ isPreApproved: false }]
+  const createWhereResult = () => {
+    const result = Promise.resolve([{ count: total }]);
+    (result as any).limit = vi.fn().mockResolvedValue([{ isPreApproved: false }]);
+    return result;
+  };
+
+  const createFromChain = () => ({
+    leftJoin: vi.fn().mockReturnValue({
+      where: mockRecordsWhere,
     }),
+    where: vi.fn().mockImplementation(() => createWhereResult()),
+  });
+
+  return {
+    select: vi.fn().mockImplementation(() => ({
+      from: vi.fn().mockImplementation(() => createFromChain()),
+    })),
     insert: vi.fn().mockReturnValue({
       values: vi.fn().mockReturnValue({
         returning: vi.fn().mockResolvedValue([{ id: 'rec-123' }]),
@@ -98,7 +115,7 @@ describe('GET /api/ev/records', () => {
       mockAuth.mockResolvedValue(null);
       const response = await GET(createRequest());
       expect(response.status).toBe(401);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Unauthorized');
     });
 
@@ -121,7 +138,7 @@ describe('GET /api/ev/records', () => {
       mockGetDatabase.mockResolvedValue(null);
       const response = await GET(createRequest());
       expect(response.status).toBe(503);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Database not available');
     });
   });
@@ -134,7 +151,7 @@ describe('GET /api/ev/records', () => {
 
       const response = await GET(createRequest());
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.page).toBe(1);
       expect(body.limit).toBe(10);
     });
@@ -146,7 +163,7 @@ describe('GET /api/ev/records', () => {
 
       const response = await GET(createRequest('http://localhost:3000/api/ev/records?page=2&limit=5'));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.page).toBe(2);
       expect(body.limit).toBe(5);
     });
@@ -158,7 +175,7 @@ describe('GET /api/ev/records', () => {
 
       const response = await GET(createRequest('http://localhost:3000/api/ev/records?limit=999'));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.limit).toBe(100);
     });
 
@@ -169,7 +186,7 @@ describe('GET /api/ev/records', () => {
 
       const response = await GET(createRequest('http://localhost:3000/api/ev/records?limit=0'));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.limit).toBe(1);
     });
 
@@ -180,7 +197,7 @@ describe('GET /api/ev/records', () => {
 
       const response = await GET(createRequest('http://localhost:3000/api/ev/records?page=-1'));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.page).toBe(1);
     });
 
@@ -191,7 +208,7 @@ describe('GET /api/ev/records', () => {
 
       const response = await GET(createRequest('http://localhost:3000/api/ev/records?page=abc'));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       // parseInt('abc') = NaN, Math.max(1, NaN) = NaN
       expect(body.page).toBeNull();
     });
@@ -203,7 +220,7 @@ describe('GET /api/ev/records', () => {
 
       const response = await GET(createRequest('http://localhost:3000/api/ev/records?limit=abc'));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       // parseInt('abc') = NaN, Math.min(100, Math.max(1, NaN)) = NaN
       expect(body.limit).toBeNull();
     });
@@ -220,7 +237,7 @@ describe('GET /api/ev/records', () => {
 
       const response = await GET(createRequest());
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.records).toEqual(records);
       expect(body.total).toBe(1);
     });
@@ -232,7 +249,7 @@ describe('GET /api/ev/records', () => {
 
       const response = await GET(createRequest());
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.records).toEqual([]);
       expect(body.total).toBe(0);
     });
@@ -261,7 +278,7 @@ describe('GET /api/ev/records', () => {
 
       const response = await GET(createRequest());
       expect(response.status).toBe(500);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Failed to fetch charging records');
     });
   });
@@ -336,7 +353,7 @@ describe('POST /api/ev/records', () => {
         })
       );
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toContain('required');
     });
 
@@ -454,7 +471,7 @@ describe('POST /api/ev/records', () => {
         })
       );
       expect(response.status).toBe(201);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.record).toBeDefined();
     });
 
@@ -528,6 +545,13 @@ describe('POST /api/ev/records', () => {
     it('should return 400 for foreign key constraint violation', async () => {
       mockAuth.mockResolvedValue(validSession);
       const db = {
+        select: vi.fn().mockReturnValue({
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([{ isPreApproved: false }]),
+            }),
+          }),
+        }),
         insert: vi.fn().mockReturnValue({
           values: vi.fn().mockReturnValue({
             returning: vi.fn().mockRejectedValue(new Error('FOREIGN KEY constraint failed')),
@@ -544,13 +568,20 @@ describe('POST /api/ev/records', () => {
         })
       );
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Invalid network selected');
     });
 
     it('should return 500 for unexpected database errors', async () => {
       mockAuth.mockResolvedValue(validSession);
       const db = {
+        select: vi.fn().mockReturnValue({
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([{ isPreApproved: false }]),
+            }),
+          }),
+        }),
         insert: vi.fn().mockReturnValue({
           values: vi.fn().mockReturnValue({
             returning: vi.fn().mockRejectedValue(new Error('Unexpected error')),

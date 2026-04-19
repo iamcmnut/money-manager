@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ChargingStats } from './charging-stats';
 import { PriceComparisonChart } from './price-comparison-chart';
 import { MonthFilter } from './month-filter';

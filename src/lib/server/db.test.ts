@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
 vi.mock('drizzle-orm/d1', () => ({
   drizzle: vi.fn().mockReturnValue({ mock: 'database' }),

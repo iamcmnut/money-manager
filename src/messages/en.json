@@ -125,6 +125,11 @@
         },
         "pagination": {
           "showing": "{from}-{to} of {total}"
+        },
+        "status": {
+          "pending": "Pending Review",
+          "approved": "Approved",
+          "rejected": "Rejected"
         }
       },
       "historyPage": {
@@ -242,7 +247,8 @@
       "overview": "Overview",
       "users": "Users",
       "evNetworks": "EV Networks",
-      "evRecords": "EV Records"
+      "evRecords": "EV Records",
+      "pendingApprovals": "Pending Approvals"
     },
     "evNetworks": {
       "title": "EV Charging Networks",
@@ -315,6 +321,24 @@
     },
     "export": "Export CSV",
     "exporting": "Exporting...",
+    "pendingApprovals": {
+      "title": "Pending Approvals",
+      "description": "Review and approve user-submitted charging records",
+      "loading": "Loading pending records...",
+      "failedToLoad": "Failed to load pending records",
+      "noRecords": "No pending records",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approving": "Approving...",
+      "rejecting": "Rejecting...",
+      "failedToApprove": "Failed to update record status"
+    },
+    "approvalStatus": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "preApproved": "Pre-approved",
     "chargingRecords": {
       "title": "Charging Records",
       "description": "View all user charging sessions",

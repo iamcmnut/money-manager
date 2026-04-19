@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
 import { chargingRecords, chargingNetworks } from '@/lib/db/schema';
 import { and, eq, gte, lt, sql } from 'drizzle-orm';
@@ -8,9 +7,6 @@ import { getKV } from '@/lib/cloudflare';
 const STATS_CACHE_TTL = 60; // seconds
 
 export async function GET(request: NextRequest) {
-  const session = await auth();
-  const userId = session?.user?.id;
-
   const db = getDatabase();
 
   if (!db) {
@@ -24,24 +20,22 @@ export async function GET(request: NextRequest) {
 
     // Check KV cache first
     const kv = getKV();
-    const cacheKey = `cache:stats:${userId || 'public'}:${month || 'all'}`;
+    const cacheKey = `cache:stats:all:${month || 'all'}`;
 
     if (kv) {
       const cached = await kv.get(cacheKey);
       if (cached) {
         return NextResponse.json(JSON.parse(cached), {
           headers: {
-            'Cache-Control': userId
-              ? 'private, max-age=60, stale-while-revalidate=300'
-              : 'public, s-maxage=60, stale-while-revalidate=300',
+            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
           },
         });
       }
     }
 
     // Run all queries in parallel
-    // If logged in, scope to user's data; otherwise show all aggregated data
-    const userFilter = userId ? eq(chargingRecords.userId, userId) : undefined;
+    // Always filter to approved records only (public aggregation)
+    const approvedFilter = eq(chargingRecords.approvalStatus, 'approved');
 
     // Build month date range filter
     let monthFilter: ReturnType<typeof and> | undefined;
@@ -57,10 +51,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Combined filter for main queries (user + month)
-    const mainFilter = and(userFilter, monthFilter);
+    // Combined filter for main queries (approved + month)
+    const mainFilter = and(approvedFilter, monthFilter);
     const mileageFilter = and(
-      mainFilter,
+      approvedFilter,
       sql`${chargingRecords.mileageKm} IS NOT NULL`
     );
 
@@ -119,7 +113,7 @@ export async function GET(request: NextRequest) {
           sessions: sql<number>`COUNT(*)`,
         })
         .from(chargingRecords)
-        .where(userFilter)
+        .where(approvedFilter)
         .groupBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`)
         .orderBy(sql`strftime('%Y-%m', datetime(${chargingRecords.chargingDatetime}, 'unixepoch'))`),
     ]);
@@ -166,7 +160,7 @@ export async function GET(request: NextRequest) {
       : null;
 
     const latestMileageKm = latestMileageResult[0]?.mileageKm ?? 0;
-    let totalDistanceKm = latestMileageKm;
+    const totalDistanceKm = latestMileageKm;
     let avgCostPerKm = 0;
 
     if (latestMileageKm > 0) {
@@ -210,9 +204,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(responseData, {
       headers: {
-        'Cache-Control': userId
-          ? 'private, max-age=60, stale-while-revalidate=300'
-          : 'public, s-maxage=60, stale-while-revalidate=300',
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
       },
     });
   } catch (error) {

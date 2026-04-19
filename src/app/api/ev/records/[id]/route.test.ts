@@ -25,12 +25,17 @@ vi.mock('@/lib/db/schema', () => ({
     chargingFinishDatetime: 'charging_finish_datetime',
     mileageKm: 'mileage_km',
     notes: 'notes',
+    approvalStatus: 'approval_status',
     createdAt: 'created_at',
   },
   chargingNetworks: {
     id: 'id',
     name: 'name',
     brandColor: 'brand_color',
+  },
+  users: {
+    id: 'id',
+    isPreApproved: 'is_pre_approved',
   },
 }));
 
@@ -55,10 +60,6 @@ const validSession = {
   user: { id: 'user-1', email: 'test@example.com', role: 'user' },
 };
 
-const otherUserSession = {
-  user: { id: 'user-2', email: 'other@example.com', role: 'user' },
-};
-
 function createMockDbForGet(records: Record<string, unknown>[] = []) {
   return {
     select: vi.fn().mockReturnValue({
@@ -74,14 +75,28 @@ function createMockDbForGet(records: Record<string, unknown>[] = []) {
 }
 
 function createMockDbForUpdate(existing: Record<string, unknown>[] = [], updated: Record<string, unknown>[] = []) {
-  return {
-    select: vi.fn().mockReturnValue({
-      from: vi.fn().mockReturnValue({
-        where: vi.fn().mockReturnValue({
-          limit: vi.fn().mockResolvedValue(existing),
-        }),
+  // Chain for existing record query (avgUnitPrice recalculation)
+  const existingRecordChain = {
+    from: vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        limit: vi.fn().mockResolvedValue(existing),
       }),
     }),
+  };
+
+  // Chain for user isPreApproved query
+  const userSelectChain = {
+    from: vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        limit: vi.fn().mockResolvedValue([{ isPreApproved: false }]),
+      }),
+    }),
+  };
+
+  return {
+    select: vi.fn()
+      .mockReturnValueOnce(existingRecordChain)
+      .mockReturnValue(userSelectChain),
     update: vi.fn().mockReturnValue({
       set: vi.fn().mockReturnValue({
         where: vi.fn().mockReturnValue({
@@ -114,7 +129,7 @@ describe('GET /api/ev/records/[id]', () => {
       mockAuth.mockResolvedValue(null);
       const response = await GET(createRequest(), createParams());
       expect(response.status).toBe(401);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Unauthorized');
     });
 
@@ -143,7 +158,7 @@ describe('GET /api/ev/records/[id]', () => {
 
       const response = await GET(createRequest(), createParams());
       expect(response.status).toBe(404);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Record not found');
     });
   });
@@ -157,7 +172,7 @@ describe('GET /api/ev/records/[id]', () => {
 
       const response = await GET(createRequest(), createParams());
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.record).toEqual(record);
     });
   });
@@ -207,8 +222,9 @@ describe('PATCH /api/ev/records/[id]', () => {
   });
 
   describe('Input validation', () => {
-    it('should return 400 when no valid fields provided', async () => {
-      mockAuth.mockResolvedValue(validSession);
+    it('should return 400 when no valid fields provided (admin user)', async () => {
+      // Admin users skip the isPreApproved check, so no approvalStatus is added
+      mockAuth.mockResolvedValue({ user: { id: 'user-1', email: 'test@example.com', role: 'admin' } });
       const db = createMockDbForUpdate();
       mockGetDatabase.mockResolvedValue(db);
 
@@ -221,12 +237,32 @@ describe('PATCH /api/ev/records/[id]', () => {
         createParams()
       );
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('No valid fields to update');
     });
 
-    it('should ignore unknown fields in the body', async () => {
+    it('should still update approvalStatus when no user fields provided (non-admin)', async () => {
       mockAuth.mockResolvedValue(validSession);
+      const updated = [{ id: 'rec-123', approvalStatus: 'pending' }];
+      const db = createMockDbForUpdate([], updated);
+      mockGetDatabase.mockResolvedValue(db);
+
+      const response = await PATCH(
+        createRequest('http://localhost:3000/api/ev/records/rec-123', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        }),
+        createParams()
+      );
+      // Non-admin, non-pre-approved user: approvalStatus is set to 'pending',
+      // so the update proceeds even with no user-provided fields
+      expect(response.status).toBe(200);
+    });
+
+    it('should ignore unknown fields in the body', async () => {
+      // Admin users skip the isPreApproved check, so only unknown fields remain
+      mockAuth.mockResolvedValue({ user: { id: 'user-1', email: 'test@example.com', role: 'admin' } });
       const db = createMockDbForUpdate([], []);
       mockGetDatabase.mockResolvedValue(db);
 
@@ -398,6 +434,13 @@ describe('PATCH /api/ev/records/[id]', () => {
     it('should return 400 for foreign key constraint violation', async () => {
       mockAuth.mockResolvedValue(validSession);
       const db = {
+        select: vi.fn().mockReturnValue({
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([{ isPreApproved: false }]),
+            }),
+          }),
+        }),
         update: vi.fn().mockReturnValue({
           set: vi.fn().mockReturnValue({
             where: vi.fn().mockReturnValue({
@@ -417,13 +460,20 @@ describe('PATCH /api/ev/records/[id]', () => {
         createParams()
       );
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Invalid network selected');
     });
 
     it('should return 500 for unexpected errors', async () => {
       mockAuth.mockResolvedValue(validSession);
       const db = {
+        select: vi.fn().mockReturnValue({
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([{ isPreApproved: false }]),
+            }),
+          }),
+        }),
         update: vi.fn().mockReturnValue({
           set: vi.fn().mockReturnValue({
             where: vi.fn().mockReturnValue({
@@ -520,7 +570,7 @@ describe('DELETE /api/ev/records/[id]', () => {
 
       const response = await DELETE(createRequest(), createParams());
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.success).toBe(true);
     });
   });
