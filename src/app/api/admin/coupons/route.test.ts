@@ -140,7 +140,7 @@ describe('GET /api/admin/coupons', () => {
 
       const response = await GET(createRequest());
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.page).toBe(1);
       expect(body.limit).toBe(20);
     });
@@ -152,7 +152,7 @@ describe('GET /api/admin/coupons', () => {
 
       const response = await GET(createRequest('http://localhost:3000/api/admin/coupons?page=2&limit=5'));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.page).toBe(2);
       expect(body.limit).toBe(5);
     });
@@ -164,7 +164,7 @@ describe('GET /api/admin/coupons', () => {
 
       const response = await GET(createRequest('http://localhost:3000/api/admin/coupons?limit=500'));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.limit).toBe(100);
     });
 
@@ -175,7 +175,7 @@ describe('GET /api/admin/coupons', () => {
 
       const response = await GET(createRequest('http://localhost:3000/api/admin/coupons?limit=0'));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.limit).toBe(1);
     });
 
@@ -186,7 +186,7 @@ describe('GET /api/admin/coupons', () => {
 
       const response = await GET(createRequest('http://localhost:3000/api/admin/coupons?page=-1'));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.page).toBe(1);
     });
   });
@@ -200,7 +200,7 @@ describe('GET /api/admin/coupons', () => {
 
       const response = await GET(createRequest('http://localhost:3000/api/admin/coupons?networkId=n1'));
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.coupons).toEqual(coupons);
       expect(body.total).toBe(1);
     });
@@ -218,7 +218,7 @@ describe('GET /api/admin/coupons', () => {
 
       const response = await GET(createRequest());
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.coupons).toEqual(coupons);
       expect(body.total).toBe(2);
     });
@@ -230,7 +230,7 @@ describe('GET /api/admin/coupons', () => {
 
       const response = await GET(createRequest());
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.coupons).toEqual([]);
       expect(body.total).toBe(0);
     });
@@ -259,7 +259,7 @@ describe('GET /api/admin/coupons', () => {
 
       const response = await GET(createRequest());
       expect(response.status).toBe(500);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Failed to fetch coupons');
     });
   });
@@ -324,7 +324,7 @@ describe('POST /api/admin/coupons', () => {
 
       const response = await POST(createPostRequest({ ...validBody, networkId: '' }));
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toContain('required');
     });
 
@@ -358,7 +358,7 @@ describe('POST /api/admin/coupons', () => {
 
       const response = await POST(createPostRequest({ ...validBody, startDate: 'not-a-date' }));
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toContain('Invalid date');
     });
 
@@ -368,7 +368,7 @@ describe('POST /api/admin/coupons', () => {
 
       const response = await POST(createPostRequest({ ...validBody, endDate: 'not-a-date' }));
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toContain('Invalid date');
     });
 
@@ -382,7 +382,7 @@ describe('POST /api/admin/coupons', () => {
         endDate: '2026-01-01T00:00:00Z',
       }));
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toContain('Start date must be before end date');
     });
 
@@ -407,7 +407,7 @@ describe('POST /api/admin/coupons', () => {
 
       const response = await POST(createPostRequest(validBody));
       expect(response.status).toBe(201);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.coupon).toBeDefined();
       expect(body.coupon.id).toBe('coupon-123');
     });
@@ -528,7 +528,7 @@ describe('POST /api/admin/coupons', () => {
 
       const response = await POST(createPostRequest(validBody));
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Invalid network selected');
     });
 
@@ -545,7 +545,7 @@ describe('POST /api/admin/coupons', () => {
 
       const response = await POST(createPostRequest(validBody));
       expect(response.status).toBe(500);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Failed to create coupon');
     });
   });

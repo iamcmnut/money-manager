@@ -3,6 +3,7 @@ import Google from 'next-auth/providers/google';
 import Credentials from 'next-auth/providers/credentials';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import type { Adapter } from 'next-auth/adapters';
+import { users, accounts, sessions, verificationTokens } from './db/schema';
 import { verifyPassword } from './password';
 
 declare module 'next-auth' {
@@ -178,7 +179,15 @@ export function createAuthConfig(options?: AuthConfigOptions): NextAuthConfig {
  * Create Drizzle adapter for D1
  */
 export function createDrizzleAdapter(db: Parameters<typeof DrizzleAdapter>[0]): Adapter {
-  return DrizzleAdapter(db) as Adapter;
+  // Schema tables use snake_case column names, but the adapter types expect camelCase.
+  // The adapter handles the mapping correctly at runtime via Drizzle's column definitions.
+  return DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+    sessionsTable: sessions,
+    verificationTokensTable: verificationTokens,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any) as Adapter;
 }
 
 // Default export using JWT strategy (no feature flag check - for middleware/static usage)

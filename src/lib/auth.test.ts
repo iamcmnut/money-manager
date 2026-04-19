@@ -37,7 +37,6 @@ vi.mock('./password', () => ({
 import { createAuthConfig, createDrizzleAdapter, handlers, signIn, signOut, auth } from './auth';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { verifyPassword } from './password';
-import Credentials from 'next-auth/providers/credentials';
 
 describe('auth', () => {
   beforeEach(() => {
@@ -90,7 +89,12 @@ describe('auth', () => {
     it('should call DrizzleAdapter with the provided db', () => {
       const mockDb = {} as any;
       const result = createDrizzleAdapter(mockDb);
-      expect(DrizzleAdapter).toHaveBeenCalledWith(mockDb);
+      expect(DrizzleAdapter).toHaveBeenCalledWith(mockDb, expect.objectContaining({
+        usersTable: expect.anything(),
+        accountsTable: expect.anything(),
+        sessionsTable: expect.anything(),
+        verificationTokensTable: expect.anything(),
+      }));
       expect(result).toEqual({ adapter: 'mock' });
     });
   });

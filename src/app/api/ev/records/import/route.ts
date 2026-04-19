@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
-import { chargingRecords, chargingNetworks } from '@/lib/db/schema';
+import { chargingRecords, chargingNetworks, users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 import * as XLSX from 'xlsx';
 
 interface ImportRow {
@@ -125,6 +126,17 @@ export async function POST(request: Request) {
       networkMap.set(n.id.toLowerCase(), n.id);
     });
 
+    // Determine approval status based on user role or pre-approval
+    let approvalStatus: 'pending' | 'approved' = 'pending';
+    if (session.user.role === 'admin') {
+      approvalStatus = 'approved';
+    } else {
+      const userRecord = await db.select({ isPreApproved: users.isPreApproved }).from(users).where(eq(users.id, session.user.id)).limit(1);
+      if (userRecord[0]?.isPreApproved) {
+        approvalStatus = 'approved';
+      }
+    }
+
     const importedRecords: typeof chargingRecords.$inferInsert[] = [];
     const errors: { row: number; error: string }[] = [];
 
@@ -231,10 +243,11 @@ export async function POST(request: Request) {
           chargingFinishDatetime,
           mileageKm,
           notes: notes ? String(notes) : null,
+          approvalStatus,
           createdAt: now,
           updatedAt: now,
         });
-      } catch (err) {
+      } catch {
         errors.push({ row: rowNum, error: 'Processing error' });
       }
     }
@@ -249,7 +262,7 @@ export async function POST(request: Request) {
       try {
         await db.insert(chargingRecords).values(batch);
         insertedCount += batch.length;
-      } catch (e) {
+      } catch {
         // If batch fails, fall back to one-by-one for this batch
         for (let i = 0; i < batch.length; i++) {
           try {

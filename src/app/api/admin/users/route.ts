@@ -35,6 +35,7 @@ export async function GET(request: Request) {
           name: users.name,
           image: users.image,
           role: users.role,
+          isPreApproved: users.isPreApproved,
           createdAt: users.createdAt,
         })
         .from(users)

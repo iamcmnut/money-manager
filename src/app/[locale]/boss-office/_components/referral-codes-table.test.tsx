@@ -154,9 +154,6 @@ describe('ReferralCodesTable', () => {
     });
 
     // Click first edit button
-    const editButtons = screen.getAllByRole('button').filter(
-      (btn) => btn.querySelector('.lucide-pencil') || btn.innerHTML.includes('pencil')
-    );
     // Use a more reliable selector
     const allButtons = screen.getAllByRole('button');
     // Find the edit button (the one with Pencil icon, not Plus or Trash)

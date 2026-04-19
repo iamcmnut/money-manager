@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, KeyRound, X, Check } from 'lucide-react';
+import { User, KeyRound, X, Check, ShieldCheck } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
 
 const ITEMS_PER_PAGE = 10;
@@ -15,6 +15,7 @@ interface UserData {
   name: string | null;
   image: string | null;
   role: 'user' | 'admin';
+  isPreApproved: boolean;
   createdAt: string | null;
 }
 
@@ -149,6 +150,30 @@ export function UsersTable() {
     fetchUsers();
   }, [fetchUsers]);
 
+  const togglePreApproved = async (userId: string, currentValue: boolean) => {
+    setUpdatingId(userId);
+
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPreApproved: !currentValue }),
+      });
+
+      const data = (await response.json()) as UpdateResponse;
+
+      if (response.ok && data.user) {
+        setUsers((prev) =>
+          prev.map((u) => (u.id === userId ? { ...u, isPreApproved: !currentValue } : u))
+        );
+      }
+    } catch (err) {
+      console.error('Failed to update user:', err);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const toggleRole = async (userId: string, currentRole: 'user' | 'admin') => {
     setUpdatingId(userId);
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
@@ -215,6 +240,16 @@ export function UsersTable() {
                 title={t('resetPassword.title')}
               >
                 <KeyRound className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={user.isPreApproved ? 'default' : 'outline'}
+                size="sm"
+                disabled={updatingId === user.id}
+                onClick={() => togglePreApproved(user.id, user.isPreApproved)}
+                className={user.isPreApproved ? 'bg-module-ev text-white hover:bg-module-ev/90' : ''}
+                title={t('preApproved')}
+              >
+                <ShieldCheck className="h-4 w-4" />
               </Button>
               <Button
                 variant={user.role === 'admin' ? 'default' : 'outline'}

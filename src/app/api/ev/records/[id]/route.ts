@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
-import { chargingRecords, chargingNetworks } from '@/lib/db/schema';
+import { chargingRecords, chargingNetworks, users } from '@/lib/db/schema';
 import { eq, and } from 'drizzle-orm';
 
 interface RouteParams {
@@ -37,6 +37,7 @@ export async function GET(request: Request, { params }: RouteParams) {
         chargingFinishDatetime: chargingRecords.chargingFinishDatetime,
         mileageKm: chargingRecords.mileageKm,
         notes: chargingRecords.notes,
+        approvalStatus: chargingRecords.approvalStatus,
         createdAt: chargingRecords.createdAt,
       })
       .from(chargingRecords)
@@ -115,6 +116,16 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       }
 
       updateData.avgUnitPrice = finalKwh > 0 ? finalCost / finalKwh : null;
+    }
+
+    // Reset approval status on edit (unless admin or pre-approved)
+    if (session.user.role === 'admin') {
+      // Admin edits stay approved
+    } else {
+      const userRecord = await db.select({ isPreApproved: users.isPreApproved }).from(users).where(eq(users.id, session.user.id)).limit(1);
+      if (!userRecord[0]?.isPreApproved) {
+        updateData.approvalStatus = 'pending';
+      }
     }
 
     if (Object.keys(updateData).length === 0) {

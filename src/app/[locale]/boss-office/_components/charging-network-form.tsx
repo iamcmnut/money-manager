@@ -230,6 +230,7 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
           <label className="block text-sm font-medium mb-2">{t('evNetworks.logo')}</label>
           <div className="flex items-center gap-4">
             {logoPreview ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={logoPreview}
                 alt="Logo preview"
@@ -283,6 +284,7 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
               <label className="block text-xs font-medium text-muted-foreground mb-2">{t('evNetworks.couponOgImageEn')}</label>
               <div className="flex items-start gap-3">
                 {ogImageEnPreview ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img src={ogImageEnPreview} alt="OG EN preview" className="h-[63px] w-[120px] rounded-lg object-cover border" />
                 ) : (
                   <div className="flex h-[63px] w-[120px] items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground">
@@ -308,6 +310,7 @@ export function ChargingNetworkForm({ network, onSuccess, onCancel }: ChargingNe
               <label className="block text-xs font-medium text-muted-foreground mb-2">{t('evNetworks.couponOgImageTh')}</label>
               <div className="flex items-start gap-3">
                 {ogImageThPreview ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img src={ogImageThPreview} alt="OG TH preview" className="h-[63px] w-[120px] rounded-lg object-cover border" />
                 ) : (
                   <div className="flex h-[63px] w-[120px] items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground">

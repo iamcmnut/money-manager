@@ -36,7 +36,7 @@ vi.mock('../_components/charging-records-list', () => ({
 
 // Need to mock FeatureGate as an async server component
 vi.mock('@/components/feature-gate', () => ({
-  FeatureGate: ({ flag, children }: { flag: string; children: React.ReactNode }) => {
+  FeatureGate: ({ children }: { flag: string; children: React.ReactNode }) => {
     // Simple sync mock: always render children (feature flag tests are separate)
     return <>{children}</>;
   },

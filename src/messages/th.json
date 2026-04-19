@@ -125,6 +125,11 @@
         },
         "pagination": {
           "showing": "{from}-{to} จาก {total}"
+        },
+        "status": {
+          "pending": "รอการตรวจสอบ",
+          "approved": "อนุมัติแล้ว",
+          "rejected": "ปฏิเสธแล้ว"
         }
       },
       "historyPage": {
@@ -242,7 +247,8 @@
       "overview": "ภาพรวม",
       "users": "ผู้ใช้",
       "evNetworks": "เครือข่าย EV",
-      "evRecords": "รายการชาร์จ"
+      "evRecords": "รายการชาร์จ",
+      "pendingApprovals": "รอการอนุมัติ"
     },
     "evNetworks": {
       "title": "เครือข่ายชาร์จ EV",
@@ -315,6 +321,24 @@
     },
     "export": "ส่งออก CSV",
     "exporting": "กำลังส่งออก...",
+    "pendingApprovals": {
+      "title": "รอการอนุมัติ",
+      "description": "ตรวจสอบและอนุมัติรายการชาร์จที่ผู้ใช้ส่งเข้ามา",
+      "loading": "กำลังโหลดรายการที่รอ...",
+      "failedToLoad": "ไม่สามารถโหลดรายการที่รอได้",
+      "noRecords": "ไม่มีรายการที่รอ",
+      "approve": "อนุมัติ",
+      "reject": "ปฏิเสธ",
+      "approving": "กำลังอนุมัติ...",
+      "rejecting": "กำลังปฏิเสธ...",
+      "failedToApprove": "ไม่สามารถอัปเดตสถานะรายการได้"
+    },
+    "approvalStatus": {
+      "pending": "รอดำเนินการ",
+      "approved": "อนุมัติแล้ว",
+      "rejected": "ปฏิเสธแล้ว"
+    },
+    "preApproved": "อนุมัติล่วงหน้า",
     "chargingRecords": {
       "title": "รายการชาร์จ",
       "description": "ดูรายการชาร์จของผู้ใช้ทั้งหมด",

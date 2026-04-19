@@ -22,6 +22,7 @@ interface RecordData {
   costThb: number;
   avgUnitPrice: number | null;
   mileageKm: number | null;
+  approvalStatus: string;
   notes: string | null;
   createdAt: string | null;
 }
@@ -32,6 +33,22 @@ interface RecordsResponse {
   page?: number;
   limit?: number;
   error?: string;
+}
+
+function ApprovalBadge({ status }: { status: string }) {
+  const t = useTranslations('admin.approvalStatus');
+
+  const styles: Record<string, string> = {
+    approved: 'bg-success/10 text-success border-success/20',
+    pending: 'bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400',
+    rejected: 'bg-destructive/10 text-destructive border-destructive/20',
+  };
+
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${styles[status] || styles.pending}`}>
+      {t(status as 'pending' | 'approved' | 'rejected')}
+    </span>
+  );
 }
 
 export function AdminChargingRecords() {
@@ -168,6 +185,7 @@ export function AdminChargingRecords() {
               <div>
                 <div className="flex items-center gap-2">
                   <p className="font-medium">{record.brandName || record.brandId}</p>
+                  <ApprovalBadge status={record.approvalStatus} />
                   <span className="text-xs text-muted-foreground">
                     {formatDate(record.chargingDatetime)}
                   </span>

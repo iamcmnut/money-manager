@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Trophy, TrendingUp, Zap, Wallet, ChevronDown, Phone, ExternalLink, Tag } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { formatNumber, formatBaht } from '@/lib/format';
@@ -27,7 +27,6 @@ const rankStyles = [
 
 export function PriceComparisonChart({ brandComparison, loading, error, showDailyPriceChart = true, showCoupon = true, couponNetworkSlugs = [] }: PriceComparisonChartProps) {
   const t = useTranslations('modules.ev.chart');
-  const locale = useLocale();
   const [mounted, setMounted] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);

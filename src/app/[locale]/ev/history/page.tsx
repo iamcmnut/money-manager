@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
-import { Car, History } from 'lucide-react';
+import { History } from 'lucide-react';
 import { auth } from '@/lib/auth';
 import { FeatureGate } from '@/components/feature-gate';
 import { ChargingRecordsList } from '../_components/charging-records-list';

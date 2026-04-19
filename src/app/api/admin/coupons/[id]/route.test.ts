@@ -112,7 +112,7 @@ describe('PATCH /api/admin/coupons/[id]', () => {
 
       const response = await PATCH(createPatchRequest({ startDate: 'not-a-date' }), createParams());
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toContain('Invalid start date');
     });
 
@@ -124,7 +124,7 @@ describe('PATCH /api/admin/coupons/[id]', () => {
 
       const response = await PATCH(createPatchRequest({ endDate: 'not-a-date' }), createParams());
       expect(response.status).toBe(400);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toContain('Invalid end date');
     });
   });
@@ -146,7 +146,7 @@ describe('PATCH /api/admin/coupons/[id]', () => {
 
       const response = await PATCH(createPatchRequest({ code: 'UPDATED' }), createParams());
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.coupon).toEqual(updatedCoupon);
     });
 
@@ -165,7 +165,7 @@ describe('PATCH /api/admin/coupons/[id]', () => {
 
       const response = await PATCH(createPatchRequest({ code: 'UPDATED' }), createParams());
       expect(response.status).toBe(404);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Coupon not found');
     });
 
@@ -291,7 +291,7 @@ describe('PATCH /api/admin/coupons/[id]', () => {
 
       const response = await PATCH(createPatchRequest({ code: 'UPDATED' }), createParams());
       expect(response.status).toBe(500);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Failed to update coupon');
     });
   });
@@ -348,7 +348,7 @@ describe('DELETE /api/admin/coupons/[id]', () => {
 
       const response = await DELETE(createRequest(), createParams());
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.success).toBe(true);
     });
 
@@ -365,7 +365,7 @@ describe('DELETE /api/admin/coupons/[id]', () => {
 
       const response = await DELETE(createRequest(), createParams());
       expect(response.status).toBe(404);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Coupon not found');
     });
   });
@@ -419,7 +419,7 @@ describe('DELETE /api/admin/coupons/[id]', () => {
 
       const response = await DELETE(createRequest(), createParams());
       expect(response.status).toBe(500);
-      const body = await response.json();
+      const body: any = await response.json();
       expect(body.error).toBe('Failed to delete coupon');
     });
   });
