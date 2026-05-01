@@ -10,6 +10,10 @@ const DEFAULT_FLAGS = {
   ev_daily_price_chart: true,
   ev_coupon: true,
   ev_history: true,
+  crowd_data: false,
+  ev_ocr: false,
+  public_profile: true,
+  legal_consent_gate: true,
 } as const satisfies Record<string, boolean>;
 
 export type FeatureFlag = keyof typeof DEFAULT_FLAGS;
@@ -27,6 +31,10 @@ const FLAG_ENV_MAP: Record<FeatureFlag, string> = {
   ev_daily_price_chart: 'FEATURE_EV_DAILY_PRICE_CHART',
   ev_coupon: 'FEATURE_EV_COUPON',
   ev_history: 'FEATURE_EV_HISTORY',
+  crowd_data: 'FEATURE_CROWD_DATA',
+  ev_ocr: 'FEATURE_EV_OCR',
+  public_profile: 'FEATURE_PUBLIC_PROFILE',
+  legal_consent_gate: 'FEATURE_LEGAL_CONSENT_GATE',
 };
 
 function parseBoolean(value: string | null | undefined, defaultValue: boolean): boolean {

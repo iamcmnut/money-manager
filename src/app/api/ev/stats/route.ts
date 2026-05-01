@@ -34,8 +34,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Run all queries in parallel
-    // Always filter to approved records only (public aggregation)
-    const approvedFilter = eq(chargingRecords.approvalStatus, 'approved');
+    // Public aggregation: only records the user has explicitly shared AND that admins have approved.
+    const approvedFilter = and(
+      eq(chargingRecords.approvalStatus, 'approved'),
+      eq(chargingRecords.isShared, true),
+    );
 
     // Build month date range filter
     let monthFilter: ReturnType<typeof and> | undefined;

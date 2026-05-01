@@ -11,6 +11,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { PhotoUpload } from '@/components/photo-upload';
 import { formatNumber } from '@/lib/format';
 
 interface NetworkData {
@@ -28,6 +29,14 @@ interface ErrorResponse {
   error?: string;
 }
 
+interface UserCarOption {
+  id: string;
+  brandName: string | null;
+  modelName: string | null;
+  nickname: string | null;
+  isDefault: boolean;
+}
+
 interface RecordData {
   id: string;
   brandId: string;
@@ -38,6 +47,9 @@ interface RecordData {
   chargingFinishDatetime: string | null;
   mileageKm: number | null;
   notes: string | null;
+  userCarId?: string | null;
+  isShared?: boolean;
+  photoKey?: string | null;
 }
 
 interface ChargingRecordFormProps {
@@ -52,8 +64,11 @@ export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: Ch
   const isEditing = !!record;
 
   const [networks, setNetworks] = useState<NetworkData[]>([]);
+  const [cars, setCars] = useState<UserCarOption[]>([]);
+  const [defaultVisibility, setDefaultVisibility] = useState<'public' | 'private'>('private');
   const [formData, setFormData] = useState({
     brandId: record?.brandId || '',
+    userCarId: record?.userCarId ?? '',
     chargingDatetime: record?.chargingDatetime
       ? new Date(record.chargingDatetime).toISOString().slice(0, 16)
       : new Date().toISOString().slice(0, 16),
@@ -65,15 +80,20 @@ export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: Ch
       : '',
     mileageKm: record?.mileageKm?.toString() || '',
     notes: record?.notes || '',
+    isShared: record?.isShared ?? null,
+    photoKey: record?.photoKey ?? null,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const isShared = formData.isShared ?? defaultVisibility === 'public';
 
   // Reset form when record changes (opening for a different record or new)
   useEffect(() => {
     if (open) {
       setFormData({
         brandId: record?.brandId || '',
+        userCarId: record?.userCarId ?? '',
         chargingDatetime: record?.chargingDatetime
           ? new Date(record.chargingDatetime).toISOString().slice(0, 16)
           : new Date().toISOString().slice(0, 16),
@@ -85,9 +105,35 @@ export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: Ch
           : '',
         mileageKm: record?.mileageKm?.toString() || '',
         notes: record?.notes || '',
+        isShared: record?.isShared ?? null,
+        photoKey: record?.photoKey ?? null,
       });
       setError(null);
     }
+  }, [open, record]);
+
+  // Fetch user cars + default visibility once when dialog opens
+  useEffect(() => {
+    if (!open) return;
+    void (async () => {
+      try {
+        const [carsRes, profileRes] = await Promise.all([
+          fetch('/api/me/cars').then((r) => r.json() as Promise<{ cars: UserCarOption[] }>),
+          fetch('/api/me/profile').then(
+            (r) => r.json() as Promise<{ profile: { defaultRecordVisibility: 'public' | 'private' } }>,
+          ),
+        ]);
+        setCars(carsRes.cars);
+        setDefaultVisibility(profileRes.profile.defaultRecordVisibility);
+        if (!record && !formData.userCarId) {
+          const defaultCar = carsRes.cars.find((c) => c.isDefault) ?? carsRes.cars[0];
+          if (defaultCar) setFormData((prev) => ({ ...prev, userCarId: defaultCar.id }));
+        }
+      } catch (err) {
+        console.error('Failed to fetch user data:', err);
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, record]);
 
   useEffect(() => {
@@ -124,6 +170,7 @@ export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: Ch
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           brandId: formData.brandId,
+          userCarId: formData.userCarId || undefined,
           chargingDatetime: formData.chargingDatetime,
           chargedKwh: parseFloat(formData.chargedKwh),
           costThb: parseFloat(formData.costThb),
@@ -131,6 +178,8 @@ export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: Ch
           chargingFinishDatetime: formData.chargingFinishDatetime || null,
           mileageKm: formData.mileageKm ? parseInt(formData.mileageKm) : null,
           notes: formData.notes || null,
+          isShared,
+          photoKey: formData.photoKey,
         }),
       });
 
@@ -279,6 +328,56 @@ export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: Ch
                 rows={2}
                 placeholder={t('notesPlaceholder')}
               />
+            </div>
+
+            {cars.length > 1 && (
+              <div className="sm:col-span-2">
+                <label className="block text-sm font-medium mb-1">Car</label>
+                <select
+                  value={formData.userCarId}
+                  onChange={(e) => setFormData({ ...formData, userCarId: e.target.value })}
+                  className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                >
+                  {cars.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.brandName ?? ''} {c.modelName ?? ''}
+                      {c.nickname ? ` · ${c.nickname}` : ''}
+                      {c.isDefault ? ' (default)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium mb-1">Slip photo (optional)</label>
+              <PhotoUpload
+                value={formData.photoKey}
+                onChange={(key) => setFormData({ ...formData, photoKey: key })}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Adding a slip photo is +5 EXP when shared records are approved.
+              </p>
+            </div>
+
+            <div className="sm:col-span-2 rounded-lg border border-border p-3">
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  className="mt-0.5"
+                  checked={isShared}
+                  onChange={(e) => setFormData({ ...formData, isShared: e.target.checked })}
+                />
+                <span className="text-sm">
+                  <span className="font-medium">Share to public stats</span>
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    (default: {defaultVisibility})
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    Public records contribute anonymized averages to /ev once an admin approves them, and earn EXP.
+                  </span>
+                </span>
+              </label>
             </div>
           </div>
 

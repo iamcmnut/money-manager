@@ -4,6 +4,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { History } from 'lucide-react';
 import { auth } from '@/lib/auth';
 import { FeatureGate } from '@/components/feature-gate';
+import { ConsentGate } from '@/components/consent-gate';
 import { ChargingRecordsList } from '../_components/charging-records-list';
 
 type Props = {
@@ -22,7 +23,9 @@ export default async function EVHistoryPage({ params }: Props) {
 
   return (
     <FeatureGate flag="ev_history">
-      <EVHistoryContent />
+      <ConsentGate locale={locale}>
+        <EVHistoryContent />
+      </ConsentGate>
     </FeatureGate>
   );
 }

@@ -1,21 +1,19 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/server';
-import { chargingRecords, chargingNetworks, users } from '@/lib/db/schema';
-import { desc, eq, sql } from 'drizzle-orm';
+import { chargingRecords, chargingNetworks, userCars, users } from '@/lib/db/schema';
+import { and, desc, eq, sql } from 'drizzle-orm';
+import { getFeatureFlag } from '@/lib/feature-flags';
+import { ConsentRequiredError, requireCurrentConsents } from '@/lib/consent';
+import { computeApprovalStatus, shouldAwardExpOnSubmit } from '@/lib/record-visibility';
+import { awardExpForApproval } from '@/lib/exp';
 
 export async function GET(request: Request) {
   const session = await auth();
-
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const db = await getDatabase();
-
-  if (!db) {
-    return NextResponse.json({ error: 'Database not available' }, { status: 503 });
-  }
+  if (!db) return NextResponse.json({ error: 'Database not available' }, { status: 503 });
 
   try {
     const url = new URL(request.url);
@@ -40,6 +38,10 @@ export async function GET(request: Request) {
           mileageKm: chargingRecords.mileageKm,
           notes: chargingRecords.notes,
           approvalStatus: chargingRecords.approvalStatus,
+          isShared: chargingRecords.isShared,
+          photoKey: chargingRecords.photoKey,
+          userCarId: chargingRecords.userCarId,
+          expAwarded: chargingRecords.expAwarded,
           createdAt: chargingRecords.createdAt,
         })
         .from(chargingRecords)
@@ -54,9 +56,7 @@ export async function GET(request: Request) {
         .where(eq(chargingRecords.userId, session.user.id)),
     ]);
 
-    const total = countResult[0].count;
-
-    return NextResponse.json({ records, total, page, limit });
+    return NextResponse.json({ records, total: countResult[0].count, page, limit });
   } catch (error) {
     console.error('Failed to fetch charging records:', error);
     return NextResponse.json({ error: 'Failed to fetch charging records' }, { status: 500 });
@@ -72,53 +72,81 @@ interface CreateRecordBody {
   chargingFinishDatetime?: string;
   mileageKm?: number;
   notes?: string;
+  userCarId?: string;
+  isShared?: boolean;
+  photoKey?: string;
 }
 
 export async function POST(request: Request) {
   const session = await auth();
-
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const db = await getDatabase();
-
-  if (!db) {
-    return NextResponse.json({ error: 'Database not available' }, { status: 503 });
-  }
+  if (!db) return NextResponse.json({ error: 'Database not available' }, { status: 503 });
 
   try {
     const body = (await request.json()) as CreateRecordBody;
-
     if (!body.brandId || !body.chargingDatetime || body.chargedKwh === undefined || body.costThb === undefined) {
       return NextResponse.json(
         { error: 'Brand, charging datetime, charged kWh, and cost are required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const avgUnitPrice = body.chargedKwh > 0 ? body.costThb / body.chargedKwh : null;
-
-    // Determine approval status based on user role or pre-approval
-    let approvalStatus: 'pending' | 'approved' = 'pending';
-    if (session.user.role === 'admin') {
-      approvalStatus = 'approved';
-    } else {
-      const userRecord = await db.select({ isPreApproved: users.isPreApproved }).from(users).where(eq(users.id, session.user.id)).limit(1);
-      if (userRecord[0]?.isPreApproved) {
-        approvalStatus = 'approved';
+    // Consent gate (skippable in dev via flag)
+    const consentGateOn = await getFeatureFlag('legal_consent_gate');
+    if (consentGateOn) {
+      try {
+        await requireCurrentConsents(db, session.user.id);
+      } catch (err) {
+        if (err instanceof ConsentRequiredError) {
+          return NextResponse.json({ error: 'Consent required', missing: err.missing }, { status: 412 });
+        }
+        throw err;
       }
     }
+
+    // Look up the user's pre-approved trust + visibility default + cars in one go
+    const userRow = await db
+      .select({ isPreApproved: users.isPreApproved, defaultVisibility: users.defaultRecordVisibility })
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
+    const isPreApproved = Boolean(userRow[0]?.isPreApproved) || session.user.role === 'admin';
+
+    // Auto-select sole car if not provided
+    let userCarId: string | null = body.userCarId ?? null;
+    if (!userCarId) {
+      const cars = await db
+        .select({ id: userCars.id, isDefault: userCars.isDefault })
+        .from(userCars)
+        .where(eq(userCars.userId, session.user.id));
+      if (cars.length === 1) userCarId = cars[0].id;
+      else if (cars.length > 1) userCarId = cars.find((c) => c.isDefault)?.id ?? null;
+    } else {
+      // Confirm ownership of the supplied car
+      const owned = await db
+        .select({ id: userCars.id })
+        .from(userCars)
+        .where(and(eq(userCars.id, userCarId), eq(userCars.userId, session.user.id)))
+        .limit(1);
+      if (owned.length === 0) return NextResponse.json({ error: 'Invalid car' }, { status: 400 });
+    }
+
+    const isShared = body.isShared ?? userRow[0]?.defaultVisibility === 'public';
+    const approvalStatus = computeApprovalStatus({ isShared, isPreApproved });
+    const avgUnitPrice = body.chargedKwh > 0 ? body.costThb / body.chargedKwh : null;
 
     const id = `rec-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const now = new Date();
 
-    const record = await db
+    const inserted = await db
       .insert(chargingRecords)
       .values({
         id,
         userId: session.user.id,
         brandId: body.brandId,
+        userCarId,
         chargingDatetime: new Date(body.chargingDatetime),
         chargedKwh: body.chargedKwh,
         costThb: body.costThb,
@@ -126,18 +154,25 @@ export async function POST(request: Request) {
         chargingPowerKw: body.chargingPowerKw ?? null,
         chargingFinishDatetime: body.chargingFinishDatetime ? new Date(body.chargingFinishDatetime) : null,
         mileageKm: body.mileageKm ?? null,
-        notes: body.notes || null,
+        notes: body.notes ?? null,
+        isShared,
+        photoKey: body.photoKey ?? null,
         approvalStatus,
         createdAt: now,
         updatedAt: now,
       })
       .returning();
 
-    return NextResponse.json({ record: record[0] }, { status: 201 });
+    let award = null;
+    if (shouldAwardExpOnSubmit({ isShared, isPreApproved })) {
+      award = await awardExpForApproval(db, id);
+    }
+
+    return NextResponse.json({ record: inserted[0], award }, { status: 201 });
   } catch (error) {
     console.error('Failed to create charging record:', error);
     if (error instanceof Error && error.message.includes('FOREIGN KEY constraint')) {
-      return NextResponse.json({ error: 'Invalid network selected' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid brand or car' }, { status: 400 });
     }
     return NextResponse.json({ error: 'Failed to create charging record' }, { status: 500 });
   }

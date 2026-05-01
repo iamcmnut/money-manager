@@ -6,20 +6,11 @@ import { desc, eq, sql } from 'drizzle-orm';
 
 export async function GET(request: Request) {
   const session = await auth();
-
-  if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  if (session.user.role !== 'admin') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
+  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (session.user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const db = await getDatabase();
-
-  if (!db) {
-    return NextResponse.json({ error: 'Database not available' }, { status: 503 });
-  }
+  if (!db) return NextResponse.json({ error: 'Database not available' }, { status: 503 });
 
   try {
     const url = new URL(request.url);
@@ -34,6 +25,8 @@ export async function GET(request: Request) {
           userId: chargingRecords.userId,
           userName: users.name,
           userEmail: users.email,
+          userDisplayName: users.displayName,
+          userPublicSlug: users.publicSlug,
           brandId: chargingRecords.brandId,
           brandName: chargingNetworks.name,
           brandColor: chargingNetworks.brandColor,
@@ -43,6 +36,8 @@ export async function GET(request: Request) {
           avgUnitPrice: chargingRecords.avgUnitPrice,
           mileageKm: chargingRecords.mileageKm,
           approvalStatus: chargingRecords.approvalStatus,
+          isShared: chargingRecords.isShared,
+          photoKey: chargingRecords.photoKey,
           notes: chargingRecords.notes,
           createdAt: chargingRecords.createdAt,
         })
@@ -59,9 +54,7 @@ export async function GET(request: Request) {
         .where(eq(chargingRecords.approvalStatus, 'pending')),
     ]);
 
-    const total = countResult[0].count;
-
-    return NextResponse.json({ records, total, page, limit });
+    return NextResponse.json({ records, total: countResult[0].count, page, limit });
   } catch (error) {
     console.error('Failed to fetch pending charging records:', error);
     return NextResponse.json({ error: 'Failed to fetch pending charging records' }, { status: 500 });

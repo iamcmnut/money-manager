@@ -28,6 +28,10 @@ describe('getDefaultFlags', () => {
       ev_daily_price_chart: true,
       ev_coupon: true,
       ev_history: true,
+      crowd_data: false,
+      ev_ocr: false,
+      public_profile: true,
+      legal_consent_gate: true,
     });
   });
 
@@ -165,6 +169,10 @@ describe('getAllFeatureFlags', () => {
     delete process.env.FEATURE_EV_DAILY_PRICE_CHART;
     delete process.env.FEATURE_EV_COUPON;
     delete process.env.FEATURE_EV_HISTORY;
+    delete process.env.FEATURE_CROWD_DATA;
+    delete process.env.FEATURE_EV_OCR;
+    delete process.env.FEATURE_PUBLIC_PROFILE;
+    delete process.env.FEATURE_LEGAL_CONSENT_GATE;
 
     const flags = await getAllFeatureFlags();
 
@@ -178,6 +186,10 @@ describe('getAllFeatureFlags', () => {
       ev_daily_price_chart: true,
       ev_coupon: true,
       ev_history: true,
+      crowd_data: false,
+      ev_ocr: false,
+      public_profile: true,
+      legal_consent_gate: true,
     });
   });
 
@@ -211,7 +223,7 @@ describe('getAllFeatureFlags', () => {
     expect(flags.module_ev).toBe(true);
     expect(flags.auth_google).toBe(true);
     expect(flags.auth_credentials).toBe(false); // default
-    expect(mockKV.get).toHaveBeenCalledTimes(9);
+    expect(mockKV.get).toHaveBeenCalledTimes(13);
   });
 });
 
@@ -227,8 +239,12 @@ describe('FeatureFlag type', () => {
       'ev_daily_price_chart',
       'ev_coupon',
       'ev_history',
+      'crowd_data',
+      'ev_ocr',
+      'public_profile',
+      'legal_consent_gate',
     ];
 
-    expect(validFlags).toHaveLength(9);
+    expect(validFlags).toHaveLength(13);
   });
 });

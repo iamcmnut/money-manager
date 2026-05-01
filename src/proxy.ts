@@ -5,7 +5,7 @@ import { routing } from '@/i18n/routing';
 const intlMiddleware = createMiddleware(routing);
 
 // Protected routes that require authentication
-const protectedRoutes = ['/boss-office', '/ev/history'];
+const protectedRoutes = ['/boss-office', '/ev/history', '/settings'];
 
 export default async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;

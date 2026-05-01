@@ -14,6 +14,50 @@
     "subtitle": "A modular personal finance application to help you make better financial decisions.",
     "getStarted": "Get started"
   },
+  "crowdData": {
+    "consent": {
+      "title": "Accept Terms & Privacy",
+      "body": "Before you submit charging data, please review and accept our Terms of Service and Privacy Policy.",
+      "accept": "I accept",
+      "viewTerms": "Terms of Service",
+      "viewPrivacy": "Privacy Policy"
+    },
+    "submit": {
+      "shareToggle": "Share to public stats",
+      "photoLabel": "Slip photo (optional)",
+      "photoHelper": "Adding a slip photo is +5 EXP when shared records are approved."
+    },
+    "profile": {
+      "level": "Level",
+      "sessions": "Sessions",
+      "totalKwh": "Total kWh",
+      "totalSpent": "Total spent",
+      "joinedAt": "Joined",
+      "notFound": "Profile not found",
+      "deleted": "Profile deleted"
+    },
+    "tiers": {
+      "sprout": "Sprout",
+      "charger": "Charger",
+      "voltage": "Voltage",
+      "amplifier": "Amplifier",
+      "megawatt": "Megawatt",
+      "gridMaster": "Grid Master"
+    },
+    "settings": {
+      "displayName": "Display name",
+      "slug": "Public slug",
+      "defaultPublic": "Public",
+      "defaultPrivate": "Private",
+      "deleteAccount": "Delete my account"
+    }
+  },
+  "legal": {
+    "termsTitle": "Terms of Service",
+    "privacyTitle": "Privacy Policy",
+    "version": "Version",
+    "effective": "Effective"
+  },
   "modules": {
     "ev": {
       "title": "EV Charging Price",
@@ -248,7 +292,22 @@
       "users": "Users",
       "evNetworks": "EV Networks",
       "evRecords": "EV Records",
-      "pendingApprovals": "Pending Approvals"
+      "pendingApprovals": "Pending Approvals",
+      "carCatalog": "Car Catalog",
+      "legalDocs": "Legal Docs",
+      "crowdReview": "Crowd Review"
+    },
+    "carCatalog": {
+      "title": "Car Catalog",
+      "description": "Manage car brands and models available to users"
+    },
+    "legalDocs": {
+      "title": "Legal Documents",
+      "description": "Publish versioned Terms of Service and Privacy Policy"
+    },
+    "crowdReview": {
+      "title": "Crowd Submissions",
+      "description": "Review user-submitted public charging records"
     },
     "evNetworks": {
       "title": "EV Charging Networks",
