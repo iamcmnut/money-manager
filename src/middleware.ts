@@ -60,10 +60,10 @@ export default async function middleware(req: NextRequest) {
   return response;
 }
 
-// OpenNext for Cloudflare only supports Edge proxy/middleware. Without this the
-// build fails with: "Node.js middleware is not currently supported."
-export const runtime = 'edge';
-
+// Next.js 16 deprecates `middleware.ts` in favor of `proxy.ts`, but the new
+// `proxy` convention forces Node.js runtime and OpenNext for Cloudflare only
+// supports Edge runtime. Until OpenNext supports Node.js proxies, we stay on
+// `middleware.ts` (deprecation warning is non-fatal, runs on Edge by default).
 export const config = {
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };
