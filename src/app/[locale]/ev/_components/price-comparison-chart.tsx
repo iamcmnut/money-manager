@@ -105,7 +105,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
       <h3 className="mb-1 font-semibold">{t('title')}</h3>
       <p className="mb-5 text-xs text-muted-foreground">{t('description')}</p>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {sorted.map((brand, index) => {
           const isExpanded = expandedId === brand.brandId;
           const price = Math.round(brand.avgPricePerKwh * 100) / 100;
@@ -186,9 +186,11 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                     <span className="text-sm font-semibold tabular-nums">
                       {formatBaht(price)}{t('perKwh')}
                     </span>
-                    <p className="text-[10px] text-muted-foreground/70">
-                      {formatNumber(brand.sessions)} {t('sessions')}
-                    </p>
+                    {brand.sessions > 0 && (
+                      <p className="text-[10px] text-muted-foreground/70">
+                        {formatNumber(brand.sessions)} {t('sessions')}
+                      </p>
+                    )}
                   </div>
                   <ChevronDown
                     className={`h-4 w-4 text-muted-foreground/50 transition-transform duration-200 motion-reduce:transition-none ${
