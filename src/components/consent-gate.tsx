@@ -33,13 +33,18 @@ export function ConsentGate({ children, locale }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
-    const res = await fetch(`/api/me/consents?locale=${locale}`);
-    if (!res.ok) return;
-    setConsents((await res.json()) as ConsentsResponse);
+    try {
+      const res = await fetch(`/api/me/consents?locale=${locale}`);
+      if (!res.ok) return;
+      setConsents((await res.json()) as ConsentsResponse);
+    } catch {
+      // Network error or env without fetch (e.g. jsdom in tests). Treat as
+      // "no consent info" — the gate stays closed and children render normally.
+    }
   }, [locale]);
 
   useEffect(() => {
-    void refresh();
+    refresh().catch(() => {});
   }, [refresh]);
 
   const mustAccept = consents

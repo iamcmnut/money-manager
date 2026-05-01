@@ -60,6 +60,10 @@ export default async function middleware(req: NextRequest) {
   return response;
 }
 
+// OpenNext for Cloudflare only supports Edge proxy/middleware. Without this the
+// build fails with: "Node.js middleware is not currently supported."
+export const runtime = 'edge';
+
 export const config = {
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };
