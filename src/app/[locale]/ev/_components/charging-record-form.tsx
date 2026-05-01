@@ -285,29 +285,6 @@ export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: Ch
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">{t('chargingPowerKw')}</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.chargingPowerKw}
-                onChange={(e) => setFormData({ ...formData, chargingPowerKw: e.target.value })}
-                className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                placeholder="150"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('chargingFinishDatetime')}</label>
-              <input
-                type="datetime-local"
-                value={formData.chargingFinishDatetime}
-                onChange={(e) => setFormData({ ...formData, chargingFinishDatetime: e.target.value })}
-                className="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
-            </div>
-
-            <div>
               <label className="block text-sm font-medium mb-1">{t('mileageKm')}</label>
               <input
                 type="number"

@@ -2,7 +2,7 @@
 
 import { signOut, useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import { LogOut, User, Settings } from 'lucide-react';
+import { LogOut, User, Settings, Shield } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -48,10 +48,16 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/settings">
+            <Settings className="mr-2 h-4 w-4" />
+            {t('user.settings')}
+          </Link>
+        </DropdownMenuItem>
         {session.user.role === 'admin' && (
           <DropdownMenuItem asChild>
             <Link href="/boss-office">
-              <Settings className="mr-2 h-4 w-4" />
+              <Shield className="mr-2 h-4 w-4" />
               {t('user.adminPanel')}
             </Link>
           </DropdownMenuItem>

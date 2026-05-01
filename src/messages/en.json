@@ -250,6 +250,7 @@
     }
   },
   "user": {
+    "settings": "Settings",
     "adminPanel": "Admin Panel"
   },
   "admin": {
