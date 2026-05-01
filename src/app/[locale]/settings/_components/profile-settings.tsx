@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { validateSlugFormat } from '@/lib/slug';
 
@@ -17,6 +18,11 @@ interface ProfileResponse {
 }
 
 export function ProfileSettings() {
+  const t = useTranslations('crowdData.settings.profile');
+  const tLevel = useTranslations('crowdData.settings.level');
+  const tCars = useTranslations('crowdData.settings.cars');
+  const tSlug = useTranslations('crowdData.settings.slugError');
+  const tTier = useTranslations('crowdData.tiers');
   const [profile, setProfile] = useState<ProfileResponse['profile'] | null>(null);
   const [displayName, setDisplayName] = useState('');
   const [slug, setSlug] = useState('');
@@ -59,22 +65,32 @@ export function ProfileSettings() {
     setSaving(false);
     if (!res.ok) {
       const j = (await res.json().catch(() => ({}))) as { error?: string };
-      setError(j.error ?? 'Failed to save');
+      setError(j.error ?? t('saveError'));
       return;
     }
-    setMessage('Saved');
+    setMessage(t('saved'));
     await refresh();
   }
 
-  if (!profile) return <div className="animate-pulse text-muted-foreground">Loading…</div>;
+  if (!profile) return <div className="animate-pulse text-muted-foreground">{tCars('loading')}</div>;
+
+  // Map English tier name from API to the i18n key
+  const tierKey = profile.tier.toLowerCase().replace(' ', '') as
+    | 'sprout'
+    | 'charger'
+    | 'voltage'
+    | 'amplifier'
+    | 'megawatt'
+    | 'gridmaster';
+  const tierLabel = tTier(tierKey === 'gridmaster' ? 'gridMaster' : tierKey);
 
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-border p-5">
-        <h2 className="mb-3 text-base font-semibold">Profile</h2>
+        <h2 className="mb-3 text-base font-semibold">{t('title')}</h2>
         <div className="grid gap-4">
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-muted-foreground">Email</span>
+            <span className="mb-1 block text-xs font-medium text-muted-foreground">{t('email')}</span>
             <input
               disabled
               className="w-full rounded-lg border border-input bg-muted px-3 py-2 text-sm"
@@ -82,9 +98,7 @@ export function ProfileSettings() {
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-muted-foreground">
-              Display name (shown on your public profile)
-            </span>
+            <span className="mb-1 block text-xs font-medium text-muted-foreground">{t('displayName')}</span>
             <input
               className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
               value={displayName}
@@ -93,9 +107,7 @@ export function ProfileSettings() {
             />
           </label>
           <label className="block">
-            <span className="mb-1 block text-xs font-medium text-muted-foreground">
-              Public slug (4–32 lowercase letters, digits, dashes)
-            </span>
+            <span className="mb-1 block text-xs font-medium text-muted-foreground">{t('slug')}</span>
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">/u/</span>
               <input
@@ -107,10 +119,10 @@ export function ProfileSettings() {
             {slugReason && (
               <p className="mt-1 text-xs text-destructive">
                 {slugReason === 'reserved'
-                  ? 'This slug is reserved.'
+                  ? tSlug('reserved')
                   : slugReason === 'leading-dash' || slugReason === 'trailing-dash' || slugReason === 'double-dash'
-                    ? 'Dashes can only appear between characters.'
-                    : 'Use 4–32 lowercase letters, digits, or dashes.'}
+                    ? tSlug('dash')
+                    : tSlug('format')}
               </p>
             )}
           </label>
@@ -118,10 +130,10 @@ export function ProfileSettings() {
       </section>
 
       <section className="rounded-xl border border-border p-5">
-        <h2 className="mb-3 text-base font-semibold">Level</h2>
+        <h2 className="mb-3 text-base font-semibold">{tLevel('title')}</h2>
         <p className="text-sm">
-          <span className="font-mono">{profile.expTotal} EXP</span> · Level {profile.level} ·{' '}
-          <span className="text-muted-foreground">{profile.tier}</span>
+          <span className="font-mono">{profile.expTotal} EXP</span> · {tLevel('title')} {profile.level} ·{' '}
+          <span className="text-muted-foreground">{tierLabel}</span>
         </p>
       </section>
 
@@ -138,7 +150,7 @@ export function ProfileSettings() {
 
       <div className="flex justify-end">
         <Button onClick={save} disabled={saving || (slug !== profile.publicSlug && !!slugReason)}>
-          {saving ? 'Saving…' : 'Save'}
+          {saving ? t('saving') : t('save')}
         </Button>
       </div>
     </div>

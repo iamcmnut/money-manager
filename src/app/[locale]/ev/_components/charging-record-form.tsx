@@ -61,6 +61,8 @@ interface ChargingRecordFormProps {
 
 export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: ChargingRecordFormProps) {
   const t = useTranslations('modules.ev.form');
+  const tSubmit = useTranslations('crowdData.submit');
+  const tPrivacy = useTranslations('crowdData.settings.privacy');
   const isEditing = !!record;
 
   const [networks, setNetworks] = useState<NetworkData[]>([]);
@@ -309,7 +311,7 @@ export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: Ch
 
             {cars.length > 1 && (
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium mb-1">Car</label>
+                <label className="block text-sm font-medium mb-1">{tSubmit('carLabel')}</label>
                 <select
                   value={formData.userCarId}
                   onChange={(e) => setFormData({ ...formData, userCarId: e.target.value })}
@@ -319,7 +321,6 @@ export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: Ch
                     <option key={c.id} value={c.id}>
                       {c.brandName ?? ''} {c.modelName ?? ''}
                       {c.nickname ? ` · ${c.nickname}` : ''}
-                      {c.isDefault ? ' (default)' : ''}
                     </option>
                   ))}
                 </select>
@@ -327,14 +328,12 @@ export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: Ch
             )}
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium mb-1">Slip photo (optional)</label>
+              <label className="block text-sm font-medium mb-1">{tSubmit('photoLabel')}</label>
               <PhotoUpload
                 value={formData.photoKey}
                 onChange={(key) => setFormData({ ...formData, photoKey: key })}
               />
-              <p className="mt-1 text-xs text-muted-foreground">
-                Adding a slip photo is +5 EXP when shared records are approved.
-              </p>
+              <p className="mt-1 text-xs text-muted-foreground">{tSubmit('photoHelper')}</p>
             </div>
 
             <div className="sm:col-span-2 rounded-lg border border-border p-3">
@@ -346,13 +345,13 @@ export function ChargingRecordForm({ record, open, onOpenChange, onSuccess }: Ch
                   onChange={(e) => setFormData({ ...formData, isShared: e.target.checked })}
                 />
                 <span className="text-sm">
-                  <span className="font-medium">Share to public stats</span>
+                  <span className="font-medium">{tSubmit('shareToggle')}</span>
                   <span className="ml-2 text-xs text-muted-foreground">
-                    (default: {defaultVisibility})
+                    {tSubmit('shareDefaultPrefix', {
+                      v: defaultVisibility === 'public' ? tPrivacy('public') : tPrivacy('private'),
+                    })}
                   </span>
-                  <span className="block text-xs text-muted-foreground">
-                    Public records contribute anonymized averages to /ev once an admin approves them, and earn EXP.
-                  </span>
+                  <span className="block text-xs text-muted-foreground">{tSubmit('shareHelper')}</span>
                 </span>
               </label>
             </div>

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { auth } from '@/lib/auth';
 import { SettingsTabs } from './_components/settings-tabs';
 
@@ -14,13 +14,13 @@ export default async function SettingsPage({ params }: Props) {
     redirect(`/${locale}/auth/signin?callbackUrl=/${locale}/settings`);
   }
 
+  const t = await getTranslations('crowdData.settings.header');
+
   return (
     <main className="container mx-auto max-w-3xl px-4 py-10">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Manage your profile, privacy, cars, and account.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t('description')}</p>
       </header>
       <SettingsTabs locale={locale} />
     </main>

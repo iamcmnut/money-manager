@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { Image as ImageIcon, Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function PhotoUpload({ value, onChange }: Props) {
+  const t = useTranslations('crowdData.photoUpload');
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -23,7 +25,7 @@ export function PhotoUpload({ value, onChange }: Props) {
       const res = await fetch('/api/ev/records/photo', { method: 'POST', body: form });
       if (!res.ok) {
         const j = (await res.json().catch(() => ({}))) as { error?: string };
-        setError(j.error ?? 'Upload failed');
+        setError(j.error ?? t('uploadFailed'));
         return;
       }
       const json = (await res.json()) as { key: string };
@@ -55,7 +57,7 @@ export function PhotoUpload({ value, onChange }: Props) {
             type="button"
             className="text-muted-foreground hover:text-destructive"
             onClick={() => onChange(null)}
-            aria-label="Remove photo"
+            aria-label={t('remove')}
           >
             <X className="h-4 w-4" />
           </button>
@@ -70,11 +72,11 @@ export function PhotoUpload({ value, onChange }: Props) {
         >
           {uploading ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" /> Uploading…
+              <Loader2 className="h-4 w-4 animate-spin" /> {t('uploading')}
             </>
           ) : (
             <>
-              <ImageIcon className="h-4 w-4" /> Attach slip photo
+              <ImageIcon className="h-4 w-4" /> {t('attach')}
             </>
           )}
         </Button>

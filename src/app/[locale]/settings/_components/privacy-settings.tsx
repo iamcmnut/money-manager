@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -12,6 +13,8 @@ interface ConsentRow {
 }
 
 export function PrivacySettings({ locale }: { locale: string }) {
+  const t = useTranslations('crowdData.settings.privacy');
+  const tLegal = useTranslations('crowdData.settings.legal');
   const [defaultVisibility, setDefaultVisibility] = useState<'public' | 'private'>('private');
   const [consents, setConsents] = useState<{ terms: ConsentRow; privacy: ConsentRow } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -41,7 +44,7 @@ export function PrivacySettings({ locale }: { locale: string }) {
     });
     setSaving(false);
     if (!res.ok) {
-      setError('Failed to save');
+      setError(t('saveError'));
       return;
     }
     await refresh();
@@ -50,10 +53,8 @@ export function PrivacySettings({ locale }: { locale: string }) {
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-border p-5">
-        <h2 className="mb-3 text-base font-semibold">Default sharing</h2>
-        <p className="mb-4 text-sm text-muted-foreground">
-          When you submit a new record, this is the default visibility. You can override per record at submit time.
-        </p>
+        <h2 className="mb-3 text-base font-semibold">{t('title')}</h2>
+        <p className="mb-4 text-sm text-muted-foreground">{t('description')}</p>
         <div className="space-y-2">
           <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-3 has-[input:checked]:border-primary has-[input:checked]:bg-primary/5">
             <input
@@ -64,8 +65,8 @@ export function PrivacySettings({ locale }: { locale: string }) {
               className="mt-0.5"
             />
             <div>
-              <div className="text-sm font-medium">Private</div>
-              <div className="text-xs text-muted-foreground">Only you see your records. Doesn&apos;t feed community stats.</div>
+              <div className="text-sm font-medium">{t('private')}</div>
+              <div className="text-xs text-muted-foreground">{t('privateHelp')}</div>
             </div>
           </label>
           <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-3 has-[input:checked]:border-primary has-[input:checked]:bg-primary/5">
@@ -77,43 +78,41 @@ export function PrivacySettings({ locale }: { locale: string }) {
               className="mt-0.5"
             />
             <div>
-              <div className="text-sm font-medium">Public</div>
-              <div className="text-xs text-muted-foreground">
-                After admin review, your record contributes anonymized averages to /ev and stats appear on your /u profile.
-              </div>
+              <div className="text-sm font-medium">{t('public')}</div>
+              <div className="text-xs text-muted-foreground">{t('publicHelp')}</div>
             </div>
           </label>
         </div>
         {error && <div className="mt-3 text-sm text-destructive">{error}</div>}
         <div className="mt-4 flex justify-end">
           <Button size="sm" onClick={save} disabled={saving}>
-            {saving ? 'Saving…' : 'Save'}
+            {saving ? t('saving') : t('save')}
           </Button>
         </div>
       </section>
 
       <section className="rounded-xl border border-border p-5">
-        <h2 className="mb-3 text-base font-semibold">Legal</h2>
+        <h2 className="mb-3 text-base font-semibold">{tLegal('title')}</h2>
         {consents && (
           <ul className="space-y-2 text-sm">
             <li>
-              Terms of Service:{' '}
+              {tLegal('terms')}:{' '}
               {consents.terms.acceptedVersion === consents.terms.currentVersion
-                ? `accepted v${consents.terms.acceptedVersion}`
-                : `must accept v${consents.terms.currentVersion}`}{' '}
+                ? tLegal('accepted', { v: String(consents.terms.acceptedVersion) })
+                : tLegal('mustAccept', { v: String(consents.terms.currentVersion) })}{' '}
               ·{' '}
               <Link href={`/${locale}/legal/terms`} className="text-primary underline-offset-4 hover:underline">
-                view
+                {tLegal('view')}
               </Link>
             </li>
             <li>
-              Privacy Policy:{' '}
+              {tLegal('privacy')}:{' '}
               {consents.privacy.acceptedVersion === consents.privacy.currentVersion
-                ? `accepted v${consents.privacy.acceptedVersion}`
-                : `must accept v${consents.privacy.currentVersion}`}{' '}
+                ? tLegal('accepted', { v: String(consents.privacy.acceptedVersion) })
+                : tLegal('mustAccept', { v: String(consents.privacy.currentVersion) })}{' '}
               ·{' '}
               <Link href={`/${locale}/legal/privacy`} className="text-primary underline-offset-4 hover:underline">
-                view
+                {tLegal('view')}
               </Link>
             </li>
           </ul>

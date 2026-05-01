@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -28,6 +29,7 @@ interface Props {
  * to read and accept. After acceptance, children render normally.
  */
 export function ConsentGate({ children, locale }: Props) {
+  const t = useTranslations('crowdData.consent');
   const [consents, setConsents] = useState<ConsentsResponse | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +79,7 @@ export function ConsentGate({ children, locale }: Props) {
       }
       const results = await Promise.all(promises);
       if (results.some((r) => !r.ok)) {
-        setError('Failed to record acceptance. Please try again.');
+        setError(t('saveError'));
         return;
       }
       await refresh();
@@ -91,10 +93,8 @@ export function ConsentGate({ children, locale }: Props) {
       <Dialog open={mustAccept}>
         <DialogContent className="max-w-lg rounded-xl">
           <DialogHeader>
-            <DialogTitle>Accept Terms &amp; Privacy</DialogTitle>
-            <DialogDescription>
-              Before you submit charging data, please review and accept our Terms of Service and Privacy Policy.
-            </DialogDescription>
+            <DialogTitle>{t('title')}</DialogTitle>
+            <DialogDescription>{t('body')}</DialogDescription>
           </DialogHeader>
           <ul className="space-y-3 py-2">
             <li className="rounded-lg border border-border p-3 text-sm">
@@ -103,12 +103,12 @@ export function ConsentGate({ children, locale }: Props) {
                 target="_blank"
                 className="font-medium text-primary underline-offset-4 hover:underline"
               >
-                Terms of Service (v{consents?.terms.currentVersion ?? '—'})
+                {t('termsHeading', { v: String(consents?.terms.currentVersion ?? '—') })}
               </Link>
               <div className="text-xs text-muted-foreground">
                 {consents?.terms.acceptedVersion
-                  ? `You previously accepted v${consents.terms.acceptedVersion}.`
-                  : 'Not yet accepted.'}
+                  ? t('previouslyAccepted', { v: String(consents.terms.acceptedVersion) })
+                  : t('notYetAccepted')}
               </div>
             </li>
             <li className="rounded-lg border border-border p-3 text-sm">
@@ -117,19 +117,19 @@ export function ConsentGate({ children, locale }: Props) {
                 target="_blank"
                 className="font-medium text-primary underline-offset-4 hover:underline"
               >
-                Privacy Policy (v{consents?.privacy.currentVersion ?? '—'})
+                {t('privacyHeading', { v: String(consents?.privacy.currentVersion ?? '—') })}
               </Link>
               <div className="text-xs text-muted-foreground">
                 {consents?.privacy.acceptedVersion
-                  ? `You previously accepted v${consents.privacy.acceptedVersion}.`
-                  : 'Not yet accepted.'}
+                  ? t('previouslyAccepted', { v: String(consents.privacy.acceptedVersion) })
+                  : t('notYetAccepted')}
               </div>
             </li>
           </ul>
           {error && <div className="text-sm text-destructive">{error}</div>}
           <DialogFooter>
             <Button onClick={acceptAll} disabled={submitting}>
-              {submitting ? 'Saving…' : 'I accept'}
+              {submitting ? t('saving') : t('accept')}
             </Button>
           </DialogFooter>
         </DialogContent>

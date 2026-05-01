@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { UserCircle, ShieldCheck, Car, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ProfileSettings } from './profile-settings';
@@ -9,20 +10,21 @@ import { CarsSettings } from './cars-settings';
 import { DangerZone } from './danger-zone';
 
 const tabs = [
-  { id: 'profile', icon: UserCircle, label: 'Profile' },
-  { id: 'privacy', icon: ShieldCheck, label: 'Privacy' },
-  { id: 'cars', icon: Car, label: 'Cars' },
-  { id: 'danger', icon: AlertTriangle, label: 'Account' },
+  { id: 'profile', icon: UserCircle, key: 'profile' },
+  { id: 'privacy', icon: ShieldCheck, key: 'privacy' },
+  { id: 'cars', icon: Car, key: 'cars' },
+  { id: 'danger', icon: AlertTriangle, key: 'account' },
 ] as const;
 
 type TabId = (typeof tabs)[number]['id'];
 
 export function SettingsTabs({ locale }: { locale: string }) {
+  const t = useTranslations('crowdData.settings.tabs');
   const [active, setActive] = useState<TabId>('profile');
   return (
     <div>
       <div role="tablist" className="mb-6 flex gap-1 rounded-xl bg-muted/50 p-1">
-        {tabs.map(({ id, icon: Icon, label }) => (
+        {tabs.map(({ id, icon: Icon, key }) => (
           <button
             key={id}
             role="tab"
@@ -37,7 +39,7 @@ export function SettingsTabs({ locale }: { locale: string }) {
             )}
           >
             <Icon className="h-4 w-4" aria-hidden="true" />
-            <span>{label}</span>
+            <span>{t(key)}</span>
           </button>
         ))}
       </div>

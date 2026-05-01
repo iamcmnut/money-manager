@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Calendar, Zap } from 'lucide-react';
 import { getDatabase } from '@/lib/server';
 import { chargingRecords, users } from '@/lib/db/schema';
@@ -57,7 +57,8 @@ export default async function PublicProfilePage({ params }: Props) {
     );
 
   const summary = levelSummary(user.expTotal);
-  const displayName = user.displayName ?? user.name ?? 'Anonymous EV driver';
+  const t = await getTranslations('crowdData.profile');
+  const displayName = user.displayName ?? user.name ?? t('anonymous');
   const sessions = Number(stats[0].sessions);
   const totalKwh = Number(stats[0].totalKwh);
   const totalThb = Number(stats[0].totalThb);
@@ -104,18 +105,18 @@ export default async function PublicProfilePage({ params }: Props) {
 
         <dl className="mt-8 grid grid-cols-3 gap-4">
           <div className="rounded-xl bg-muted/30 p-4">
-            <dt className="text-xs uppercase tracking-wide text-muted-foreground">Sessions</dt>
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">{t('sessions')}</dt>
             <dd className="mt-1 text-2xl font-bold">{formatNumber(sessions)}</dd>
           </div>
           <div className="rounded-xl bg-muted/30 p-4">
-            <dt className="text-xs uppercase tracking-wide text-muted-foreground">Total kWh</dt>
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">{t('totalKwh')}</dt>
             <dd className="mt-1 flex items-center gap-1 text-2xl font-bold">
               <Zap className="h-5 w-5 text-module-ev" aria-hidden="true" />
               {formatNumber(totalKwh, 1)}
             </dd>
           </div>
           <div className="rounded-xl bg-muted/30 p-4">
-            <dt className="text-xs uppercase tracking-wide text-muted-foreground">Total spent</dt>
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">{t('totalSpent')}</dt>
             <dd className="mt-1 text-2xl font-bold">{formatBaht(totalThb, 0)}</dd>
           </div>
         </dl>
@@ -123,7 +124,12 @@ export default async function PublicProfilePage({ params }: Props) {
         {user.createdAt && (
           <p className="mt-6 flex items-center gap-1 text-xs text-muted-foreground">
             <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
-            Joined {user.createdAt.toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', { year: 'numeric', month: 'long' })}
+            {t('joinedAt', {
+              date: user.createdAt.toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
+                year: 'numeric',
+                month: 'long',
+              }),
+            })}
           </p>
         )}
       </div>

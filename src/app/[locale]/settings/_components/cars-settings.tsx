@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Plus, Star, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -28,6 +29,7 @@ interface CatalogBrand {
 }
 
 export function CarsSettings() {
+  const t = useTranslations('crowdData.settings.cars');
   const [cars, setCars] = useState<UserCar[]>([]);
   const [catalog, setCatalog] = useState<CatalogBrand[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +66,7 @@ export function CarsSettings() {
     });
     if (!res.ok) {
       const j = (await res.json().catch(() => ({}))) as { error?: string };
-      setError(j.error ?? 'Failed to add');
+      setError(j.error ?? t('addError'));
       return;
     }
     setAdding(false);
@@ -84,17 +86,17 @@ export function CarsSettings() {
   }
 
   async function removeCar(id: string) {
-    if (!confirm('Remove this car?')) return;
+    if (!confirm(t('removeConfirm'))) return;
     const res = await fetch(`/api/me/cars/${id}`, { method: 'DELETE' });
     if (!res.ok) {
       const j = (await res.json().catch(() => ({}))) as { error?: string };
-      setError(j.error ?? 'Failed to remove');
+      setError(j.error ?? t('removeError'));
       return;
     }
     await refresh();
   }
 
-  if (loading) return <div className="animate-pulse text-muted-foreground">Loading…</div>;
+  if (loading) return <div className="animate-pulse text-muted-foreground">{t('loading')}</div>;
 
   const selectedBrand = catalog.find((b) => b.id === newCarBrandId);
 
@@ -108,7 +110,7 @@ export function CarsSettings() {
 
       {cars.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          No cars yet. Add one to start logging charging records.
+          {t('empty')}
         </div>
       ) : (
         <ul className="space-y-2">
@@ -121,7 +123,7 @@ export function CarsSettings() {
                   </span>
                   {c.isDefault && (
                     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                      Default
+                      {t('default')}
                     </span>
                   )}
                 </div>
@@ -130,14 +132,14 @@ export function CarsSettings() {
               <div className="flex items-center gap-2">
                 {!c.isDefault && (
                   <Button size="sm" variant="outline" onClick={() => makeDefault(c.id)}>
-                    <Star className="h-3.5 w-3.5" /> Set default
+                    <Star className="h-3.5 w-3.5" /> {t('setDefault')}
                   </Button>
                 )}
                 <button
                   type="button"
                   className="text-destructive hover:opacity-80"
                   onClick={() => removeCar(c.id)}
-                  aria-label="Remove car"
+                  aria-label={t('removeAria')}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -149,11 +151,11 @@ export function CarsSettings() {
 
       {!adding ? (
         <Button onClick={() => setAdding(true)} variant="outline">
-          <Plus className="h-4 w-4" /> Add a car
+          <Plus className="h-4 w-4" /> {t('addCar')}
         </Button>
       ) : (
         <div className="rounded-xl border border-border p-4">
-          <h3 className="mb-3 text-sm font-semibold">Add car</h3>
+          <h3 className="mb-3 text-sm font-semibold">{t('addTitle')}</h3>
           <div className="grid gap-3">
             <select
               className="rounded-lg border border-input bg-background px-3 py-2 text-sm"
@@ -163,7 +165,7 @@ export function CarsSettings() {
                 setNewCarModelId('');
               }}
             >
-              <option value="">Select brand…</option>
+              <option value="">{t('selectBrand')}</option>
               {catalog.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
@@ -176,7 +178,7 @@ export function CarsSettings() {
               onChange={(e) => setNewCarModelId(e.target.value)}
               disabled={!selectedBrand}
             >
-              <option value="">Select model…</option>
+              <option value="">{t('selectModel')}</option>
               {selectedBrand?.models.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.name}
@@ -187,16 +189,16 @@ export function CarsSettings() {
             </select>
             <input
               className="rounded-lg border border-input bg-background px-3 py-2 text-sm"
-              placeholder="Nickname (optional)"
+              placeholder={t('nicknamePlaceholder')}
               value={newCarNickname}
               onChange={(e) => setNewCarNickname(e.target.value)}
             />
             <div className="flex justify-end gap-2">
               <Button size="sm" variant="outline" onClick={() => setAdding(false)}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button size="sm" onClick={addCar} disabled={!newCarModelId}>
-                Add
+                {t('add')}
               </Button>
             </div>
           </div>
