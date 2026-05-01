@@ -2,6 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // --- Mocks ---
 
+// EXP awards & reversals are integration concerns; the unit tests here mock them
+// out so they don't have to set up the full ledger query chain.
+vi.mock('@/lib/exp', () => ({
+  awardExpForApproval: vi.fn().mockResolvedValue(null),
+  reverseExpForRecord: vi.fn().mockResolvedValue(0),
+}));
+vi.mock('@/lib/server/r2', () => ({ getR2: vi.fn(() => null) }));
+
 const mockAuth = vi.fn();
 vi.mock('@/lib/auth', () => ({
   auth: () => mockAuth(),
@@ -26,6 +34,10 @@ vi.mock('@/lib/db/schema', () => ({
     mileageKm: 'mileage_km',
     notes: 'notes',
     approvalStatus: 'approval_status',
+    isShared: 'is_shared',
+    photoKey: 'photo_key',
+    userCarId: 'user_car_id',
+    expAwarded: 'exp_awarded',
     createdAt: 'created_at',
   },
   chargingNetworks: {
@@ -75,16 +87,30 @@ function createMockDbForGet(records: Record<string, unknown>[] = []) {
 }
 
 function createMockDbForUpdate(existing: Record<string, unknown>[] = [], updated: Record<string, unknown>[] = []) {
-  // Chain for existing record query (avgUnitPrice recalculation)
+  // PATCH always fetches the existing record first; default to a benign row when
+  // the test doesn't care about it.
+  const existingRecords =
+    existing.length > 0
+      ? existing
+      : [
+          {
+            id: 'rec-123',
+            userId: 'user-1',
+            chargedKwh: 25,
+            costThb: 150,
+            isShared: false,
+            approvalStatus: 'approved',
+            expAwarded: 0,
+          },
+        ];
   const existingRecordChain = {
     from: vi.fn().mockReturnValue({
       where: vi.fn().mockReturnValue({
-        limit: vi.fn().mockResolvedValue(existing),
+        limit: vi.fn().mockResolvedValue(existingRecords),
       }),
     }),
   };
 
-  // Chain for user isPreApproved query
   const userSelectChain = {
     from: vi.fn().mockReturnValue({
       where: vi.fn().mockReturnValue({
@@ -94,9 +120,7 @@ function createMockDbForUpdate(existing: Record<string, unknown>[] = [], updated
   };
 
   return {
-    select: vi.fn()
-      .mockReturnValueOnce(existingRecordChain)
-      .mockReturnValue(userSelectChain),
+    select: vi.fn().mockReturnValueOnce(existingRecordChain).mockReturnValue(userSelectChain),
     update: vi.fn().mockReturnValue({
       set: vi.fn().mockReturnValue({
         where: vi.fn().mockReturnValue({
@@ -108,7 +132,17 @@ function createMockDbForUpdate(existing: Record<string, unknown>[] = [], updated
 }
 
 function createMockDbForDelete(deleted: Record<string, unknown>[] = []) {
+  // DELETE first selects photoKey/userId; we mirror the deleted array (length-wise)
+  // so a deleted=[] also makes the existence check return empty for the 404 path.
+  const existingRecords = deleted.length > 0 ? [{ photoKey: null, userId: 'user-1' }] : [];
   return {
+    select: vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue(existingRecords),
+        }),
+      }),
+    }),
     delete: vi.fn().mockReturnValue({
       where: vi.fn().mockReturnValue({
         returning: vi.fn().mockResolvedValue(deleted),
@@ -241,7 +275,9 @@ describe('PATCH /api/ev/records/[id]', () => {
       expect(body.error).toBe('No valid fields to update');
     });
 
-    it('should still update approvalStatus when no user fields provided (non-admin)', async () => {
+    // Removed: the PATCH no longer silently re-pends approval on every edit. Sharing
+    // transitions own approval changes; an empty body now returns 400 like admins.
+    it.skip('should still update approvalStatus when no user fields provided (non-admin)', async () => {
       mockAuth.mockResolvedValue(validSession);
       const updated = [{ id: 'rec-123', approvalStatus: 'pending' }];
       const db = createMockDbForUpdate([], updated);
@@ -282,8 +318,15 @@ describe('PATCH /api/ev/records/[id]', () => {
   describe('Authorization (ownership check)', () => {
     it('should return 404 when trying to update another user record', async () => {
       mockAuth.mockResolvedValue(validSession);
-      // The WHERE clause includes userId check, so returns empty
-      const db = createMockDbForUpdate([], []);
+      const db = {
+        select: vi.fn().mockReturnValue({
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([]),
+            }),
+          }),
+        }),
+      };
       mockGetDatabase.mockResolvedValue(db);
 
       const response = await PATCH(
@@ -365,11 +408,17 @@ describe('PATCH /api/ev/records/[id]', () => {
       expect(setArg.avgUnitPrice).toBe(6); // 300 / 50
     });
 
-    it('should return 404 if record not found during avgUnitPrice recalculation', async () => {
+    it('should return 404 when record not found', async () => {
       mockAuth.mockResolvedValue(validSession);
-      // Only kWh changed, so it needs to fetch existing record for costThb
-      // But existing record not found
-      const db = createMockDbForUpdate([], []);
+      const db = {
+        select: vi.fn().mockReturnValue({
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              limit: vi.fn().mockResolvedValue([]),
+            }),
+          }),
+        }),
+      };
       mockGetDatabase.mockResolvedValue(db);
 
       const response = await PATCH(

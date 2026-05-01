@@ -26,6 +26,10 @@ vi.mock('@/lib/db/schema', () => ({
     mileageKm: 'mileage_km',
     notes: 'notes',
     approvalStatus: 'approval_status',
+    isShared: 'is_shared',
+    photoKey: 'photo_key',
+    userCarId: 'user_car_id',
+    expAwarded: 'exp_awarded',
     createdAt: 'created_at',
   },
   chargingNetworks: {
@@ -37,8 +41,32 @@ vi.mock('@/lib/db/schema', () => ({
   users: {
     id: 'id',
     isPreApproved: 'is_pre_approved',
+    defaultRecordVisibility: 'default_record_visibility',
+  },
+  userCars: {
+    id: 'id',
+    userId: 'user_id',
+    isDefault: 'is_default',
   },
 }));
+
+// Disable consent gate so the POST flow doesn't hit DB queries we don't mock.
+vi.mock('@/lib/feature-flags', () => ({
+  getFeatureFlag: vi.fn().mockResolvedValue(false),
+}));
+vi.mock('@/lib/consent', () => ({
+  requireCurrentConsents: vi.fn().mockResolvedValue(undefined),
+  ConsentRequiredError: class ConsentRequiredError extends Error {
+    missing: string[] = [];
+  },
+}));
+vi.mock('@/lib/exp', () => ({
+  awardExpForApproval: vi.fn().mockResolvedValue(null),
+}));
+vi.mock('@/lib/record-visibility', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/record-visibility')>('@/lib/record-visibility');
+  return actual;
+});
 
 vi.mock('drizzle-orm', () => ({
   and: vi.fn((...args: unknown[]) => ({ type: 'and', args })),
@@ -76,7 +104,9 @@ function createMockDb(records: Record<string, unknown>[] = [], total = 0) {
   // POST user query: select().from(users).where().limit() -> resolves to [{ isPreApproved: false }]
   const createWhereResult = () => {
     const result = Promise.resolve([{ count: total }]);
-    (result as any).limit = vi.fn().mockResolvedValue([{ isPreApproved: false }]);
+    (result as any).limit = vi
+      .fn()
+      .mockResolvedValue([{ isPreApproved: false, defaultRecordVisibility: 'private' }]);
     return result;
   };
 
@@ -569,7 +599,7 @@ describe('POST /api/ev/records', () => {
       );
       expect(response.status).toBe(400);
       const body: any = await response.json();
-      expect(body.error).toBe('Invalid network selected');
+      expect(body.error).toBe('Invalid brand or car');
     });
 
     it('should return 500 for unexpected database errors', async () => {

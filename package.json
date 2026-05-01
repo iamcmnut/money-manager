@@ -20,10 +20,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply manager-money-db --local",
     "db:migrate:prod": "wrangler d1 migrations apply manager-money-db --remote",
-    "db:seed:local": "wrangler d1 execute manager-money-db --local --file=./scripts/seed.sql",
-    "db:seed:prod": "wrangler d1 execute manager-money-db --remote --file=./scripts/seed.sql",
-    "db:seed:ev:local": "wrangler d1 execute manager-money-db --local --file=./scripts/seed-ev-networks.sql",
-    "db:seed:ev:prod": "wrangler d1 execute manager-money-db --remote --file=./scripts/seed-ev-networks.sql",
+    "db:seed:local": "node scripts/seed.mjs --local",
+    "db:seed:prod": "node scripts/seed.mjs --remote",
     "db:setup:local": "npm run db:migrate:local && npm run db:seed:local",
     "db:setup:prod": "npm run db:migrate:prod && npm run db:seed:prod",
     "db:studio": "drizzle-kit studio"

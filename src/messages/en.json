@@ -14,6 +14,133 @@
     "subtitle": "A modular personal finance application to help you make better financial decisions.",
     "getStarted": "Get started"
   },
+  "crowdData": {
+    "consent": {
+      "title": "Accept Terms & Privacy",
+      "body": "Before you submit charging data, please review and accept our Terms of Service and Privacy Policy.",
+      "accept": "I accept",
+      "saving": "Saving…",
+      "viewTerms": "Terms of Service",
+      "viewPrivacy": "Privacy Policy",
+      "termsHeading": "Terms of Service (v{v})",
+      "privacyHeading": "Privacy Policy (v{v})",
+      "previouslyAccepted": "You previously accepted v{v}.",
+      "notYetAccepted": "Not yet accepted.",
+      "saveError": "Failed to record acceptance. Please try again."
+    },
+    "submit": {
+      "shareToggle": "Share to public stats",
+      "shareHelper": "Public records contribute anonymized averages to /ev once an admin approves them, and earn EXP.",
+      "shareDefaultPrefix": "(default: {v})",
+      "carLabel": "Car",
+      "photoLabel": "Slip photo (optional)",
+      "photoHelper": "Adding a slip photo is +5 EXP when shared records are approved."
+    },
+    "profile": {
+      "level": "Level",
+      "sessions": "Sessions",
+      "totalKwh": "Total kWh",
+      "totalSpent": "Total spent",
+      "joinedAt": "Joined {date}",
+      "anonymous": "Anonymous EV driver",
+      "notFound": "Profile not found",
+      "deleted": "Profile deleted"
+    },
+    "tiers": {
+      "sprout": "Sprout",
+      "charger": "Charger",
+      "voltage": "Voltage",
+      "amplifier": "Amplifier",
+      "megawatt": "Megawatt",
+      "gridMaster": "Grid Master"
+    },
+    "settings": {
+      "tabs": {
+        "profile": "Profile",
+        "privacy": "Privacy",
+        "cars": "Cars",
+        "account": "Account"
+      },
+      "header": {
+        "title": "Settings",
+        "description": "Manage your profile, privacy, cars, and account."
+      },
+      "profile": {
+        "title": "Profile",
+        "email": "Email",
+        "displayName": "Display name (shown on your public profile)",
+        "slug": "Public slug (4–32 lowercase letters, digits, dashes)",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "saveError": "Failed to save"
+      },
+      "level": {
+        "title": "Level"
+      },
+      "privacy": {
+        "title": "Default sharing",
+        "description": "When you submit a new record, this is the default visibility. You can override per record at submit time.",
+        "private": "Private",
+        "privateHelp": "Only you see your records. Doesn't feed community stats.",
+        "public": "Public",
+        "publicHelp": "After admin review, your record contributes anonymized averages to /ev and stats appear on your /u profile.",
+        "save": "Save",
+        "saving": "Saving…",
+        "saveError": "Failed to save"
+      },
+      "legal": {
+        "title": "Legal",
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy",
+        "accepted": "accepted v{v}",
+        "mustAccept": "must accept v{v}",
+        "view": "view"
+      },
+      "cars": {
+        "loading": "Loading…",
+        "empty": "No cars yet. Add one to start logging charging records.",
+        "default": "Default",
+        "setDefault": "Set default",
+        "addCar": "Add a car",
+        "addTitle": "Add car",
+        "selectBrand": "Select brand…",
+        "selectModel": "Select model…",
+        "nicknamePlaceholder": "Nickname (optional)",
+        "cancel": "Cancel",
+        "add": "Add",
+        "removeConfirm": "Remove this car?",
+        "removeAria": "Remove car",
+        "addError": "Failed to add",
+        "removeError": "Failed to remove"
+      },
+      "danger": {
+        "title": "Delete account",
+        "description": "Permanently delete your account, all charging records, photos, cars, and profile. This cannot be undone.",
+        "confirmPrompt": "Type {keyword} to confirm:",
+        "deleting": "Deleting…",
+        "deleteButton": "Delete my account",
+        "deleteError": "Failed to delete account"
+      },
+      "slugError": {
+        "reserved": "This slug is reserved.",
+        "dash": "Dashes can only appear between characters.",
+        "format": "Use 4–32 lowercase letters, digits, or dashes."
+      }
+    },
+    "photoUpload": {
+      "uploading": "Uploading…",
+      "attach": "Attach slip photo",
+      "remove": "Remove photo",
+      "uploadFailed": "Upload failed"
+    }
+  },
+  "legal": {
+    "termsTitle": "Terms of Service",
+    "privacyTitle": "Privacy Policy",
+    "version": "Version",
+    "effective": "Effective"
+  },
   "modules": {
     "ev": {
       "title": "EV Charging Price",
@@ -206,6 +333,7 @@
     }
   },
   "user": {
+    "settings": "Settings",
     "adminPanel": "Admin Panel"
   },
   "admin": {
@@ -248,7 +376,22 @@
       "users": "Users",
       "evNetworks": "EV Networks",
       "evRecords": "EV Records",
-      "pendingApprovals": "Pending Approvals"
+      "pendingApprovals": "Pending Approvals",
+      "carCatalog": "Car Catalog",
+      "legalDocs": "Legal Docs",
+      "crowdReview": "Crowd Review"
+    },
+    "carCatalog": {
+      "title": "Car Catalog",
+      "description": "Manage car brands and models available to users"
+    },
+    "legalDocs": {
+      "title": "Legal Documents",
+      "description": "Publish versioned Terms of Service and Privacy Policy"
+    },
+    "crowdReview": {
+      "title": "Crowd Submissions",
+      "description": "Review user-submitted public charging records"
     },
     "evNetworks": {
       "title": "EV Charging Networks",

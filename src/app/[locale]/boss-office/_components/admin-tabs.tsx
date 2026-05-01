@@ -2,13 +2,15 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Shield, Users, Zap, FileText, Flag, Tag, Mail, UserCircle, BadgeCheck, ClipboardCheck } from 'lucide-react';
+import { Shield, Users, Zap, FileText, Flag, Tag, Mail, UserCircle, BadgeCheck, ClipboardCheck, Car, FileCheck } from 'lucide-react';
 import { FeatureFlagsPanel } from './feature-flags';
 import { UsersTable } from './users-table';
 import { ChargingNetworksTable } from './charging-networks-table';
 import { AdminChargingRecords } from './admin-charging-records';
 import { PendingApprovals } from './pending-approvals';
 import { CouponsTable } from './coupons-table';
+import { CarCatalogTab } from './car-catalog-tab';
+import { LegalDocsTab } from './legal-docs-tab';
 import { cn } from '@/lib/utils';
 
 type Session = {
@@ -25,6 +27,8 @@ const tabs = [
   { id: 'evNetworks', icon: Zap },
   { id: 'evRecords', icon: FileText },
   { id: 'pendingApprovals', icon: ClipboardCheck },
+  { id: 'carCatalog', icon: Car },
+  { id: 'legalDocs', icon: FileCheck },
 ] as const;
 
 type TabId = (typeof tabs)[number]['id'];
@@ -67,6 +71,30 @@ export function AdminTabs({ session }: { session: Session }) {
         {activeTab === 'evNetworks' && <EVNetworksTab />}
         {activeTab === 'evRecords' && <EVRecordsTab />}
         {activeTab === 'pendingApprovals' && <PendingApprovals />}
+        {activeTab === 'carCatalog' && (
+          <div>
+            <div className="mb-4 flex items-center gap-3">
+              <Car className="h-5 w-5 text-primary" />
+              <div>
+                <h2 className="text-base font-semibold">{t('carCatalog.title')}</h2>
+                <p className="text-xs text-muted-foreground">{t('carCatalog.description')}</p>
+              </div>
+            </div>
+            <CarCatalogTab />
+          </div>
+        )}
+        {activeTab === 'legalDocs' && (
+          <div>
+            <div className="mb-4 flex items-center gap-3">
+              <FileCheck className="h-5 w-5 text-primary" />
+              <div>
+                <h2 className="text-base font-semibold">{t('legalDocs.title')}</h2>
+                <p className="text-xs text-muted-foreground">{t('legalDocs.description')}</p>
+              </div>
+            </div>
+            <LegalDocsTab />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -14,7 +14,7 @@ vi.mock('@/i18n/routing', () => ({
   routing: { defaultLocale: 'en', locales: ['en', 'th'] },
 }));
 
-import middleware from './middleware';
+import middleware from "./middleware";
 
 // --- Helpers ---
 

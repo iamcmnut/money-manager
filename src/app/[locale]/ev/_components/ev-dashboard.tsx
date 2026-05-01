@@ -72,7 +72,7 @@ export function EVDashboard({ showDailyPriceChart, showCoupon }: EVDashboardProp
   }, [showCoupon, selectedMonth]);
 
   return (
-    <div className="space-y-6" aria-busy={loading}>
+    <div className="space-y-4 md:space-y-6" aria-busy={loading}>
       {availableMonths.length > 0 && (
         <div className="flex justify-end">
           <MonthFilter

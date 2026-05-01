@@ -69,7 +69,7 @@ src/
 │   └── cloudflare.ts                # getDb(), getKV(), getCloudflareEnv()
 ├── i18n/                            # Locale config, routing, navigation
 ├── messages/                        # en.json, th.json translation files
-└── middleware.ts                     # i18n + auth + security headers
+└── middleware.ts                     # i18n + auth + security headers (Next.js 16 deprecates this for `proxy.ts`, but `proxy` forces Node.js runtime which OpenNext for Cloudflare doesn't support)
 ```
 
 ## Database Schema
@@ -153,7 +153,7 @@ page.tsx (server) → fetches feature flags, generates metadata/SEO
 - Mock `next-intl` translations return the key as text
 
 ### Security
-- Protected routes (middleware): `/boss-office`, `/ev/history` — redirect to signin if no session token
+- Protected routes (middleware): `/boss-office`, `/ev/history`, `/settings` — redirect to signin if no session token
 - Middleware adds: `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`
 - Password: PBKDF2-SHA256, 50k iterations, 16-byte salt
 - Rate limiting: 5 login attempts / 15 min, 3 registration attempts / 1 hr

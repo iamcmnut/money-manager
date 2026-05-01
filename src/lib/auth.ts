@@ -156,6 +156,35 @@ function createBaseConfig(options?: AuthConfigOptions): NextAuthConfig {
         return session;
       },
     },
+    events: {
+      async createUser({ user }) {
+        // Lazy slug assignment for OAuth signups: the DrizzleAdapter inserts the
+        // user before our app code runs, so we backfill the slug here.
+        if (!user.id) return;
+        try {
+          const { getDatabase } = await import('@/lib/server');
+          const { generateUserSlug } = await import('@/lib/slug');
+          const { eq } = await import('drizzle-orm');
+          const { users: usersTable } = await import('@/lib/db/schema');
+          const db = await getDatabase();
+          if (!db) return;
+          for (let attempt = 0; attempt < 10; attempt++) {
+            const candidate = generateUserSlug();
+            const existing = await db
+              .select({ id: usersTable.id })
+              .from(usersTable)
+              .where(eq(usersTable.publicSlug, candidate))
+              .limit(1);
+            if (existing.length === 0) {
+              await db.update(usersTable).set({ publicSlug: candidate }).where(eq(usersTable.id, user.id));
+              return;
+            }
+          }
+        } catch (err) {
+          console.error('Failed to assign public slug on createUser:', err);
+        }
+      },
+    },
     pages: {
       signIn: '/en/auth/signin',
       error: '/en/auth/error',

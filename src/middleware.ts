@@ -5,7 +5,7 @@ import { routing } from '@/i18n/routing';
 const intlMiddleware = createMiddleware(routing);
 
 // Protected routes that require authentication
-const protectedRoutes = ['/boss-office', '/ev/history'];
+const protectedRoutes = ['/boss-office', '/ev/history', '/settings'];
 
 export default async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
@@ -60,6 +60,10 @@ export default async function middleware(req: NextRequest) {
   return response;
 }
 
+// Next.js 16 deprecates `middleware.ts` in favor of `proxy.ts`, but the new
+// `proxy` convention forces Node.js runtime and OpenNext for Cloudflare only
+// supports Edge runtime. Until OpenNext supports Node.js proxies, we stay on
+// `middleware.ts` (deprecation warning is non-fatal, runs on Edge by default).
 export const config = {
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };

@@ -105,7 +105,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
       <h3 className="mb-1 font-semibold">{t('title')}</h3>
       <p className="mb-5 text-xs text-muted-foreground">{t('description')}</p>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {sorted.map((brand, index) => {
           const isExpanded = expandedId === brand.brandId;
           const price = Math.round(brand.avgPricePerKwh * 100) / 100;
@@ -117,7 +117,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
               type="button"
               onClick={() => handleToggle(brand.brandId)}
               className={`
-                group w-full overflow-hidden rounded-lg border p-3 text-left
+                group w-full overflow-hidden rounded-lg border px-3 py-2 text-left
                 transition-colors duration-200 ease-out
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                 ${brand.isCheapest
@@ -133,7 +133,7 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
               <div className="flex items-center gap-3">
                 {/* Rank badge */}
                 <div
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
                     rank <= 3
                       ? rankStyles[rank - 1]
                       : 'text-muted-foreground'
@@ -148,13 +148,13 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                   <Image
                     src={brand.brandLogo}
                     alt=""
-                    width={36}
-                    height={36}
-                    className="h-9 w-9 shrink-0 rounded-lg object-cover"
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 shrink-0 rounded-lg object-cover"
                   />
                 ) : (
                   <div
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
                     style={{ backgroundColor: brand.brandColor || 'hsl(var(--muted-foreground))' }}
                   >
                     {brand.brandName?.charAt(0) || '?'}
@@ -172,9 +172,9 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                     <Link
                       href={`/ev/coupon/${brand.brandSlug}`}
                       onClick={(e) => e.stopPropagation()}
-                      className="mt-1.5 inline-flex w-fit items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary/25 active:scale-[0.97]"
+                      className="mt-0.5 inline-flex w-fit items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/25 active:scale-[0.97]"
                     >
-                      <Tag className="h-3.5 w-3.5" />
+                      <Tag className="h-3 w-3" />
                       {t('coupon')}
                     </Link>
                   )}
@@ -186,9 +186,11 @@ export function PriceComparisonChart({ brandComparison, loading, error, showDail
                     <span className="text-sm font-semibold tabular-nums">
                       {formatBaht(price)}{t('perKwh')}
                     </span>
-                    <p className="text-[10px] text-muted-foreground/70">
-                      {formatNumber(brand.sessions)} {t('sessions')}
-                    </p>
+                    {brand.sessions > 0 && (
+                      <p className="text-[10px] text-muted-foreground/70">
+                        {formatNumber(brand.sessions)} {t('sessions')}
+                      </p>
+                    )}
                   </div>
                   <ChevronDown
                     className={`h-4 w-4 text-muted-foreground/50 transition-transform duration-200 motion-reduce:transition-none ${
